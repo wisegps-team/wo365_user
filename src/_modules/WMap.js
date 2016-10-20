@@ -52,6 +52,12 @@ function allInit(){
 
 function baiduInit(){
 	Object.assign(WMap,BMap);
+	WMap.Map=class Map extends BMap.Map{
+		constructor(id){
+			super(document.getElementById(id));
+			this.centerAndZoom(new BMap.Point(116.404, 39.915), 15);  // 初始化地图,设置中心点坐标和地图级别
+		}
+	}
 }
 
 function googleInit(){

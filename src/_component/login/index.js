@@ -35,15 +35,22 @@ class Login extends Component {
     }
     
     loginSuccess(res){
-        // if(res.error){//登录出错
-        //     W.errorCode(res);
-        //     return;
-        // }
-        let user={
-            devices:res.data,
-            mobile:this.formData.account
+        if(res.status_code){//登录出错
+            W.errorCode(res);
+            return;
         }
-        this.props.onSuccess(user);
+        
+        let that=this;
+        Wapi.user.get(function(user) {
+            Object.assign(user.data,res);
+            Wapi.papi.login(d=>{
+                user.data.devices=d.data;
+                that.props.onSuccess(user);
+            },Object.assign({},that.formData));
+        }, {
+            objectId: res.uid,
+            access_token: res.access_token
+        });
     }
     submit(){
         this.formData.account=this.formData.account?this.formData.account.trim():null;
@@ -57,7 +64,7 @@ class Login extends Component {
             this.setState({password_err:___.input_pwd});
             return;
         }
-        Wapi.papi.login(this.loginSuccess,Object.assign({},this.formData),{err:true});
+        Wapi.user.login(this.loginSuccess,Object.assign({},this.formData),{err:true});
         if(this.need_remember){
             W.setSetting("pwd",this.formData.password);
             W.setSetting("account",this.formData.account);

@@ -27,49 +27,43 @@ class App extends Component {
         this.loginSuccess = this.loginSuccess.bind(this);
         this.forgetSuccess = this.forgetSuccess.bind(this);
     }
-    // getUserData(user){
-    //     W.loading(1);
-    //     if(user.userType==9){//如果是员工
-    //         let that=this;
-    //         Wapi.employee.get(res=>{
-    //             user.employee=res.data;
-    //             this.getCustomer(user);
-    //         },{
-    //             uid:user.uid,
-    //             access_token:user.access_token
-    //         })
-    //     }else
-    //         this.getCustomer(user);
-    // }
-    // getCustomer(user){
-    //     let token=user.access_token;
-    //     let cust_data={
-    //         access_token:token
-    //     };
-    //     let role_user;//获取权限时将会用到
-    //     if(user.employee){
-    //         cust_data.objectId=user.employee.companyId;
-    //         role_user=user.employee.objectId;
-    //     }else{
-    //         cust_data.uid=user.uid;
-    //     }
-    //     Wapi.customer.get(function(result){
-    //         user.customer=result.data;
-    //         W._loginSuccess(user);
-    //         if(WiStorm.agent.mobile)
-    //             top.location="src/moblie/home.html";
-    //         else
-    //             top.location="src/pc/home.html";
-    //     },cust_data);
-    // }
-    loginSuccess(user){
+    getUserData(user){
+        W.loading(1);
+        this.getCustomer(user);
+    }
+    getCustomer(user){
+        let token=user.access_token;
+        let cust_data={
+            access_token:token
+        };
+        let role_user;//获取权限时将会用到
+        if(user.employee){
+            cust_data.objectId=user.employee.companyId;
+            role_user=user.employee.objectId;
+        }else{
+            cust_data.uid=user.uid;
+        }
+        Wapi.customer.get(function(result){
+            user.customer=result.data;
+            W._loginSuccess(user);
+            if(WiStorm.agent.mobile)
+                top.location="src/moblie/home.html";
+            else
+                top.location="src/pc/home.html";
+        },cust_data);
+    }
+    loginSuccess(res){
+        let user=res.data;
         user.devices=user.devices.map(e=>{return {did:e}});
-        W._loginSuccess(user);
-        top.location="src/moblie/home.html";
-        // if(WiStorm.agent.mobile)
-        //     top.location="src/moblie/home.html";
-        // else
-        //     top.location="src/pc/home.html";
+        let min=-Math.floor((W.date(res.data.expire_in).getTime()-new Date().getTime())/60000);
+        W.setCookie("access_token", res.data.access_token,min);
+        if(!user.mobileVerified&&user.mobile){//未通过手机验证
+            W.alert(___.please_verification);
+            this._user=user;//先暂存
+            this.setState({active:2});
+        }else{
+            this.getUserData(user);
+        }
     }
     forgetSuccess(res){
         W.toast(___.reset_pwd+___.success);

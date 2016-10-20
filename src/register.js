@@ -6,8 +6,10 @@ import AppBar from 'material-ui/AppBar';
 
 import {ThemeProvider} from './_theme/default';
 import FlatButton from 'material-ui/FlatButton';
+import Input from './_component/base/input';
+import SexRadio from './_component/base/SexRadio';
+import Register from './_component/login/Register';
 
-import Register from './_component/login/register';
 
 require('./_sass/index.scss');//包含css
 
@@ -43,7 +45,7 @@ class App extends Component {
         return (
             <ThemeProvider>
                 <div className='login' style={{padding:'10px 10%'}}>
-                    <Register onSuccess={this.registerCallback}/>
+                    <RegisterBox success={this.registerCallback}/>
                     <div style={{
                         textAlign: 'right',
                         marginTop: '10px'
@@ -53,6 +55,111 @@ class App extends Component {
                     </div>
                 </div>
             </ThemeProvider>
+        );
+    }
+}
+
+
+class RegisterBox extends Component{
+    constructor(props, context) {
+        super(props, context);
+        this.registerSuccess = this.registerSuccess.bind(this);
+        this.data={
+            sex:1
+        };
+        this.change = this.change.bind(this);
+        this.nameChange = this.nameChange.bind(this);
+        this.beforRegister = this.beforRegister.bind(this);
+    }
+
+    beforRegister(data){
+        if(!this.data.name){
+            W.alert(___.user_name_empty);
+            return false;
+        }
+        if(!this.data.did){
+            W.alert(___.please_input_correct_device_num);
+            return false;
+        }
+        return true;
+    }
+    
+    registerSuccess(res){
+        let user=res;
+        let that=this;
+        Wapi.papi.register(function(){
+            let cust=Object.assign({},this.data,{tel:user.mobile});
+            delete cust.did;
+            Wapi.user.login(function(data){//先登录获取token
+                if(data.status_code){
+                    if(data.status_code==2&&user.status_code==8){//密码错误且之前已经注册过用户
+                        user._code=1;
+                        that.props.success(user);
+                        return;
+                    }
+                    W.errorCode(data);
+                    return;
+                }
+                delete data.status_code;
+                Object.assign(user,data);//用户信息
+                let token=data.access_token;
+                cust.access_token=token;
+                cust.uid=data.uid;
+                if(user.status_code==8)//如果是之前就已经注册过用户则先校验一下有没有添加过客户表
+                    Wapi.customer.get(function(cust){//如果有，则不能注册，提示去重置密码
+                        if(cust.data){
+                            user._code=2;
+                            user.customer=cust.data;
+                            that.props.success(user);
+                        }else
+                            addCust();
+                    },{uid:cust.uid,access_token:token});
+                else
+                    addCust();
+
+                function addCust(){//添加客户表资料
+                    Wapi.customer.add(function(res){
+                        cust.objectId=res.objectId;
+                        user.customer=cust;
+                        that.props.success(user);
+                        W.alert(___.register_success,()=>location='index.html');
+                    },cust);
+                    Wapi.user.updateMe(null,{
+                        _sessionToken:data.session_token,
+                        access_token:token,
+                        userType:7,
+                        authData:{
+                            openId:_g.openid
+                        }
+                    });
+                }
+            },{
+                account:user.mobile,
+                password:user.password
+            });
+        },{
+            mobile:user.mobile,
+            password:user.password,
+            did:this.data.did
+        });
+    }
+
+    nameChange(e,val){
+        this.data[e.target.name]=val;
+    }
+    change(val,name){
+        this.data.sex=val;
+    }
+    render() {
+        return (
+            <div>
+                <form>
+                    <Input name='name' floatingLabelText={___.person} onChange={this.nameChange}/>
+                    <Input name='did' floatingLabelText={___.did} onChange={this.nameChange}/>
+                    <SexRadio onChange={this.change}/>
+                </form>
+                <Register onSuccess={this.registerSuccess} beforRegister={this.beforRegister}/>
+            </div>
         );
     }
 }

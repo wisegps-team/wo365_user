@@ -1,0 +1,37 @@
+<!--
+	作者：小吴
+	时间：2016-09-08
+	描述：登录注册忘记密码
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+
+		<script src="wslib/WiStorm.js"></script>
+		<script src="common.js"></script>
+		<script src="src/index.js"></script>
+		<script>
+			document.write('<title>'+___.app_name+'</title>');
+		</script>
+	</head>
+	<body>
+		<script>
+			if(_g.location){
+				var url=_g.location+'?';
+				delete _g.location;
+				var g=[];
+				for(var k in _g){
+					g.push(k+'='+_g[k]);
+				}
+				url+=g.join('&');
+				location=url;
+			}
+		</script>
+		<div id='main'></div>
+	</body>
+</html>

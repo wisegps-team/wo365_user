@@ -1,0 +1,76 @@
+.top_Mid{
+    font-size: 16px;
+    color: white;
+    height: 50px;
+    line-height: 50px;
+    display: inline-block;
+    vertical-align: top;
+    flex: 3 1 0%;
+}
+.top_Mid>span{		
+    padding:0 20px 0 20px;		
+    cursor: pointer;	
+    vertical-align: top;
+    overflow: hidden;
+    display: inline-block;				 
+}
+.top_Mid>span:nth-child(5){
+    line-height: 0;
+}		
+.top_R{
+    display: inline-block;
+    height: 50px;
+    line-height: 50px;
+    color: white;
+    vertical-align: top;
+    text-align: right;
+}	
+.top_R>span{
+    padding: 0 20px;				
+    line-height: 50px;
+    vertical-align: top;
+    overflow: hidden;
+    cursor: pointer;
+    border-left: 1px solid rgb(97, 97, 101);
+    font-size: 14px;		
+}
+
+
+
+*{
+    box-sizing: border-box;
+}
+#main{
+    display: flex;
+}
+#main>.main_L,#main>.main_R{
+    padding-top: 50px; 
+}
+.main_L{
+    border-right: 1px solid #ccc;
+    background: #F5F5F5;
+    width: 20%;
+    align-items: stretch;
+    position: relative;
+}
+.main_R{
+    align-items: stretch;
+    min-height: 100vh;
+    width: 100vw;
+    display: flex;
+}
+.Put_on{
+    position: absolute;
+    background: #fff;
+    border: 1px solid #ccc;
+    border-right: none;
+    border-radius: 5px;
+    cursor: pointer;
+    right: 0;
+    top: 50px;
+}
+
+a{
+    color:inherit;
+    text-decoration:none;
+}

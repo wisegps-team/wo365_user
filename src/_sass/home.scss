@@ -1,0 +1,23 @@
+#moblie0home{
+    .tab{
+        font-size: 12px !important;
+    }
+    .tab>div>div{
+        height: 52px !important;
+        svg{
+            margin-bottom: 0 !important;
+        }
+    }
+    .main{
+        display: flex;
+        align-items: center;
+        flex-wrap:wrap;
+    }
+    .title{
+        text-align: center;
+        padding: 2em 0;
+        background: #2196F3;
+        color: #fff;
+        text-shadow: 3px 2px 3px rgba(0,0,0,.2);
+    }
+}

@@ -54,7 +54,6 @@ class App extends Component {
     }
     loginSuccess(res){
         let user=res.data;
-        user.devices=user.devices.map(e=>{return {did:e}});
         let min=-Math.floor((W.date(res.data.expire_in).getTime()-new Date().getTime())/60000);
         W.setCookie("access_token", res.data.access_token,min);
         if(!user.mobileVerified&&user.mobile){//未通过手机验证
@@ -83,7 +82,7 @@ class App extends Component {
         ]
         let buttons=[
             <FlatButton label={___.login} primary={true} onClick={()=>this.setState({active:0})} key='login'/>,
-            <FlatButton label={___.register} primary={true} onClick={()=>location='register.html?intent=logout'} key='register'/>,
+            <FlatButton label={___.register} primary={true} onClick={()=>location='register.html?intent=logout&needOpenId=true'} key='register'/>,
             /*<FlatButton label={___.forget_pwd} primary={true} onClick={()=>this.setState({active:2})} key='forget_pwd'/>*/];
         return (
             <ThemeProvider>

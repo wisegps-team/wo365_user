@@ -840,7 +840,8 @@ const Wapi={
 	product:new WAPI('product',_user?_user.access_token:null),
 	booking:new WAPI('booking'),
 	base:new WBaseApi(_user?_user.access_token:null),
-	papi:new Papi()
+	papi:new Papi(),
+	activity:new WAPI('activity',_user?_user.access_token:null),
 };
 
 
@@ -872,6 +873,7 @@ makeGetOp('area','id,name,parentId,level,areaCode,zipCode,provinceId,provinceNam
 makeGetOp('brand','objectId,name,company,uid',{limit:-1,sorts:'name',page:'name'});
 makeGetOp('product','objectId,name,company,uid,brand,brandId',{limit:-1,sorts:'name',page:'name'});
 makeGetOp('booking','mobile,sellerId,uid,status,status0,status1,status2,status3,name,carType,resTime,payTime,confirmTime,money,objectId,createdAt,updatedAt');
+makeGetOp('activity','uid,type,name,url,status,reward,objectId,createdAt,updatedAt');
 
 
 

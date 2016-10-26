@@ -24,6 +24,7 @@ class App extends Component {
         this.registerCallback = this.registerCallback.bind(this);
     }
     registerCallback(res){
+        W.loading();
         if(!res._code){
             W.alert(___.register_success,()=>location='index.html');
         }else{
@@ -88,7 +89,7 @@ class RegisterBox extends Component{
         let user=res;
         let that=this;
         Wapi.papi.register(function(){
-            let cust=Object.assign({},this.data,{tel:user.mobile});
+            let cust=Object.assign({},that.data,{tel:user.mobile});
             delete cust.did;
             Wapi.user.login(function(data){//先登录获取token
                 if(data.status_code){
@@ -118,12 +119,90 @@ class RegisterBox extends Component{
                     addCust();
 
                 function addCust(){//添加客户表资料
-                    Wapi.customer.add(function(res){
-                        cust.objectId=res.objectId;
-                        user.customer=cust;
-                        that.props.success(user);
-                        W.alert(___.register_success,()=>location='index.html');
-                    },cust);
+                    W.loading(true,___.checking_device);
+                    Wapi.device.get(function(dev){
+                        if(dev.status_code){
+                            W.loading();
+                            W.alert(___.dev_err);
+                            return;
+                        }
+                        if(!dev.data){
+                            W.loading();
+                            W.alert(___.dev_null);
+                            return;
+                        }
+                        if(dev.data.binded){
+                            W.loading();
+                            W.alert(___.dev_binded);
+                            return;
+                        }
+                        cust.parentId=[dev.data.uid.toString()];
+                        Wapi.customer.add(function(res){
+                            cust.objectId=res.objectId;
+                            user.customer=cust;
+                            W.loading(true,___.checking_booking);
+                            Wapi.booking.get(function(booking){//判断一下是否预订了
+                                if(booking.status_code){
+                                    W.alert(___.booking_err,e=>that.props.success(user));
+                                    return;
+                                }
+                                if(booking.data){
+                                    Wapi.booking.update(function(res){
+
+                                    },{
+                                        _objectId:booking.data.objectId,
+                                        status1:1,
+                                        resTime:W.dateToString(new Date()),
+                                        did:that.data.did
+                                    });
+                                }
+                                
+                                W.loading(true,___.adding_car);
+                                let vehicle={
+                                    access_token:token,
+                                    name:(booking.data)?booking.data.carType.car_num:___.default_vehicle,
+                                    uid:user.customer.objectId.toString(),
+                                    did:dev.data.did,
+                                    deviceType:dev.data.model,
+                                    err:true  //由回调处理返回错误
+                                }
+                                Wapi.vehicle.add(function(veh){
+                                    if(veh.status_code){
+                                        W.alert(___.add_car_err,e=>that.props.success(user));
+                                        return;
+                                    }
+                                    W.loading(true,___.binding_device);
+
+                                    vehicle.objectId=veh.objectId;
+                                    that.props.success(user);
+                                    Wapi.device.update(function(res){
+                                        if(veh.status_code){
+                                            W.alert(___.bind_err,e=>that.props.success(user));
+                                            return;
+                                        }
+                                        that.props.success(user);
+                                    },{
+                                        access_token:token,
+                                        binded:true,
+                                        bindDate:W.dateToString(new Date()),
+                                        vehicleName:vehicle.name,
+                                        vehicleId:vehicle.objectId,
+                                        err:true  //由回调处理返回错误
+                                    });
+                                },vehicle);
+                                
+                            },{
+                                mobile:user.mobile,
+                                status:0,
+                                err:true  //由回调处理返回错误
+                            });
+                        },cust);
+                        
+                    },{
+                        did:that.data.did,
+                        access_token:token,
+                        err:true  //由回调处理返回错误
+                    });
                     Wapi.user.updateMe(null,{
                         _sessionToken:data.session_token,
                         access_token:token,

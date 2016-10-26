@@ -5,7 +5,7 @@ import WiStormAPI from './WiStormAPI.js';
  */
 class Papi {
 	constructor(props, context) {
-		this.url='http://localhost:8080/test/papi.php?method=';
+		this.url='http://192.168.3.233:8080/test/papi.php?method=';
 		this.ajax=WiStormAPI.prototype.ajax;
 	}
 	api(url,data={},callback,type='get',dataType='json'){
@@ -48,6 +48,7 @@ class Papi {
 			phone:data.account,
 			pswd:data.password
 		};
+		D._err=data.err;
 
 		this.api(url,D,callback,'post');
 	}
@@ -67,6 +68,7 @@ class Papi {
 			pswd:data.password,
 			imei:data.did
 		};
+		D._err=data.err;
 
 		this.api(url,D,callback,'post');
 	}
@@ -86,6 +88,7 @@ class Papi {
 			newpswd:data.password,
 			oldpswd:data.oldpwd
 		};
+		D._err=data.err;
 
 		this.api(url,D,callback,'post');
 	}
@@ -103,6 +106,7 @@ class Papi {
 			mobile:data.mobile,
 			imei:data.did
 		};
+		D._err=data.err;
 
 		this.api(url,D,callback,'post');
 	}
@@ -120,6 +124,7 @@ class Papi {
 			mobile:data.mobile,
 			imei:data.did
 		};
+		D._err=data.err;
 
 		this.api(url,D,callback,'post');
 	}
@@ -137,8 +142,9 @@ class Papi {
 			map:data.map,
 			imei:data.did
 		};
+		D._err=data.err;
 
-		this.api(url,D,callback,'get');
+		this.api(url,D,callback,'post');
 	}
 
 	/**
@@ -156,8 +162,9 @@ class Papi {
 			date:data.date,
 			imei:data.did
 		};
+		D._err=data.err;
 
-		this.api(url,D,callback,'get');
+		this.api(url,D,callback,'post');
 	}
 
 	/**
@@ -175,8 +182,21 @@ class Papi {
 			alertdelay:data.alertdelay,
 			imei:data.did
 		};
+		D._err=data.err;
 
-		this.api(url,D,callback,'get');
+		this.api(url,D,callback,'post');
+	}
+
+	test(callback,data){
+		let url=this.url+'postdata';
+		let D={
+			fileType:'asdflkjsd',
+			fileUrl:'http://www.baidu.com',
+			imei:'asdfsdfds',
+			tag:'test_tag'
+		};
+
+		this.api(url,D,callback,'post');
 	}
 }
 

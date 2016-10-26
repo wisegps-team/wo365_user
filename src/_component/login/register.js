@@ -48,6 +48,7 @@ class Register extends Component {
             W.alert('email or mobile'+___.not_null);
             return;
         }
+        W.loading(true,___.registering);
         if(!this.props.beforRegister||this.props.beforRegister(data))
             Wapi.user.register(this.success,data);
     }

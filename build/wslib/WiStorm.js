@@ -893,7 +893,7 @@ window._g=W.getSearch();
 
 var	WiStorm_root="http://"+location.host+"/";
 if(location.host.indexOf('localhost')==-1&&!location.host.match(/(192\.|127\.)/))
-	WiStorm_root+="wo365/";
+	WiStorm_root+="wo365_user/";
 var u = navigator.userAgent;
 var _d=false;
 if(_g.debug)_d=true;
@@ -937,7 +937,9 @@ if(keys){
 	try {
 		keys=JSON.parse(keys);
 		Object.assign(WiStorm.config,keys);
-		WiStorm.config.wx_app_id=keys.wxAppKey;
+		WiStorm.config.wx_app_id=_g.wx_app_id||keys.wxAppKey;
+		if(_g.wx_app_id)
+			WiStorm.config.wx_login=WiStorm.config.wx_login+'?wx_app_id='+WiStorm.config.wx_app_id;
 	} catch (error) {
 		alert('app key error');
 	}

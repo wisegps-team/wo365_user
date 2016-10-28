@@ -174,15 +174,44 @@ class RegisterBox extends Component{
                                     W.loading(true,___.binding_device);
 
                                     vehicle.objectId=veh.objectId;
-                                    that.props.success(user);
                                     Wapi.device.update(function(res){
                                         if(veh.status_code){
                                             W.alert(___.bind_err,e=>that.props.success(user));
                                             return;
                                         }
-                                        that.props.success(user);
+                                        //添加出入库记录
+                                        let log={
+                                            did:[dev.data.did],
+                                            from:dev.data.uid,
+                                            fromName:'',
+                                            to:user.customer.objectId,
+                                            toName:user.customer.name,
+                                            status:2,//状态为1，表示 已发货待签收，发货流程未完整之前暂定为1
+                                            err:true
+                                        }
+                                        let popLog={//出库
+                                            uid:dev.data.uid,
+                                            type:0,
+                                            inCount:0,
+                                            outCount:1,
+                                        };
+                                        let pushLog={//下级的入库
+                                            uid:user.customer.objectId,
+                                            type:1,
+                                            inCount:1,
+                                            outCount:0,
+                                        };
+                                        Object.assign(popLog,log,MODEL);
+                                        Object.assign(pushLog,log,MODEL);
+                                        Wapi.deviceLog.add(function(res){//给上一级添加出库信息
+                                            that.props.success(user);
+                                        },popLog);
+                                        Wapi.deviceLog.add(function(res_log){//给下一级添加入库信息
+                                            //个人的入库不怎么重要
+                                        },pushLog);
                                     },{
                                         access_token:token,
+                                        did:dev.data.did,
                                         binded:true,
                                         bindDate:W.dateToString(new Date()),
                                         vehicleName:vehicle.name,

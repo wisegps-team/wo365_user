@@ -186,18 +186,6 @@ class Papi {
 
 		this.api(url,D,callback,'post');
 	}
-
-	test(callback,data){
-		let url=this.url+'postdata';
-		let D={
-			fileType:'asdflkjsd',
-			fileUrl:'http://www.baidu.com',
-			imei:'asdfsdfds',
-			tag:'test_tag'
-		};
-
-		this.api(url,D,callback,'post');
-	}
 }
 
 export default Papi;

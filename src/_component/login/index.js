@@ -32,6 +32,21 @@ class Login extends Component {
     componentDidMount() {
         // if(this.formData.password&&this.formData.account)
         //     this.submit();
+        if(_g.sso_login){//后台微信登录返回
+            if(_g.access_token){//登录成功了
+                this.loginSuccess({
+                    access_token:_g.access_token,
+                    expire_in:_g.expire_in,
+                    refresh_token:_g.refresh_token,
+                    session_token:_g.session_token,
+                    status_code:0,
+                    uid:_g.uid,
+                    user_type:_g.user_type
+                });
+            }else{
+                W.alert(___.login_bind);
+            }
+        }
     }
     
     loginSuccess(res){

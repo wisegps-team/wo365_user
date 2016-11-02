@@ -1,0 +1,33 @@
+<!--
+	作者：小吴
+	时间：2016-08-01
+	描述：移动端应用主页
+-->
+<!DOCTYPE html>
+<html lang="zh-CN">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+		<meta name="apple-mobile-web-app-capable" content="yes">
+			
+		<script>
+			var config={
+				src:'src',    //静态资源根目录
+				defaultModule:'my_account.js',//主页面模块
+				loading:'<div class="loader"><div></div><div></div><div></div><span>正在加载</span></div>',//模块加载中显示的内容，可以是html
+				animation:0  //0：双动画模式（转场时两个模块均有动画） 1：单动画模式（只有入或者只有出的动画）
+			}
+		</script>
+		<script src="../../wslib/WiStorm.js"></script>
+		<script src="../../common.js"></script>
+		<script src="../../wslib/launcher.js"></script>
+		<script src="../../wslib/toolkit/WxSdk.js" async="async"></script>
+		<script type="text/javascript">
+			document.write('<title>'+___.my_account+'</title>');
+		</script>
+	</head>
+	<body>
+	</body>
+</html>

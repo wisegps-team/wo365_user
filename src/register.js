@@ -89,7 +89,7 @@ class RegisterBox extends Component{
         let user=res;
         let that=this;
         Wapi.papi.register(function(){
-            let cust=Object.assign({},that.data,{tel:user.mobile});
+            let cust=Object.assign({},that.data,{tel:user.mobile,custTypeId:7,custType:'私家车主'});
             delete cust.did;
             Wapi.user.login(function(data){//先登录获取token
                 if(data.status_code){

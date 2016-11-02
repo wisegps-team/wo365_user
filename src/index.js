@@ -46,10 +46,10 @@ class App extends Component {
         Wapi.customer.get(function(result){
             user.customer=result.data;
             W._loginSuccess(user);
-            if(WiStorm.agent.mobile)
-                top.location="src/moblie/home.html";
-            else
-                top.location="src/pc/home.html";
+            let loginLocation=_g.loginLocation||"src/moblie/home.html";
+            if(loginLocation.indexOf('.html')==-1)//需要到home.html跳转
+                loginLocation="src/moblie/home.html?loginLocation="+_g.loginLocation;
+            top.location=loginLocation;
         },cust_data);
     }
     loginSuccess(res){
@@ -61,7 +61,17 @@ class App extends Component {
             this._user=user;//先暂存
             this.setState({active:2});
         }else{
-            this.getUserData(user);
+            if((!user.authData||!user.authData.openId)&&_g.openid)//没有绑定的，进行绑定
+                Wapi.user.updateMe(res=>{
+                    user.authData=Object.assign(user.authData,{openId:_g.openid});
+                    this.getUserData(user);
+                },{
+                    access_token:user.access_token,
+                    'authData.openId':_g.openid,
+                    _sessionToken:user.session_token
+                });
+            else
+                this.getUserData(user);
         }
     }
     forgetSuccess(res){

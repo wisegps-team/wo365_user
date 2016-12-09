@@ -2,6 +2,7 @@ import WiStormAPI from './WiStormAPI.js';
 import config from './config.js';
 
 import Papi from './Papi';
+import ServerApi from './serverApi.js';
 
 
 export function WAPI(name,token){
@@ -68,20 +69,14 @@ WUserApi.prototype.register=function(callback,data,op){
 }
 
 /**
- * 检查账号或者用户名是否存在
+ * 检查用户是否已注册（特指user表和customer都存在的情况
  * mobile: 手机号
  * username: 用户名
  * @param {Object} callback
  * @param {Object} data
- * @param {Object} op
  */
-WUserApi.prototype.checkExists=function(callback,data,op){
-	var OP={
-		fields:'exist'			//默认返回的字段
-	};
-	Object.assign(OP,op);
-	OP.method=this.apiName+".exists";//接口名称
-	this.getApi(data,callback,OP);
+WUserApi.prototype.checkExists=function(callback,data){
+	Wapi.serverApi.checkExists(callback,data);
 }
 
 
@@ -309,7 +304,9 @@ WCommApi.prototype.sendSMS=function(callback,mobile,type,content){
 		method:this.apiName+".sms.send",
 		mobile:mobile,
 		type:type,
-		'content':content
+		'content':content,
+		content_type:0,
+		content_sign:'智联车网'
 	};
 	
 	this.getApi(Data,callback);	
@@ -841,6 +838,7 @@ const Wapi={
 	booking:new WAPI('booking'),
 	base:new WBaseApi(_user?_user.access_token:null),
 	papi:new Papi(),
+	serverApi:new ServerApi(),
 	activity:new WAPI('activity',_user?_user.access_token:null),
 };
 

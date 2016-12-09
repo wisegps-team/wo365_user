@@ -71,7 +71,7 @@ class PasswordRepeat extends Component {
                     type='password'
                     disabled={this.state.err}
                     hintText={___.input_pwd}
-                    floatingLabelText={___.pwd}
+                    floatingLabelText={___.confirm_pwd}
                     errorText={pwdErr}
                     onChange={this.change}
                 />

@@ -47,13 +47,13 @@ class App extends Component {
             <ThemeProvider>
                 <div className='login' style={{padding:'10px 10%'}}>
                     <RegisterBox success={this.registerCallback}/>
-                    <div style={{
+                    {/*<div style={{
                         textAlign: 'right',
                         marginTop: '10px'
                         }}
                     >
                         <FlatButton label={___.login} primary={true} onClick={()=>location.href='index.html'}/>
-                    </div>
+                    </div>*/}
                 </div>
             </ThemeProvider>
         );
@@ -66,7 +66,8 @@ class RegisterBox extends Component{
         super(props, context);
         this.registerSuccess = this.registerSuccess.bind(this);
         this.data={
-            sex:1
+            sex:1,
+            did:_g.did
         };
         this.change = this.change.bind(this);
         this.nameChange = this.nameChange.bind(this);
@@ -141,90 +142,114 @@ class RegisterBox extends Component{
                             cust.objectId=res.objectId;
                             user.customer=cust;
                             W.loading(true,___.checking_booking);
-                            Wapi.booking.get(function(booking){//判断一下是否预订了
-                                if(booking.status_code){
-                                    W.alert(___.booking_err,e=>that.props.success(user));
-                                    return;
+                            Wapi.serverApi.addAndBind(function(res){
+                                W.loading(false);
+                                if(res.status_code){
+                                    W.alert(___.add_car_err,e=>that.props.success(user));
                                 }
-                                if(booking.data){
-                                    Wapi.booking.update(function(res){
-
-                                    },{
-                                        _objectId:booking.data.objectId,
-                                        status1:1,
-                                        resTime:W.dateToString(new Date()),
-                                        did:that.data.did
-                                    });
-                                }
-                                
-                                W.loading(true,___.adding_car);
-                                let vehicle={
-                                    access_token:token,
-                                    name:(booking.data)?booking.data.carType.car_num:___.default_vehicle,
-                                    uid:user.customer.objectId.toString(),
-                                    did:dev.data.did,
-                                    deviceType:dev.data.model,
-                                    err:true  //由回调处理返回错误
-                                }
-                                Wapi.vehicle.add(function(veh){
-                                    if(veh.status_code){
-                                        W.alert(___.add_car_err,e=>that.props.success(user));
-                                        return;
-                                    }
-                                    W.loading(true,___.binding_device);
-
-                                    vehicle.objectId=veh.objectId;
-                                    Wapi.device.update(function(res){
-                                        if(veh.status_code){
-                                            W.alert(___.bind_err,e=>that.props.success(user));
-                                            return;
-                                        }
-                                        //添加出入库记录
-                                        let log={
-                                            did:[dev.data.did],
-                                            from:dev.data.uid,
-                                            fromName:'',
-                                            to:user.customer.objectId,
-                                            toName:user.customer.name,
-                                            status:2,//状态为1，表示 已发货待签收，发货流程未完整之前暂定为1
-                                            err:true
-                                        }
-                                        let popLog={//出库
-                                            uid:dev.data.uid,
-                                            type:0,
-                                            inCount:0,
-                                            outCount:1,
-                                        };
-                                        let pushLog={//下级的入库
-                                            uid:user.customer.objectId,
-                                            type:1,
-                                            inCount:1,
-                                            outCount:0,
-                                        };
-                                        Object.assign(popLog,log,MODEL);
-                                        Object.assign(pushLog,log,MODEL);
-                                        Wapi.deviceLog.add(function(res){//给上一级添加出库信息
-                                            that.props.success(user);
-                                        },popLog);
-                                        Wapi.deviceLog.add(function(res_log){//给下一级添加入库信息
-                                            //个人的入库不怎么重要
-                                        },pushLog);
-                                    },{
-                                        access_token:token,
-                                        did:dev.data.did,
-                                        binded:true,
-                                        bindDate:W.dateToString(new Date()),
-                                        vehicleName:vehicle.name,
-                                        vehicleId:vehicle.objectId,
-                                        err:true  //由回调处理返回错误
-                                    });
-                                },vehicle);
-                                
+                                that.props.success(user);
                             },{
+                                did:that.data.did,
+                                uid:cust.objectId,
+                                openId:_g.openid,
                                 mobile:user.mobile,
-                                status:0,
-                                err:true  //由回调处理返回错误
+                                name:user.name
                             });
+                            // Wapi.booking.get(function(booking){//判断一下是否预订了
+                            //     if(booking.status_code){
+                            //         W.alert(___.booking_err,e=>that.props.success(user));
+                            //         return;
+                            //     }
+                            //     if(booking.data){
+                            //         Wapi.booking.update(function(res){
+
+                            //         },{
+                            //             _objectId:booking.data.objectId,
+                            //             status:1,
+                            //             status1:1,
+                            //             resTime:W.dateToString(new Date()),
+                            //             did:that.data.did
+                            //         });
+                            //     }
+                                
+                            //     W.loading(true,___.adding_car);
+                            //     let vehicle={
+                            //         access_token:token,
+                            //         name:(booking.data)?booking.data.carType.car_num:___.default_vehicle,
+                            //         uid:user.customer.objectId.toString(),
+                            //         did:dev.data.did,
+                            //         deviceType:dev.data.model,
+                            //         err:true  //由回调处理返回错误
+                            //     }
+                            //     Wapi.vehicle.add(function(veh){
+                            //         if(veh.status_code){
+                            //             W.alert(___.add_car_err,e=>that.props.success(user));
+                            //             return;
+                            //         }
+                            //         W.loading(true,___.binding_device);
+
+                            //         vehicle.objectId=veh.objectId;
+                            //         Wapi.device.update(function(res){
+                            //             if(veh.status_code){
+                            //                 W.alert(___.bind_err,e=>that.props.success(user));
+                            //                 return;
+                            //             }
+                            //             Wapi.product.get(function(product){
+                            //                 //添加出入库记录
+                            //                 let MODEL={
+                            //                     brand:product.data.brand,
+                            //                     brandId:product.data.brandId,
+                            //                     model:product.data.name,
+                            //                     modelId:product.data.objectId.toString()
+                            //                 }
+                            //                 let log={
+                            //                     did:[dev.data.did],
+                            //                     from:dev.data.uid,
+                            //                     fromName:'',
+                            //                     to:user.customer.objectId,
+                            //                     toName:user.customer.name,
+                            //                     status:2,//状态为1，表示 已发货待签收，发货流程未完整之前暂定为1
+                            //                     err:true
+                            //                 }
+                            //                 let popLog={//出库
+                            //                     uid:dev.data.uid,
+                            //                     type:0,
+                            //                     inCount:0,
+                            //                     outCount:1,
+                            //                 };
+                            //                 let pushLog={//下级的入库
+                            //                     uid:user.customer.objectId,
+                            //                     type:1,
+                            //                     inCount:1,
+                            //                     outCount:0,
+                            //                 };
+                            //                 Object.assign(popLog,log,MODEL);
+                            //                 Object.assign(pushLog,log,MODEL);
+                            //                 Wapi.deviceLog.add(function(res){//给上一级添加出库信息
+                            //                     that.props.success(user);
+                            //                 },popLog);
+                            //                 Wapi.deviceLog.add(function(res_log){//给下一级添加入库信息
+                            //                     //个人的入库不怎么重要
+                            //                 },pushLog);
+                            //             },{
+                            //                 objectId:dev.data.modelId
+                            //             });
+                            //         },{
+                            //             access_token:token,
+                            //             _did:dev.data.did,
+                            //             binded:true,
+                            //             bindDate:W.dateToString(new Date()),
+                            //             vehicleName:vehicle.name,
+                            //             vehicleId:vehicle.objectId,
+                            //             err:true  //由回调处理返回错误
+                            //         });
+                            //     },vehicle);
+                                
+                            // },{
+                            //     mobile:user.mobile,
+                            //     status:0,
+                            //     err:true  //由回调处理返回错误
+                            // });
                         },cust);
                         
                     },{
@@ -262,8 +287,7 @@ class RegisterBox extends Component{
         return (
             <div>
                 <form>
-                    <Input name='name' floatingLabelText={___.person} onChange={this.nameChange}/>
-                    <Input name='did' floatingLabelText={___.did} onChange={this.nameChange}/>
+                    <Input name='name' floatingLabelText={___.person_name} onChange={this.nameChange}/>
                     <SexRadio onChange={this.change}/>
                 </form>
                 <Register onSuccess={this.registerSuccess} beforRegister={this.beforRegister}/>

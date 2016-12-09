@@ -33,6 +33,7 @@ window.___={
 	'account':'账号',
 	'input_account':'请输入登录手机号',
 	'pwd':'密码',
+	'confirm_pwd':'确认密码',
 	'input_pwd':'请输入密码',
 	'remember':'记住密码',
 	'login':'登录',

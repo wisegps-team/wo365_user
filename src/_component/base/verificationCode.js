@@ -83,6 +83,7 @@ class VerificationCode extends Component {
                     floatingLabelText={___.input_code}
                     errorText={this.state.code_err}
                     onChange={this.change}
+                    type="tel"
                 />
                 <RaisedButton 
                     label={this.state.second||___.getCode} 

@@ -60,7 +60,7 @@ class PasswordRepeat extends Component {
             <div {...this.props} onChange={null}>
                 <Input
                     name='password'
-                    type='password'
+                    type='tel'
                     hintText={___.input_pwd}
                     floatingLabelText={___.pwd}
                     errorText={errorText}
@@ -68,7 +68,7 @@ class PasswordRepeat extends Component {
                 />
                 <Input
                     name='pass'
-                    type='password'
+                    type='tel'
                     disabled={this.state.err}
                     hintText={___.input_pwd}
                     floatingLabelText={___.confirm_pwd}

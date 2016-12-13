@@ -4,8 +4,9 @@ import WiStormAPI from './WiStormAPI.js';
  * 服务器转发
  */
 class Papi {
-	constructor(props, context) {
-		this.url='http://192.168.3.233:8080/test/papi.php?method=';
+	constructor() {
+		// this.url=location.origin+'/papi.php?method=';
+		this.url='http://user.autogps.cn/papi.php?method=';
 		this.ajax=WiStormAPI.prototype.ajax;
 	}
 	api(url,data={},callback,type='get',dataType='json'){

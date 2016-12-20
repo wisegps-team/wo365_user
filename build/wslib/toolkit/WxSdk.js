@@ -20,17 +20,6 @@ W._nativeSdkReady=function(){
 			}
 		};
 		W.native.close=wx.closeWindow;//关闭窗口
-		wx.fillFriend=function(id,fid,name,fname,c){
-			if(id==fid||!id||!fid||!WiStorm.agent.weixin)return;
-			name=name||"";
-			fname=fname||"";
-			c=c||0;
-			Wapi.friend.update(function(res){
-				if (res && res.status_code) {
-					window.onerror("friend.add错误，错误码："+res.status_code+";错误信息:"+res.err_msg,location.href,1242);
-				}
-			},{_open_id:id,_friend_open_id:fid,click_count:c,'name':name,friend_name:fname});
-		}
 	}else{
 		W.plus.scanner=window.plus.scanner;
 	}
@@ -113,6 +102,9 @@ if(WiStorm.agent.weixin){//如果是微信端
 						'openCard'] // 需要使用的js接口
 				});
 				wx.ready(W._nativeSdkReady);
+				wx.error(function(res){
+					res;
+				});
 			}
 			W.wx.loaded=true;//标记微信sdk的js文件已经加载完
 		}

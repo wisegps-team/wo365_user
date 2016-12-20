@@ -379,8 +379,12 @@ W.ajax=function(url,options) {
 	    for (items in json.data){
 			data+="&"+items+"="+json.data[items];
 		}
-		if(json.type=="GET")
-			json.url+="?"+data.slice(1);
+		if(json.type=="GET"){
+			if(json.url.indexOf('?')==-1)
+				json.url+="?"+data.slice(1);
+			else
+				json.url+=data;
+		}
     }
 	
 	var xmlhttp=new XMLHttpRequest();

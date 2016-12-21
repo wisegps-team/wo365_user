@@ -3,3 +3,30 @@
     max-width: 400px;
     margin: auto;
 }
+
+#main{
+    display: flex;
+    height: 100vh;
+    align-items: center;
+}
+#main>div{
+    width: 100%;
+}
+body{
+    margin: 0;
+}
+
+.center{
+    text-align: center;
+    margin-top: 2em;
+}
+p.center{
+    color: #FF9800;
+}
+
+p>span{
+    color: #2196f3;
+}
+p{
+    line-height: 1.5
+}

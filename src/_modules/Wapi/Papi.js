@@ -16,7 +16,8 @@ class Papi {
             success=callback;
         }else{
             success=function(res){
-                if(res.error){
+                if(res.error&&res.error!=21002){
+					W.loading();
 					W.alert(___.papi_error[res.error]);
                 }else
                     callback(res);
@@ -119,7 +120,7 @@ class Papi {
 	 * 		did:123456,
 	 * }
 	 */
-	deviceBind(callback,data){
+	deviceUnbind(callback,data){
 		let url=this.url+'deviceunbind';
 		let D={
 			mobile:data.mobile,

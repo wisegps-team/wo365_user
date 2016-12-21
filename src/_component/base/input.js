@@ -39,14 +39,15 @@ class Input extends Component {
     }
     
     render() {
+        let s=Object.assign({},sty.tf,this.props.style);
         return (
             <TextField
-                style={sty.tf}
                 floatingLabelStyle={sty.tl}
                 inputStyle={sty.ti}
                 errorStyle={sty.te}
                 fullWidth={true}
                 {...this.props}
+                style={s}
                 value={this.state.value}
                 onChange={this.change}
             />

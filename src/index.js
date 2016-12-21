@@ -121,8 +121,8 @@ class App extends Component {
         ]
         let buttons=[
             <FlatButton label={___.login} primary={true} onClick={()=>this.setState({active:0})} key='login'/>,
-            <FlatButton label={___.register} primary={true} onClick={()=>location='register.html?intent=logout&needOpenId=true'} key='register'/>,
-            /*<FlatButton label={___.forget_pwd} primary={true} onClick={()=>this.setState({active:2})} key='forget_pwd'/>*/];
+            /*<FlatButton label={___.register} primary={true} onClick={()=>location='register.html?intent=logout&needOpenId=true'} key='register'/>,
+            <FlatButton label={___.forget_pwd} primary={true} onClick={()=>this.setState({active:2})} key='forget_pwd'/>*/];
         return (
             <ThemeProvider>
                 <div className='login'>

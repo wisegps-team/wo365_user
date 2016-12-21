@@ -870,7 +870,7 @@ makeGetOp('custType','id,name,appId,useType,userType,role,roleId',{limit:-1,sort
 makeGetOp('area','id,name,parentId,level,areaCode,zipCode,provinceId,provinceName',{limit:-1,sorts:'id',page:'id'});
 makeGetOp('brand','objectId,name,company,uid',{limit:-1,sorts:'name',page:'name'});
 makeGetOp('product','objectId,name,company,uid,brand,brandId',{limit:-1,sorts:'name',page:'name'});
-makeGetOp('booking','mobile,sellerId,uid,status,status0,status1,status2,status3,name,carType,resTime,payTime,confirmTime,money,objectId,createdAt,updatedAt');
+makeGetOp('booking','mobile,sellerId,uid,status,status0,status1,status2,status3,name,carType,resTime,payTime,payMoney,confirmTime,money,objectId,createdAt,updatedAt,product,userName,userMobile,userOpenId');
 makeGetOp('activity','uid,type,name,url,status,reward,objectId,createdAt,updatedAt');
 
 

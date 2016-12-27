@@ -725,12 +725,12 @@ W._getSeting=function(){
 	delete setting;
 }
 
-W.logout=function(){
+W.logout=function(param){
 	W.setCookie("access_token","");
 	W.setSetting("user",null);
 	W.setSetting("pwd",null);
 	W._login=false;
-	top.location=WiStorm.root+'index.html?intent=logout';
+	top.location=WiStorm.root+'index.html?intent=logout'+param;
 }
 
 W.wxLogin=function(s){

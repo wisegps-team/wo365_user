@@ -5,7 +5,8 @@ import WiStormAPI from './WiStormAPI.js';
 
 class ServerApi{
     constructor(props, context) {
-		this.url='http://wx.autogps.cn/server_api.php';
+		this.url='http://h5.bibibaba.cn/server_api.php';
+		// this.url='http://192.168.3.233:8080/test/server_api.php';
 		this.ajax=WiStormAPI.prototype.ajax;
 	}
     get(data={},success,dataType='json'){
@@ -61,11 +62,30 @@ class ServerApi{
 
 	checkExists(callback,data){
 		data.method='checkExists';
+		data.appId=WiStorm.config.objectId;
+		this.get(data,callback);
+	}
+	
+	addAndBind(callback,data){
+		data.method='addAndBind';
+		this.get(data,callback);
+	}
+	setMenu(callback,data){
+		data.method='setMenu';
 		this.get(data,callback);
 	}
 
-	addAndBind(callback,data){
-		data.method='addAndBind';
+	getBrand(callback,data){
+		data.method='getBrand';
+		this.get(data,callback);
+	}
+	getWeixinKey(callback,data){
+		data.method='getWeixinKey';
+		this.get(data,callback);
+	}
+	bindOpenId(callback,data){
+		data.method='bindOpenId';
+		data.host=location.host;
 		this.get(data,callback);
 	}
 }

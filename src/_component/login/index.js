@@ -32,8 +32,8 @@ class Login extends Component {
     componentDidMount() {
         // if(this.formData.password&&this.formData.account)
         //     this.submit();
-        if(_g.sso_login){//后台微信登录返回
-            if(_g.access_token){//登录成功了
+        if(WiStorm.agent.weixin){//后台微信登录返回
+            if(_g.sso_login&&_g.access_token){//登录成功了
                 this.loginSuccess({
                     access_token:_g.access_token,
                     expire_in:_g.expire_in,
@@ -43,8 +43,8 @@ class Login extends Component {
                     uid:_g.uid,
                     user_type:_g.user_type
                 });
-            }else{
-                W.alert(___.login_bind);
+            }else if(_g.sso_login||_g.logout){
+                this.props.ssoLoginFail?this.props.ssoLoginFail():null;
             }
         }
     }
@@ -56,12 +56,9 @@ class Login extends Component {
         }
         
         let that=this;
-        Wapi.user.get(function(user) {
-            Object.assign(user.data,res);
-            Wapi.papi.login(d=>{
-                user.data.devices=d.data;
-                that.props.onSuccess(user);
-            },Object.assign({},that.formData));
+        Wapi.user.get(function(result) {
+            Object.assign(result.data,res);
+            that.props.onSuccess(result);
         }, {
             objectId: res.uid,
             access_token: res.access_token
@@ -109,6 +106,7 @@ class Login extends Component {
                     value={this.formData.account}
                     errorText={this.state.account_err}
                     onChange={this.change}
+                    type='tel'
                 />
                 <Input
                     name='password'

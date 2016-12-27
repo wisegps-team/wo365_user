@@ -7,11 +7,12 @@ import AppBar from 'material-ui/AppBar';
 import {ThemeProvider} from './_theme/default';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
-import VerificationCode from './_component/base/verificationCode';
 
 import Login from './_component/login';
 import Forget from './_component/login/forget';
-import Wapi from './_modules/Wapi';
+import AgentShowBox from './_component/login/agent_register';
+import VerificationCode from './_component/base/verificationCode';
+import BindBox from './_component/login/bindBox';
 import sty from './_component/login/style';
 import {getOpenIdKey} from './_modules/tool';
 
@@ -26,21 +27,21 @@ class App extends Component {
     constructor(props, context) {
         super(props, context);
         this.state={
-            active:0//0,登录；1，注册；2，忘记密码
+            active:0//0,登录；1，注册；2，忘记密码；3，更改绑定openid
         }
         this.loginSuccess = this.loginSuccess.bind(this);
         this.forgetSuccess = this.forgetSuccess.bind(this);
         this.bindSuccess = this.bindSuccess.bind(this);
+        this.showBind = this.showBind.bind(this);
     }
     getUserData(user){
         //校验记录的openId是否当前获取到的openId
-        WiStorm.agent.weixin=true;
         if(WiStorm.agent.weixin&&_g.openid&&user.authData&&user.authData[getOpenIdKey()]){//保存有当前域名的openId
             if(user.authData[getOpenIdKey()]!==_g.openid){
                 W.confirm(___.ask_change_openId,res=>{
                     if(res){
                         this._user=user;
-                        this.setState({active:2});
+                        this.setState({active:3});
                     }
                 });
                 return;
@@ -55,15 +56,13 @@ class App extends Component {
             access_token:token,
             appId:WiStorm.config.objectId
         };
-        let role_user;//获取权限时将会用到
         if(user.employee){
             cust_data.objectId=user.employee.companyId;
-            role_user=user.employee.objectId;
         }else{
             cust_data.uid=user.uid;
         }
-        Wapi.customer.get(function(result){
-            user.customer=result.data;
+        Wapi.customer.get(function(cust){
+            user.customer=cust.data;
             W._loginSuccess(user);
             let loginLocation=_g.loginLocation||"src/moblie/home.html";
             if(loginLocation.indexOf('.html')==-1)//需要到home.html跳转
@@ -72,67 +71,73 @@ class App extends Component {
         },cust_data);
     }
     loginSuccess(res){
-        let user=res.data;
         let min=-Math.floor((W.date(res.data.expire_in).getTime()-new Date().getTime())/60000);
         W.setCookie("access_token", res.data.access_token,min);
-        if(!user.mobileVerified&&user.mobile){//未通过手机验证
+        let user=res.data;
+        if(!user.mobileVerified){//未通过手机验证
             W.alert(___.please_verification);
-            this._user=user;//先暂存
+            this._res=res;//先暂存,重置密码成功之后会再调用loginSuccess传递进来
             this.setState({active:2});
         }else{
-            if((!user.authData||!user.authData.openId)&&_g.openid)//没有绑定的，进行绑定
-                Wapi.user.updateMe(res=>{
-                    user.authData=Object.assign(user.authData,{openId:_g.openid});
-                    this.getUserData(user);
-                },{
+            let openIdKey=getOpenIdKey();
+            if((!user.authData||!user.authData[openIdKey])&&_g.openid){//没有绑定的，进行绑定
+                let u={
                     access_token:user.access_token,
-                    'authData.openId':_g.openid,
                     _sessionToken:user.session_token
-                });
-            else
+                };
+                u['authData.'+openIdKey]=_g.openid;
+                Wapi.user.updateMe(res=>{
+                    delete u._sessionToken;
+                    delete u.access_token;
+                    user.authData=Object.assign(user.authData,u);
+                    this.getUserData(user);
+                },u);
+            }else
                 this.getUserData(user);
         }
     }
     forgetSuccess(res){
         W.toast(___.reset_pwd+___.success);
-        if(this._user){//第一次登陆验证手机并重置密码
-            this._user.mobileVerified=true;
-            this.getUserData(this._user);
-            this._user=undefined;
+        if(this._res){//第一次登陆验证手机并重置密码
+            this.loginSuccess(this._res);
+            this._res=undefined;
         }
         this.setState({active:0});
     }
 
-    bindSuccess(user){//绑定微信成功
-        W.toast(___.update_su);
-        if(this._user){//继续
-            this.getUserData(user);
-            this._user=undefined;
-        }
-        this.setState({active:0});
+    showBind(){
+        this.setState({active:3});
     }
-    
+    bindSuccess(user){//绑定微信成功
+        let p='';
+        if(_g.wx_app_id)
+            p='/?wx_app_id='+_g.wx_app_id;
+        location=location.origin+p;
+    }
     render() {
+        let _sty=this.state.active==1?{padding:'10px'}:null;
+        let login_sty=WiStorm.agent.weixin?{
+            display:'none'
+        }:null;
         let actives=[
-            <Login onSuccess={this.loginSuccess}/>,
+            <Login onSuccess={this.loginSuccess} style={login_sty} ssoLoginFail={this.showBind}/>,
             <div/>,
-            <BindBox onSuccess={this.bindSuccess} user={this._user||null}/>
-            /*<Forget onSuccess={this.forgetSuccess} user={this._user}/>*/
+            null,
+            <BindBox onSuccess={this.bindSuccess} openId={_g.openid}/>
         ]
-        let buttons=[
-            <FlatButton label={___.login} primary={true} onClick={()=>this.setState({active:0})} key='login'/>,
-            /*<FlatButton label={___.register} primary={true} onClick={()=>location='register.html?intent=logout&needOpenId=true'} key='register'/>,
-            <FlatButton label={___.forget_pwd} primary={true} onClick={()=>this.setState({active:2})} key='forget_pwd'/>*/];
+        let buttons=(this.state.active&&this.state.active!=3)?
+            (<FlatButton label={___.login} primary={true} onClick={()=>this.setState({active:0})} key='login'/>)
+            :null;
         return (
             <ThemeProvider>
-                <div className='login'>
+                <div className='login' style={_sty}>
                     {actives[this.state.active]}
                     <div style={{
                         textAlign: 'right',
                         marginTop: '10px'
                         }}
                     >
-                        {buttons.filter((e,i)=>i!=this.state.active)}
+                        {buttons}
                     </div>
                 </div>
             </ThemeProvider>
@@ -141,48 +146,3 @@ class App extends Component {
 }
 
 
-class BindBox extends Component{
-    constructor(props, context) {
-        super(props, context);
-        this.submit = this.submit.bind(this);
-        this.change = this.change.bind(this);
-    }
-
-    change(val,name){
-        this.code=name;
-    }
-
-    submit(){
-        if(!this.code){
-            W.alert(___.code_err);
-            return;
-        }
-        let user=this.props.user;
-        let key='authData.'+getOpenIdKey();
-        let data={
-            access_token:user.access_token,
-            _sessionToken:user.session_token
-        };
-        data[key]=_g.openid;
-        Wapi.user.updateMe(res=>{
-            let d={};
-            d[getOpenIdKey()]=_g.openid;
-            user.authData=Object.assign(user.authData,d);
-            this.props.onSuccess(user);
-        },data);
-    }
-    render() {
-        return (
-            <div>
-                <VerificationCode 
-                    name='valid_code'
-                    type={1}
-                    account={this.props.user.mobile} 
-                    onSuccess={this.change}
-                />
-
-                <RaisedButton label={___.ok} primary={true} style={sty.but} onClick={this.submit}/>
-            </div>
-        );
-    }
-}

@@ -115,14 +115,6 @@ class AddCar extends React.Component{
             W.alert(___.brand+' '+___.not_null);
             return;
         }
-        if(this.state.frameNo==''){
-            W.alert(___.frame_no+' '+___.not_null);
-            return;
-        }
-        if(this.state.engineNo==''){
-            W.alert(___.engine_no+' '+___.not_null);
-            return;
-        }
         if(this.state.buyDate==''){
             W.alert(___.buy_date+' '+___.not_null);
             return;

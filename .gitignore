@@ -54,9 +54,9 @@ Temporary Items
 /.vscode/*
 /npm-debug.log
 
-
-/build/src/*/*.js
 /build/src/*.js
+/build/src/*/*.js
+/build/src/*/*/*.js
 
 
 /build/src/test/*

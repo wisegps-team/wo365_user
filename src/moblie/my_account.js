@@ -8,12 +8,16 @@ import {List, ListItem} from 'material-ui/List';
 import Divider from 'material-ui/Divider';
 
 import Input from '../_component/base/input';
+import AreaSelect from '../_component/base/areaSelect';
 import Avatar from 'material-ui/Avatar';
+
 import ActionLock from 'material-ui/svg-icons/action/lock';
 import ActionAccountBalanceWallet from 'material-ui/svg-icons/action/account-balance-wallet';
+import NavigationChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
 import ActionFace from 'material-ui/svg-icons/action/face';
 import ActionAccountBox from 'material-ui/svg-icons/action/account-box';
 import ContentClear from 'material-ui/svg-icons/content/clear';
+
 import RaisedButton from 'material-ui/RaisedButton';
 import LinearProgress from 'material-ui/LinearProgress';
 
@@ -21,16 +25,21 @@ import Forget from '../_component/login/forget';
 import UserNameInput from '../_component/base/userNameInput';
 import AppBar from '../_component/base/appBar';
 import AutoList from '../_component/base/autoList';
+import {getOpenIdKey} from '../_modules/tool';
 
 import Dialog from 'material-ui/Dialog';
 
 const thisView=window.LAUNCHER.getView();//第一句必然是获取view
 thisView.addEventListener('load',function(){
     ReactDOM.render(<App/>,thisView);
+
     let view=thisView.prefetch('#forget',3);
     ReactDOM.render(<ForgetApp/>,view);
+
     let walletView=thisView.prefetch('#wallet',3);
     ReactDOM.render(<WalletApp/>,walletView);
+    
+    thisView.prefetch('booking_list.js',2);
 });
 
 const sty={
@@ -103,13 +112,13 @@ class App extends Component {
         this.setState({edit:false});
     }
     render() {
-        let box=this.state.edit?(<EditBox back={this.back}/>):(<ShowBox edit={this.edit}/>);
+        // let box=this.state.edit?(<EditBox back={this.back}/>):(<ShowBox edit={this.edit}/>);
         return (
             <ThemeProvider>
             <div>
-                <AppBar title={___.my_account}/>
+                <AppBar title={___.user}/>
                 <div style={sty.p}>
-                    {box}
+                    <ShowBox/>
                 </div>
             </div>
             </ThemeProvider>
@@ -405,23 +414,25 @@ class ShowBox extends Component{
     }
 
     logout(){
-        W.loading('退出登录');
-        if(_user.customer.wxAppKey)
-            W.logout('&logout=true&needOpenId=true&wx_app_id='+_user.customer.wxAppKey);
-        else if(_user.customer.parentId&&_user.customer.parentId.length){
-            Wapi.customer.get(res=>{
-                if(res.data.wxAppKey)
-                    W.logout('&logout=true&needOpenId=true&wx_app_id='+(res.data.wxAppKey||''));
-                else
-                    W.logout('&logout=true&needOpenId=true');
-            },{
-                objectId:_user.customer.parentId[0]
-            });
-        }else{
+        W.loading('正在退出');
+        let key=getOpenIdKey();
+        let wxId=_user.authData[key+'_wx'];//上次登录的公众号id
+        if(wxId)
+            W.logout('&logout=true&needOpenId=true&wx_app_id='+wxId);
+        else
             W.logout('&logout=true&needOpenId=true');
-        }
     }
-    
+    recommend(){
+        thisView.goTo('my_marketing.js');
+    }
+    toBillList(){
+        //这里的‘我的订单’是指的什么？sellerId为当前用户的订单？
+        let par={
+            sellerId:_user.objectId,
+            status:0
+        }
+        thisView.goTo('booking_list.js',par);
+    }
     render() {
         const actions = [
             <FlatButton
@@ -438,27 +449,48 @@ class ShowBox extends Component{
         ];
 
         let forget=this.state.resetPwd?sty.p:Object.assign({},sty.p,{display:'none'});
+        console.log((_user));
         return (
             <Paper zDepth={1} style={sty.p}>
-                <List>
-                    <ListItem
-                        primaryText={_user.username}
-                        leftAvatar={<Logo style={sty.logo}/>}
-                        secondaryText={_user.mobile}
-                    />
-                </List>
+                <div style={{textAlign:'center',padding:'10px 0px 20px'}}>
+                    <div style={{marginBottom:'10px',fontSize:'18px'}}>{_user.customer.name}</div>
+                    <div style={{marginBottom:'10px'}}>{_user.employee && _user.employee.name}</div>
+                    <div>{_user.mobile}</div>
+                </div>
                 <Divider/>
                 <List>
-                    <ListItem primaryText={___.edit_user_name} leftIcon={<ActionAccountBox/>} onClick={this.userName}/>
-                    <ListItem primaryText={___.reset_pwd} leftIcon={<ActionLock/>} onClick={this.reset}/>
+                    {/*修改用户名*/}
+                    {/*<ListItem primaryText={___.edit_user_name} leftIcon={<ActionAccountBox/>} onClick={this.userName}/>*/}
+                    {/*修改密码*/}
+                    {/*<ListItem primaryText={___.reset_pwd} leftIcon={<ActionLock/>} onClick={this.reset}/>*/}
+                    {/*我的订单*/}
+                    {/*<ListItem 
+                        primaryText={___.my_order} 
+                        onClick={this.toBillList}
+                        rightAvatar={<span style={{marginTop:'12px',marginRight:'30px'}}>2</span>}
+                        rightIcon={<NavigationChevronRight />}
+                        style={{borderBottom:'1px solid #dddddd'}}
+                    />*/}
                     <ListItem 
                         primaryText={___.my_wallet} 
-                        leftIcon={<ActionAccountBalanceWallet/>} 
                         onClick={this.wallet}
-                        rightAvatar={<span style={{marginTop:'13px'}}>{toMoneyFormat(_user.balance)}</span>}
+                        rightAvatar={<span style={{marginTop:'12px',marginRight:'30px'}}>{toMoneyFormat(_user.balance)}</span>}
+                        rightIcon={<NavigationChevronRight />}
+                        style={{borderBottom:'1px solid #dddddd'}}
                     />
+                    <ListItem 
+                        primaryText={___.recommend} 
+                        onClick={this.recommend}
+                        rightAvatar={<span style={{marginTop:'12px',marginRight:'30px'}}>{toMoneyFormat(_user.balance)}</span>}
+                        rightIcon={<NavigationChevronRight />}
+                        style={{borderBottom:'1px solid #dddddd'}}
+                    />
+                    {/*系统设置*/}
+                    {/*<ListItem 
+                        primaryText={___.system_set} 
+                        rightIcon={<NavigationChevronRight />}
+                    />*/}
                 </List>
-                <Divider/>
                 <List style={{padding:'20px 16px 8px 16px',textAlign:'canter'}}>
                     <RaisedButton label={___.logout} fullWidth={true} secondary={true} style={sty.lo} onClick={this.logout}/>                    
                 </List>
@@ -473,6 +505,17 @@ class ShowBox extends Component{
         );
     }
 }
+
+class EditBox extends Component {
+    render() {
+        return (
+            <div>
+                edit
+            </div>
+        );
+    }
+}
+
 
 class Logo extends Component{
     constructor(props, context) {

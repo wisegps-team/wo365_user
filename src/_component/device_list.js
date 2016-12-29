@@ -3,9 +3,12 @@ import React, {Component} from 'react';
 class DeviceList extends Component {
     render() {
         return (
-            <div>
-                
-            </div>
+            <ul>
+                <li>123456</li>
+                <li>565844</li>
+                <li>186581</li>
+                <li>3873515</li>
+            </ul>
         );
     }
 }

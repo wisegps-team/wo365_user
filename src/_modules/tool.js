@@ -49,6 +49,16 @@ export function getAllChild(data){
     return ids;
 }
 
+
+export function makeRandomEvent(obj){
+    let key=randomStr();
+    let o={};
+    for(let k in obj){
+        o[k]=key+obj[k];
+    }
+    return o;
+}
+
 /**
  * 返回保存当前域名openId的key名,域名中的点符号“.”使用下划线“_”替换，并且在最后加上“_openId”
  * 例如 wx_autogps_cn_openId

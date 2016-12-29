@@ -10,7 +10,6 @@ import RaisedButton from 'material-ui/RaisedButton';
 
 import Login from './_component/login';
 import Forget from './_component/login/forget';
-import AgentShowBox from './_component/login/agent_register';
 import VerificationCode from './_component/base/verificationCode';
 import BindBox from './_component/login/bindBox';
 import sty from './_component/login/style';

@@ -261,7 +261,7 @@ function info(data,thisCar) {
 
     let div=document.createElement('div');
     div.style.fontSize='14px';
-    div.innerHTML=W.replace('<p><span><font style="font-size: 15px; font-weight:bold; font-family:微软雅黑;">'+data.name+'</font></span><img src="http://web.wisegps.cn/images/wifi'+desc.signal_l+'.png" title="<%signal%>'+desc.singal_desc+'"/><img src="http://web.wisegps.cn/images/gps'+g+'.png" title="'+gt+'"/></p><table style="width: 100%;"><tbody><tr><td><font color="#244FAF"><%car_state%>：</font>'+desc.desc+'</td><td><font color="#244FAF"><%state%>：</font>'+desc.status_desc+'</td></tr><tr><td colspan="2"><font color="#244FAF"><%gps_time%>：'+desc.gps_time+'</font></td></tr><tr><td colspan="2"><font color="#244FAF"><%position_description%>：</font><span class="location"><%getting_position%></span></td></tr></tbody></table>');
+    div.innerHTML=W.replace('<p><span><font style="font-size: 15px; font-weight:bold; font-family:微软雅黑;">'+data.did+'</font></span><img src="http://web.wisegps.cn/images/wifi'+desc.signal_l+'.png" title="<%signal%>'+desc.singal_desc+'"/><img src="http://web.wisegps.cn/images/gps'+g+'.png" title="'+gt+'"/></p><table style="width: 100%;"><tbody><tr><td><font color="#244FAF"><%car_state%>：</font>'+desc.desc+'</td></tr><tr><td colspan="2"><font color="#244FAF"><%gps_time%>：'+desc.gps_time+'</font></td></tr><tr><td colspan="2"><font color="#244FAF"><%position_description%>：</font><span class="location"><%getting_position%></span></td></tr></tbody></table>');
     
     let b=document.createElement('button');
     b.innerText=thisCar.state.tracking?___.untrack:___.track;

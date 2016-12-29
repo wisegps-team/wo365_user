@@ -4,12 +4,12 @@ import thunkMiddleware from 'redux-thunk';
 import {carsReducer,selectCarReducer} from './monitor';
 
 const initialState = {
-    devices:_user.devices.map(e=>{return{did:e}})
+    cars:(_user&&_user.devices)?_user.devices.map(e=>{return {did:e}}):[]
 };
 
 function main(state = initialState, action) {
     return {
-        devices:carsReducer(state.devices,action)
+        cars:carsReducer(state.cars,action)
     };
 }
 

@@ -357,4 +357,10 @@ window.___={
 	'withdraw_cash':'提现',
 	'input_admin_psw':'请输入管理员密码',
 	'input_user_psw':'请输入用户密码',
+	'add_new_mobile':'绑定新手机号',
+	'add_new_car_num':'添加新车牌',
+	'input_new_car_num':'输入新车牌',
+	'user_mobile':'车主手机',
+	'pls_input_new_car_num':'请输入一个新车牌号码',
+	'reg_des0':'<%name%>在<%install%>有<%count%>条预约安装信息，请点击选择'
 }

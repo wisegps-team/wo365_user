@@ -34,7 +34,7 @@ class App extends Component {
             active:0,
             booking:null,
             user:null,
-            // start:false
+            selectBookingId:null
         }
         this.registerCallback = this.registerCallback.bind(this);
         this.haveBooking = this.haveBooking.bind(this);
@@ -136,7 +136,8 @@ class App extends Component {
                 valid_code:code,
                 password:booking.userMobile.slice(-6),
                 valid_type:1
-            }
+            },
+            selectBookingId:booking.objectId
         };
         // newState.start=(_g.bookingId==this.state.booking.objectId);//带bookingId进来的，直接注册
         this.setState(newState);
@@ -147,7 +148,7 @@ class App extends Component {
             <h2 style={{textAlign:'center'}}>{___.searching_booking}</h2>,
             <BookingCheckBox onSuccess={this.haveBooking}/>,
             <BookingBox booking={this.state.booking} onSuccess={this.checkSuccess}/>,
-            <RegisterBox success={this.registerCallback} user={this.state.user}/>
+            <RegisterBox success={this.registerCallback} user={this.state.user} bookingId={this.state.selectBookingId}/>
         ];
         let box=boxs[this.state.active];
         return (
@@ -297,13 +298,17 @@ class RegisterBox extends Component{
             did:that.data.did,
             uid:user.customer.objectId,
             openId:_g.openid,
-            mobile:this.state.formData.mobile,//必须传预订时的车主手机号，因为是用于获取预订信息的
+            mobile:user.mobile,
             name:user.customer.name,
         };
         if(user.carId){
             data.carId=user.carId;
         }else
             data.carNum=user.carNum;
+
+        if(this.props.bookingId){//如果有预订
+            data.bookingId=this.props.bookingId;
+        }
         Wapi.serverApi.addAndBind(function(res){
             W.loading(false);
             if(res.status_code){

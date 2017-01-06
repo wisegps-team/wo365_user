@@ -70,7 +70,7 @@ class App extends Component {
         this.showDeviceList = this.showDeviceList.bind(this);
     }
     componentDidMount() {
-        STORE.dispatch(ACT.fun.getPos(this.props.cars));
+        STORE.dispatch(ACT.fun.getCars());
     }
     
     

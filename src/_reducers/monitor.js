@@ -4,15 +4,38 @@ export const ACT ={
         SELECT_CAR:'SELECT_CAR',
         GET_POS:'get_pos',
         GETED_POS:'GETED_POS',
-        GETED_DEVICES:'GETED_DEVICES'
+        GETED_DEVICES:'GETED_DEVICES',
+        GETED_CARS:'GETED_CARS',
+        // GETED_DEVICES:'GETED_DEVICES'
     },
     fun:{
         selectCar:function (car) {
             return {type: ACT.action.SELECT_CAR,car};
         },
-        getPos:function(devices){
+        getCars:function () {//异步获取车辆资料,所以是返回一个方法而不是一个json
             return function(dispatch) {
-                devices.forEach((d,i)=>{
+                Wapi.vehicle.list(res=>{
+                    let cars=res.data;
+                    dispatch(ACT.fun.getedCars(cars));
+                    // let device_ids=cars.map(car=>car.did);
+                    if(cars&&cars.length)
+                        dispatch(ACT.fun.getPos(cars));
+                },{
+                    uid:_user.customer.objectId
+                },{
+                    limit:'-1'
+                });
+            }
+        },
+        getedCars:function (data) {
+            return {type: ACT.action.GETED_CARS,data};
+        },
+        // getedDevices:function (data) {
+        //     return {type: ACT.action.GETED_DEVICES,data};
+        // },
+        getPos:function(cars){
+            return function(dispatch) {
+                cars.forEach((d,i)=>{//如果有多辆车，避免同时发出多个请求，使用延时发送
                     setTimeout(function(){
                         Wapi.papi.getPosition(function(res){
                             if(res.error&&res.error!=22002){
@@ -30,12 +53,12 @@ export const ACT ={
                             did:d.did,
                             err:true //不使用默认处理返回错误
                         });
-                    },i*300);
+                    },i*300);//300毫秒请求一辆车
                 });
                 if(!ACT.fun.getPos._id)//只能有一次轮询
                     ACT.fun.getPos._id=setTimeout(()=>{
                         ACT.fun.getPos._id=0;
-                        dispatch(ACT.fun.getPos(devices))
+                        dispatch(ACT.fun.getPos(cars))
                     },20000);//10秒轮询
             }
         },
@@ -68,6 +91,9 @@ export function carsReducer(state = [], action) {
                 });
             }
             return newState;
+        case ACT.action.GETED_CARS://获取到车辆数据
+            let carsArr=action.data||[];
+            return carsArr;
         // case ACT.action.GETED_DEVICES:
         //     state.forEach(car=>{
         //         car._device=action.data.find(d=>(d.did==car.did));//匹配上

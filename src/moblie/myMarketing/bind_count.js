@@ -5,7 +5,6 @@ import ReactDOM from 'react-dom';
 
 import {ThemeProvider} from '../../_theme/default';
 import AppBar from '../../_component/base/appBar';
-import Card from 'material-ui/Card';
 
 
 var thisView=window.LAUNCHER.getView();//第一句必然是获取view
@@ -17,9 +16,10 @@ thisView.addEventListener('load',function(){
 
 const styles = {
     main:{paddingTop:'50px',paddingBottom:'20px'},
-    card:{margin:'1em',padding:'0px 0.5em 0.5em'},
+    card:{margin:'10px',padding:'0px 10px 10px',borderBottom:'1px solid #cccccc'},
     line:{paddingTop:'0.5em'},
     count:{marginRight:'1em'},
+    link:{color:'#009688',marginRight:'1em'},
 };
 function combineStyle(arr){
     return arr.reduce((a,b)=>Object.assign({},styles[a],styles[b]));
@@ -34,24 +34,51 @@ class App extends Component {
     componentDidMount() {
         thisView.addEventListener('show',e=>{
             if(e.params){
-                console.log('show bind count, act = ' + e.params.act);
+                let batchId=e.params._id.batchId;
+                Wapi.qrLink.list(res=>{
+                    console.log(res);
+                    this.data=res.data;
+                    this.forceUpdate();
+                },{
+                    batchId:batchId,
+                    status:1,
+                    sellerId:_user.objectId,
+                });
             }
         });
-        this.data=[1,2,3,5];
-        this.forceUpdate();
     }
     toScan(data){
-        thisView.goTo('scan_count.js',data);
+        // thisView.goTo('scan_count.js',data);
+    }
+    removeBind(data){
+        console.log('remove bind');
+        let _data={
+            _objectId:data.objectId,
+            id:data.id,
+            url:'',
+            sellerId:'',
+            act:'',
+            i:data.i,
+            type:data.type,
+            batchId:data.batchId,
+            batchName:data.batchName,
+            status:0
+        }
+        Wapi.qrLink.update(res=>{
+            W.alert(___.remove_bind_success);
+            this.data=this.data.filter(ele=>ele.id!=data.id);
+            this.forceUpdate();
+        },_data);
     }
     render() {
         let items=this.data.map((ele,i)=>
-            <Card key={i} style={styles.card}>
-                <div style={styles.line}>{i+1}个营销人员</div>
+            <div key={i} style={styles.card}>
+                <div style={styles.line}>{___.qrcode_num +' '+ ele.id}</div>
                 <div style={styles.line}>
-                    <span onClick={()=>this.toScan(ele)} style={{marginRight:'1em'}}>扫描统计</span>
-                    <span>解除绑定</span>
+                    <span onClick={()=>this.toScan(ele)} style={styles.link}>{___.scan_count}0</span>
+                    <span onClick={()=>this.removeBind(ele)} style={styles.link}>{___.remove_bind}</span>
                 </div>
-            </Card>
+            </div>
         )
         return (
             <ThemeProvider>

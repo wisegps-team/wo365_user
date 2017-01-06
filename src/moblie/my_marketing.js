@@ -31,8 +31,8 @@ const styles = {
     bottom_btn_right:{width:'100%',display:'block',textAlign:'right',paddingTop:'5px'},
     count:{marginRight:'1em',float:'left'},
     link:{color:'#009688'},
-    table:{paddingTop:'12px',paddingBottom:'10px',paddingLeft:'3px'},
-    spans:{marginBottom:'10px',fontSize:'0.8em',paddingLeft:'5px',marginBottom:'15px',display:'block',width:'100%'},
+    table:{paddingTop:'12px',paddingBottom:'10px',paddingLeft:'3px',marginRight:'120px'},
+    spans:{marginBottom:'10px',fontSize:'0.8em',paddingLeft:'5px',marginBottom:'15px',display:'block',width:'100%',height:'15px'},
     share_page:{width:'100%',height:window.innerHeight+'px',display:'block',backgroundColor:'#ffffff',position:'fixed',top:'0px',left:'0px'},
     share_content:{width:'90%',marginLeft:'5%',marginTop:'20px'},
     hide:{display:'none'},
@@ -85,27 +85,27 @@ class App extends Component {
         };
     }
     componentDidMount() {
-        let par={
-            "group":{
-                "_id":{"activityId":"$activityId"},
-                "status0":{"$sum":"$status0"},
-                "status1":{"$sum":"$status1"},
-                "status2":{"$sum":"$status2"},
-                "status3":{"$sum":"$status3"}
-            },
-            "sorts":"activityId",
-            sellerId:_user.employee?_user.employee.objectId:_user.customer.objectId,
-        }
-        Wapi.booking.aggr(resAggr=>{
-            this.booking=resAggr.data;
-            Wapi.customer.list(res=>{
-                this._parents=res.data||[];
-                this.getData();
-            },{
-                objectId:_user.customer.parentId.join('|')+'|'+_user.customer.objectId
-            });
-        },par);
-        
+        // let par={
+        //     "group":{
+        //         "_id":{"activityId":"$activityId"},
+        //         "status0":{"$sum":"$status0"},
+        //         "status1":{"$sum":"$status1"},
+        //         "status2":{"$sum":"$status2"},
+        //         "status3":{"$sum":"$status3"}
+        //     },
+        //     "sorts":"activityId",
+        //     sellerId:_user.employee?_user.employee.objectId:_user.customer.objectId,
+        // }
+        // Wapi.booking.aggr(resAggr=>{
+        //     this.booking=resAggr.data;
+        //     Wapi.customer.list(res=>{
+        //         this._parents=res.data||[];
+        //         this.getData();
+        //     },{
+        //         objectId:_user.customer.parentId.join('|')+'|'+_user.customer.objectId
+        //     });
+        // },par);
+        this.getData();
     }
     nextPage(){
         // this.page_no++;
@@ -484,7 +484,7 @@ class DList extends Component{
                         style={styles.icon}
                     >
                         <MenuItem key='0' onTouchTap={()=>this.share(ele)}>{___.act_share}</MenuItem>
-                        {/*<MenuItem key='1' onClick={()=>this.activityData(ele)}>{___.act_data}</MenuItem>*/}
+                        <MenuItem key='1' onTouchTap={()=>this.activityData(ele)}>{___.act_data}</MenuItem>
                     </IconMenu>
                 </div>
                 <div style={combineStyle(['table','link'])} onClick={()=>this.toActivityPage(ele)}>{ele.name}</div>
@@ -509,7 +509,7 @@ class DList extends Component{
                         <span>{___.bookingNum +' '}</span>
                         <span style={styles.link}>{ele.status0}</span>
                     </div>
-                    <div onClick={()=>this.toCountPage('registe',ele)}>
+                    <div style={styles.count} onClick={()=>this.toCountPage('registe',ele)}>
                         <span>{___.register +' '}</span>
                         <span style={styles.link}>{ele.status1}</span>
                     </div>

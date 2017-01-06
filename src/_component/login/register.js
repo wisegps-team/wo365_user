@@ -50,8 +50,8 @@ class Register extends Component {
     }
 
     componentDidMount() {
-        if(_g.uid&&_g.access_token){//已有账号，扫码进来
-            this.getUser(_g.uid,_g.access_token);
+        if(_g.uid&&_g.token){//已有账号，扫码进来
+            this.getUser(_g.uid,_g.token);
         }else if(this.state.mobile){
             Wapi.user.login(res=>{//尝试使用手机号后6位作为密码登录
                 if(!res.status_code)//如果登录不成功，则无法进行下面的操作

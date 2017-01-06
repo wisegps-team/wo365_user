@@ -362,7 +362,7 @@ window.___={
 	'input_new_car_num':'输入新车牌',
 	'user_mobile':'车主手机',
 	'pls_input_new_car_num':'请输入一个新车牌号码',
-	'reg_des0':'<%name%>在<%install%>有<%count%>条预约安装信息，请点击选择',
+	'reg_des0':'<%name%>在<%install%>有<%count%>条预约安装信息，请选择后继续注册：',
 	'booking_status':['预订','注册','结算','确认'],
 	'booked_cust':'预约客户',
 	'order_status':'订单状态',

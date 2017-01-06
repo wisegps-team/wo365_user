@@ -427,16 +427,21 @@ class BookingItem extends Component{
         let sty={
             display:'block'
         };
-        if(this.props.border)
-            sty.borderBottom='1px solid #ccc';
-            sty.padding='1em';
+        let checkbox=null;
+        if(this.props.border){
+            sty.borderTop='1px solid #ccc';
+            sty.padding='1em 0 1em 1em';
+            checkbox=<Checkbox iconStyle={{left:'calc(100% - 24px)'}} onCheck={this.success}/>;
+        }
+        
         return (
-            <span onClick={this.success} style={sty} className={'p'}>
+            <label style={sty} className={'p'}>
+                {checkbox}
                 <label>{___.order_no+'：'}</label><span>{b.objectId}</span><br/>
                 <label>{___.booking_date+'：'}</label><span>{W.dateToString(W.date(b.createdAt)).slice(0,-3)}</span><br/>
                 <label>{___.booking_p+'：'}</label><span>{b.product.name}</span><br/>
                 <label>{___.booking_pay+'：'}</label><span>{parseFloat(b.payMoney).toFixed(2)}</span><br/>
-            </span>
+            </label>
         );
     }
 }

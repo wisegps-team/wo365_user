@@ -430,7 +430,7 @@ class BookingItem extends Component{
         let checkbox=null;
         if(this.props.border){
             sty.borderTop='1px solid #ccc';
-            sty.padding='1em 0 1em 1em';
+            sty.padding='1em 0';
             checkbox=<Checkbox iconStyle={{left:'calc(100% - 24px)'}} onCheck={this.success}/>;
         }
         

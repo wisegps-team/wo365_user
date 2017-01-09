@@ -329,7 +329,7 @@ window.___={
 	'booking_p':'预订产品',
 	'booking_date':'预订时间',
 	'booking_pay':'预付款项',
-	'r_des1':'点击获取验证码将给xxx发送验证短信，验证成功后点击确定继续注册，并将预付款项支付给安装网点。',
+	'r_des1':'点击获取验证码将给xxx发送短信，验证成功后点击确定继续注册，并将预付款项支付给安装网点。',
 	'booking_data':'预订信息',
 	'device_register':'终端注册',
 	'b_user_mobile':'预订车主手机号码',
@@ -362,7 +362,7 @@ window.___={
 	'input_new_car_num':'输入新车牌',
 	'user_mobile':'车主手机',
 	'pls_input_new_car_num':'请输入一个新车牌号码',
-	'reg_des0':'<%name%>在<%install%>有<%count%>条预约安装信息，请点击选择',
+	'reg_des0':'<%name%>在<%install%>有<%count%>条预约安装信息，请选择后继续注册！',
 	'booking_status':['预订','注册','结算','确认'],
 	'booked_cust':'预约客户',
 	'order_status':'订单状态',
@@ -388,4 +388,5 @@ window.___={
 	'product_price':'产品价格',
 	'personal_info':'个人信息',
 	'logined_bind':'登录绑定',
+	'pls_select':'请选择',
 }

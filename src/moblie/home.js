@@ -44,6 +44,9 @@ thisView.addEventListener('load',function(){
         <Provider store={STORE}>
         <ConnectAPP/>
         </Provider>,thisView);
+    if(_g.loginLocation){
+        thisView.goTo(_g.loginLocation+'.js');
+    }
 });
 
 

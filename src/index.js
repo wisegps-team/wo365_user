@@ -63,9 +63,10 @@ class App extends Component {
         Wapi.customer.get(function(cust){
             user.customer=cust.data;
             W._loginSuccess(user);
-            let loginLocation=_g.loginLocation||"src/moblie/home.html";
+            let home="src/moblie/home.html";
+            let loginLocation=_g.loginLocation||home;
             if(loginLocation.indexOf('.html')==-1)//需要到home.html跳转
-                loginLocation="src/moblie/home.html?loginLocation="+_g.loginLocation;
+                loginLocation=home+"?loginLocation="+encodeURIComponent(_g.loginLocation);
             top.location=loginLocation;
         },cust_data);
     }

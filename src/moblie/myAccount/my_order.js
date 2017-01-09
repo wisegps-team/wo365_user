@@ -176,7 +176,7 @@ class DumbList extends React.Component{
     render() {
         let cards=this.props.data.map((ele,index)=>{
             let colors=['#8BC34A','#00BFA5'];
-            let strStatus=Status(data);
+            let strStatus=Status(ele);
             return(
                 <div key={index} style={styles.card}>
                     <div style={{float:'right'}}><a style={styles.a} onClick={e=>this.openDetails(ele)}>{___.details}</a></div>

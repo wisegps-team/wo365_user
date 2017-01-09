@@ -105,7 +105,7 @@ class Papi {
 	deviceBind(callback,data){
 		let url=this.url+'devicebind';
 		let D={
-			mobile:data.mobile,
+			phone:data.mobile,
 			imei:data.did
 		};
 		D._err=data.err;
@@ -123,7 +123,7 @@ class Papi {
 	deviceUnbind(callback,data){
 		let url=this.url+'deviceunbind';
 		let D={
-			mobile:data.mobile,
+			phone:data.mobile,
 			imei:data.did
 		};
 		D._err=data.err;

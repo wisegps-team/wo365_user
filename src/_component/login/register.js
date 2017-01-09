@@ -22,14 +22,12 @@ class Register extends Component {
             accountType:'phone', //表示是用什么注册
             mobile:null,
             car:[],
-            s_num:0,
-            s_mob:0
+            s_num:-1,
+            s_mob:-1
         }
         this.formData=Object.assign({},props.formData);
         this.formData.valid_type=1;
         this.state.mobile=this.formData.mobile;
-        if(this.state.mobile)
-            this.state.s_mob=1;
 
         this.change = this.change.bind(this);
         this.accountChange = this.accountChange.bind(this);
@@ -70,7 +68,7 @@ class Register extends Component {
         }
         Wapi.user.get(user=>{//获取手机号
             this.formData.mobile=user.data.mobile;
-            this.setState({s_mob:1,mobile:this.formData.mobile});
+            this.setState({mobile:this.formData.mobile});
             Wapi.customer.get(cust=>{//获取客户表信息
                 if(cust.data){
                     Wapi.vehicle.list(ve=>{
@@ -128,13 +126,13 @@ class Register extends Component {
             W.alert(___.code_err);
             return;
         }
-        if(!this.state.s_num&&!this._newNum){
+        if(this.state.s_num<=0&&!this._newNum){
             W.alert(___.pls_input_new_car_num);
             return;
         }
         let data=Object.assign({},this.formData);
         if(!data.mobile&&!data.email){
-            W.alert('email or mobile'+___.not_null);
+            W.alert('mobile'+___.not_null);
             return;
         }
         W.loading(true,___.registering);
@@ -157,7 +155,7 @@ class Register extends Component {
 
     selectMobil(event, index, s_mob){
         let newState={s_mob};
-        if(s_mob){
+        if(s_mob==1){
             this.formData.mobile=this.state.mobile;
             newState.car=this._car;
         }else{
@@ -168,6 +166,7 @@ class Register extends Component {
         this.setState(newState);
     }
     selectNum(event, index, s_num){
+        if(this.state.s_mob!=1&&s_num!=0)return;//如果是新手机注册，不能选择现有车辆
         if(s_num){//选择了某辆车
             this._newNum='';
         }
@@ -180,7 +179,10 @@ class Register extends Component {
 
     render() {
         // let dis=this.props.disabled?{display:'none'}:null;
-        let mob=[<MenuItem value={0} primaryText={___.add_new_mobile} key={0} />];
+        let mob=[
+            <MenuItem value={-1} primaryText={___.pls_select} key={-1} />,
+            <MenuItem value={0} primaryText={___.add_new_mobile} key={0} />
+        ];
         if(this.state.mobile)
             mob.push(<MenuItem value={1} primaryText={this.state.mobile} key={1} />);
         let newUser=this.state.s_mob?null:
@@ -203,8 +205,10 @@ class Register extends Component {
             />
         </div>);
 
-        let numList=this.state.car.map((e,i)=><MenuItem value={e.objectId} primaryText={e.name} key={i+1} />);
+        let cars=this.state.car||[];
+        let numList=cars.map((e,i)=><MenuItem value={e.objectId} primaryText={e.name} key={i+1} />);
         numList.unshift(<MenuItem value={0} primaryText={___.add_new_car_num} key={0} />);
+        numList.unshift(<MenuItem value={-1} primaryText={___.pls_select} key={-1} />);
         let newNum=this.state.s_num?null:
         (<Input 
             name='newNum'
@@ -228,34 +232,6 @@ class Register extends Component {
                     </DropDownMenu>
                     {newNum}
                 </div>
-                {/*<Input
-                    name='account'
-                    hintText={___.input_account}
-                    floatingLabelText={___.account}
-                    onChange={this.accountChange}
-                    value={this.formData.mobile}
-                    disabled={this.props.disabled}
-                    style={dis}
-                    type='tel'
-                />
-                <VerificationCode 
-                    name='valid_code'
-                    type={1}
-                    accountType={this.state.accountType}
-                    account={this.state.account} 
-                    onSuccess={this.change}
-                    value={this.formData.valid_code}
-                    clean={this.props.clean}
-                    disabled={this.props.disabled}
-                    style={dis}
-                />
-                <PasswordRepeat 
-                    onChange={this.change}
-                    name='password'
-                    value={this.formData.password}
-                    clean={this.props.clean}
-                    style={{display:'none'}}
-                />*/}
                 <RaisedButton label={___.register} primary={true} style={sty.but} onClick={this.submit}/>
             </div>
         );

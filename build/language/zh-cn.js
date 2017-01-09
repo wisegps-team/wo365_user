@@ -388,4 +388,5 @@ window.___={
 	'product_price':'产品价格',
 	'personal_info':'个人信息',
 	'logined_bind':'登录绑定',
+	'pls_select':'请选择',
 }

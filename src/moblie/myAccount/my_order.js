@@ -176,11 +176,11 @@ class DumbList extends React.Component{
     render() {
         let cards=this.props.data.map((ele,index)=>{
             let colors=['#8BC34A','#00BFA5'];
-            let i=ele.status;
+            let strStatus=Status(data);
             return(
                 <div key={index} style={styles.card}>
                     <div style={{float:'right'}}><a style={styles.a} onClick={e=>this.openDetails(ele)}>{___.details}</a></div>
-                    <div>{___.order_status+'：'+___.booking_status[i]}</div>
+                    <div>{___.order_status+'：'+strStatus}</div>
                     <div>{___.book_date+'：'+W.dateToString(W.date(ele.createdAt)).slice(0,10)}</div>
                     <div>{___.booking_product + '：'+ ele.product.name}</div>
                 </div>
@@ -203,4 +203,20 @@ let Alist=AutoList(DumbList);
 //工具方法 金额转字符
 function toMoneyFormat(money){
     return money.toFixed(2);
+}
+//工具方法 返回订单的状态
+function Status(data){
+    if(data.resTime){
+        return ___.str_order_status[4];
+    }
+    if(data.confirmTime){
+        return ___.str_order_status[3];
+    }
+    if(data.selectInstallDate){
+        return ___.str_order_status[2];
+    }
+    if(data.receiptDate||data.carType.noPay==1){
+        return ___.str_order_status[1];
+    }
+    return ___.str_order_status[0];
 }

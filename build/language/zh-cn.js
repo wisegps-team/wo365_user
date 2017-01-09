@@ -389,4 +389,5 @@ window.___={
 	'personal_info':'个人信息',
 	'logined_bind':'登录绑定',
 	'pls_select':'请选择',
+	'str_order_status':['已预订待付款','待选择安装网点','已选择安装网点待回复','已预约待安装','已完成'],
 }

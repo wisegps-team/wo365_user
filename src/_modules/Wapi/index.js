@@ -549,6 +549,24 @@ WGps.prototype._clearTime=function(date){
 	return newDate;
 }
 
+/**
+ * 崩溃记录表
+ */
+class WCrashApi extends WiStormAPI{
+	constructor() {
+		super('crash',null,config.app_key,config.app_secret);
+		this.get_op={
+			fields:'app_key,bug_report,account,objectId,ACL,creator,createdAt,updatedAt'//默认返回的字段
+		}
+		this.list_op={
+			fields:this.get_op.fields,
+			sorts:"-objectId",
+			page:"objectId",
+			limit:"20"
+		}
+	}
+}
+
 const Wapi={
     user:new WUserApi(_user?_user.access_token:null,_user?_user.session_token:null),
     developer:new WDeveloperApi(_user?_user.access_token:null),
@@ -560,6 +578,7 @@ const Wapi={
 	page:new WPageApi(_user?_user.access_token:null),
 	feature:new WFeatureApi(_user?_user.access_token:null),
 	service:new WServiceApi(_user?_user.access_token:null),
+	crash:new WCrashApi(),
 	//以下为非核心功能表
 	customer:new WAPI('customer',_user?_user.access_token:null),//客户表
 	employee:new WAPI('employee',_user?_user.access_token:null),//员工表

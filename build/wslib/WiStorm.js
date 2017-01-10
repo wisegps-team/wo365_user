@@ -37,7 +37,7 @@ window.onerror=function(msg,url,l){
 		}
 		var errorJson={"bug_report":text,"account":account};
 		if(typeof Wapi=="object"){//如果已经加载了api文件，则直接发送错误
-			Wapi.user.createCrash(errorJson,function(res){});
+			Wapi.crash.add(function(res){},errorJson);
 		}else{//否则存在本地，等Wapi加载完会自动发送
 			var errorLog=localStorage.getItem("errorList");
 			var errorList;

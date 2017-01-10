@@ -149,7 +149,7 @@ class Playback extends Component {
         delete this.stop_pos;
         let et=W.date(end.gpsTime);
         let st=W.date(start.gpsTime);
-        let time=(et-st)/60/1000;
+        let time=parseInt((et-st)/60/1000);
         if(time>5){//大于5分钟
             let map=this.props.map;
             let marker=map.addMarker({
@@ -211,7 +211,8 @@ class Playback extends Component {
                     },{
                         gpsTime:W.dateToString(this.data.start_time)+'@'+W.dateToString(this.data.end_time),
                         did:this.props.data.did,
-                        map:WiStorm.config.map
+                        map:WiStorm.config.map,
+                        // gpsFlag:2
                     });
                 }else{//重新播放
                     this.i=0;
@@ -256,7 +257,7 @@ class Playback extends Component {
         return (
             <div {...this.props} map={null} order={null} data={null}>
                 <div style={sty.d}>
-                    <label style={sty.l}>{___.carNum+':'}</label>
+                    <label style={sty.l}>{___.carNum+': '}</label>
                     <div style={sty.r}>
                         <span style={sty.lh}>
                             {this.props.data.name}
@@ -267,7 +268,7 @@ class Playback extends Component {
                     </div>
                 </div>
                 <div style={sty.d}>
-                    <label style={sty.l}>{___.start_time+':'}</label>
+                    <label style={sty.l}>{___.start_time+': '}</label>
                     <DateTime 
                         style={sty.r} 
                         value={this.data.start_time} 
@@ -276,7 +277,7 @@ class Playback extends Component {
                     />
                 </div>
                 <div style={sty.d}>
-                    <label style={sty.l}>{___.end_time+':'}</label>
+                    <label style={sty.l}>{___.end_time+': '}</label>
                     <DateTime 
                         style={sty.r} 
                         value={this.data.end_time}
@@ -285,7 +286,7 @@ class Playback extends Component {
                     />
                 </div>     
                 <div style={sty.d}>
-                    <label style={sty.l}>{___.play_speed+':'}</label>
+                    <label style={sty.l}>{___.play_speed+': '}</label>
                     <div style={sty.r}>
                         <Slider 
                             defaultValue={0.5} 
@@ -303,11 +304,11 @@ class Playback extends Component {
                     </label>
                     <div style={sty.r}>
                         <div style={sty.f}>
-                            <label>{___.car_state+':'}</label>
+                            <label>{___.car_state+': '}</label>
                             <span ref={'car_state'}></span>
                         </div>
                         <div style={sty.f}>
-                            <label>{___.gps_time+':'}</label>
+                            <label>{___.gps_time+': '}</label>
                             <span ref={'gps_time'}></span>
                         </div>
                     </div>

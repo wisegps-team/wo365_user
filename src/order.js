@@ -391,7 +391,7 @@ class DetailBox extends Component{
                         {/*产品型号*/}
                         <div style={styles.childLine}>{___.booking_product+'：'+(a.product||'--')}</div>
                         {/*产品价格*/}
-                        <div style={styles.childLine}>{___.product_price+'：'+(a.price||'--')}</div>
+                        <div style={styles.childLine}>{___.product_price+'：'+(a.price.toFixed(2)||'--')}</div>
                     </div>
 
                     <div style={(time1 && !time2) ? {} : hide}>
@@ -416,7 +416,7 @@ class DetailBox extends Component{
                             <div style={styles.childLine}>零元预定</div>
                         :[  
                             /*付款金额*/
-                            <div style={styles.childLine} key={1}>{___.order_pay_amount+'：'+(d.payMoney||'--')}</div>,
+                            <div style={styles.childLine} key={1}>{___.order_pay_amount+'：'+(d.payMoney.toFixed(2)||'--')}</div>,
                             /*付款方式*/
                             <div style={styles.childLine} key={2}>{___.order_pay_type+'：'+(d.payMoney ? ___.wxPay : '--')}</div>
                         ]}
@@ -516,7 +516,7 @@ class DetailBox extends Component{
 
                     <div name='step6' style={this.state.step==6 ? show : hide}>
                         {/*支付金额*/}
-                        <div style={styles.childLine}>{___.paid_amount+'：'+(d.money||'--')}</div>
+                        <div style={styles.childLine}>{___.paid_amount+'：'+(d.money.toFixed(2)||'--')}</div>
                     </div>
 
                     <div style={(time6 && !time7) ? {} : hide}>
@@ -537,7 +537,7 @@ class DetailBox extends Component{
 
                     <div name='step7' style={this.state.step==7 ? show : hide}>
                         {/*支付金额*/}
-                        <div style={styles.childLine}>{___.paid_amount+'：'+(d.commission||'--')}</div>
+                        <div style={styles.childLine}>{___.paid_amount+'：'+(d.commission.toFixed(2)||'--')}</div>
                     </div>
 
                 </div>

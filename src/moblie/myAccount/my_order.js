@@ -24,11 +24,13 @@ import QrBox from '../../_component/booking/qr_box';
 import AppBox from '../../_component/booking/app_box';
 
 const thisView=window.LAUNCHER.getView();//第一句必然是获取view
-
+// const payView=thisView.prefetch('#pay',3);
 let _par=null;
 thisView.addEventListener('load',function(e){
     ReactDOM.render(<App/>,thisView);
     _par=e.params;
+
+    // ReactDOM.render(<Pay/>,payView);
 });
 
 const EVENT=makeRandomEvent({
@@ -122,13 +124,14 @@ class App extends React.Component {
         // this.setState({bookData:data});
         // location.href='http://'+WiStorm.config.domain.wx+'/autogps/order.html?intent=logout&bookingId='+data.objectId;
         history.replaceState('','','../my_account.html');
-        location.href=WiStorm.root+'order.html?intent=logout&bookingId='+data.objectId;
+        location.href=WiStorm.root+'/order.html?intent=logout&bookingId='+data.objectId;
     }
     load(){
         let arr=this.state.books;
         this.page++;
 
         Wapi.booking.list(res=>{
+            console.log(res);
             this.setState({
                 books:arr.concat(res.data),
             });
@@ -159,6 +162,9 @@ class App extends React.Component {
                     />
                 </div>
                 
+                {/*<SonPage title={___.order_detail} open={this.state.bookData!=null} back={this.toList}>
+                    <DetailBox data={this.state.bookData}/>
+                </SonPage>*/}
             </ThemeProvider>
         )
     }
@@ -205,6 +211,7 @@ let Alist=AutoList(DumbList);
 function toMoneyFormat(money){
     return money.toFixed(2);
 }
+
 //工具方法 返回订单的状态
 function Status(data){
     if(data.resTime){

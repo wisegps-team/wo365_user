@@ -46,7 +46,7 @@ WCommApi.prototype.sendSMS=function(callback,mobile,type,content){
 		content_type:0,
 		content_sign:'智联车网'
 	}
-	if(typeof mobile==='Object'){
+	if(typeof mobile==='object'){
 		Data=Object.assign(Data,mobile);
 	}else{
 		Data=Object.assign(Data,{mobile,type,content});

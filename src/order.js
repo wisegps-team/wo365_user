@@ -184,7 +184,7 @@ class DetailBox extends Component{
         
         let booking=this.booking;
         Wapi.customer.get(res=>{
-            location.href='http://'+WiStorm.config.domain.wx+'/autogps/booking.html?intent=logout'
+            location.href='http://'+WiStorm.config.domain.user+'/autogps/booking.html?intent=logout'
                 +'&bookingId='+booking.objectId
                 +'&wxAppKey='+this.act.wxAppKey
                 +'&name='+booking.name
@@ -199,7 +199,7 @@ class DetailBox extends Component{
         let booking=this.booking;
         
         Wapi.customer.get(res=>{
-            location.href='http://'+WiStorm.config.domain.wx+'/autogps/booking.html?intent=logout'
+            location.href='http://'+WiStorm.config.domain.user+'/autogps/booking.html?intent=logout'
                 +'&bookingId='+booking.objectId
                 +'&wxAppKey='+this.act.wxAppKey
                 +'&name='+booking.name
@@ -213,7 +213,7 @@ class DetailBox extends Component{
         console.log('selectInstall ');
     
         let booking=this.booking;
-        location.href='http://'+WiStorm.config.domain.wx+'/autogps/booking_install.html?intent=logout'
+        location.href='http://'+WiStorm.config.domain.user+'/autogps/booking_install.html?intent=logout'
             +'&needOpenId=true'
             +'&bookingId='+booking.objectId
             +'&wx_app_id='+_user.customer.wxAppKey
@@ -259,7 +259,7 @@ class DetailBox extends Component{
                 W.alert(str);
             }
         }else{
-            location.href='http://'+WiStorm.config.domain.wx+'/autogps/booking_install.html?intent=logout'
+            location.href='http://'+WiStorm.config.domain.user+'/autogps/booking_install.html?intent=logout'
                 +'&needOpenId=true'
                 +'&bookingId='+booking.objectId
                 +'&wx_app_id='+_user.customer.wxAppKey
@@ -273,7 +273,7 @@ class DetailBox extends Component{
 
         let booking=this.booking;
 
-        let _url='http://'+WiStorm.config.domain.wx+'/autogps/commission.php'
+        let _url='http://'+WiStorm.config.domain.user+'/autogps/commission.php'
             +'?bookingId='+booking.objectId
             +'&cid='+_user.customer.objectId
             +'&receipt='+this.act.price

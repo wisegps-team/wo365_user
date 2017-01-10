@@ -399,4 +399,7 @@ window.___={
 	'cancel_order':'取消订单',
 	'order_pay_booking':'支付款项',
 	'booking_install_success':'尊敬的合作伙伴，你有新的服务预约，请及时回复。',
+	'wxPay':'微信支付',
+	'cash':'现金支付',
+	'pay_deposit_now':'现在支付订金XX元',
 }

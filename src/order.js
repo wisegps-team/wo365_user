@@ -13,10 +13,17 @@ import NavigationExpandLess from 'material-ui/svg-icons/navigation/expand-less';
 import NavigationExpandMore from 'material-ui/svg-icons/navigation/expand-more';
 import RaisedButton from 'material-ui/RaisedButton';
 
+import SonPage from './_component/base/sonPage';
+import AppBox from './_component/booking/app_box';
+import PayBox from './_component/booking/pay_box';
+
 
 const thisView=window.LAUNCHER.getView();//第一句必然是获取view
+const payView=thisView.prefetch('#pay',3);
 thisView.addEventListener('load',function(e){
     ReactDOM.render(<DetailBox/>,thisView);
+    
+    ReactDOM.render(<Pay/>,payView);
 });
 
 let noTap=false;
@@ -61,6 +68,9 @@ const styles={
     },
 }
 
+let _booking={};
+let _act={};
+let _url=location.href;
 //详细信息
 class DetailBox extends Component{
     constructor(props) {
@@ -76,6 +86,8 @@ class DetailBox extends Component{
             carowner:false,
             installer:false
         };
+        this.payPage=false;
+
         this.getData = this.getData.bind(this);
 
         this.setStep = this.setStep.bind(this);
@@ -88,6 +100,7 @@ class DetailBox extends Component{
         this.confirmInstall = this.confirmInstall.bind(this);
         this.contactInstall = this.contactInstall.bind(this);
         this.changeInstall = this.changeInstall.bind(this);
+        this.payBack = this.payBack.bind(this);
     }    
     componentDidMount() {
         Wapi.booking.get(res=>{
@@ -98,6 +111,7 @@ class DetailBox extends Component{
     }
     
     getData() {
+        // if(nextProps.data&&this.props.data!=nextProps.data){
         //_user.mobile//当前用户电话
         //nextProps.data.userMobile//车主电话
         //nextProps.data.mobile//预定人电话
@@ -107,6 +121,9 @@ class DetailBox extends Component{
         }
         if(this.booking.userMobile==_user.mobile){
             this.user.carowner=true;
+        }
+        if(this.booking.installId==_user.customer.objectId){
+            this.user.installer=true;
         }
 
         let that=this;
@@ -119,13 +136,14 @@ class DetailBox extends Component{
                         Wapi.customer.get(function(re){//获取安装网点电话
                             if(re.data){
                                 that.booking=Object.assign({},that.booking,{installTel:re.data.tel});
-                                that.setStep();
+                                that.checkpay();
                             }
                         },{
                             objectId:res.data.installId
                         });
                     }else{
-                        that.setStep();
+                        that.checkpay();
+                        
                     }
 
                 }
@@ -134,10 +152,34 @@ class DetailBox extends Component{
             });
         }
     }
+    checkpay(){
+        let that=this;
+        let isPay=Wapi.pay.checkWxPay(function(res){
+            let booking=W.ls('booking');
+            if(res.status_code){
+                W.alert(___.pay_fail);
+                booking.payMoney=0;
+                booking.payStatus=0;
+                that.setStep();
+            }else{
+                booking.orderId=res.orderId;
+                Wapi.booking.update(e=>console.log(e),{
+                    _objectId:booking.objectId,
+                    orderId:booking.orderId,
+                    payMoney:booking.payMoney,
+                    payStatus:booking.payStatus,
+                    receiptDate:W.dateToString(new Date())
+                });
+                that.booking=Object.assign({},booking);
+                that.setStep();
+            }
+        },this.act.objectId);
+        if(!isPay)this.setStep();
+    }
     setStep(){
         let data=this.booking;
         let s=1;
-        if(data.receiptDate){
+        if(data.receiptDate||(data.carType&&(data.carType.noPay==1))){
             s=2;
         }
         if(data.selectInstallDate){
@@ -181,14 +223,21 @@ class DetailBox extends Component{
         if(noTap)return;
         tapTimer();
         console.log('payBook');
-        
-        let booking=this.booking;
-        Wapi.customer.get(res=>{
-            location.href='http://'+WiStorm.config.domain.user+'/autogps/booking.html?intent=logout'
-                +'&bookingId='+booking.objectId
-                +'&activityId='+this.act.objectId;
-                // +'&wx_app_id='+this.act.wxAppKey;
-        },{objectId:this.act.uid});
+
+        _booking=this.booking;
+        _act=this.act;
+        thisView.goTo('#pay');
+
+        // this.payPage=true;
+        // this.forceUpdate();
+
+        // let booking=this.booking;
+        // Wapi.customer.get(res=>{
+        //     location.href='http://'+WiStorm.config.domain.user+'/autogps/booking.html?intent=logout'
+        //         +'&bookingId='+booking.objectId
+        //         +'&activityId='+this.act.objectId;
+        //         // +'&wx_app_id='+this.act.wxAppKey;
+        // },{objectId:this.act.uid});
     }
     sendToBooker(){//carowner
         //发送给好友，跳转到booking.html
@@ -289,6 +338,10 @@ class DetailBox extends Component{
         
         location.href=url;
     }
+    payBack(){
+        this.payPage=false;
+        this.forceUpdate();
+    }
     render() {
         let d=this.booking||{};
         let a=this.act||{};
@@ -303,7 +356,7 @@ class DetailBox extends Component{
         let time1 = W.dateToString(W.date(d.createdAt));
         let time2 = d.receiptDate ? W.dateToString(W.date(d.receiptDate)) : '' ;
         if(d.carType&&(d.carType.noPay==1)){
-            time2='--';
+            time2='未支付';
         }
         let time3 = d.selectInstallDate ? W.dateToString(W.date(d.selectInstallDate)) : '' ;
         let time4 = d.confirmTime ? W.dateToString(W.date(d.confirmTime)) : '' ;
@@ -355,11 +408,11 @@ class DetailBox extends Component{
                     <div name='time2' onClick={()=>this.changeStep(2)}>
                         {/*付款时间*/}
                         {this.state.step==2 ? less : more}
-                        <div style={styles.line}>{___.order_pay_date+'：'+time2}</div>
+                        <div style={styles.line}>{___.order_pay_booking+'：'+time2}</div>
                     </div>
 
                     <div name='step2' style={this.state.step==2 ? show : hide}>
-                        {time2=='--'?
+                        {time2=='未支付'?
                             <div style={styles.childLine}>零元预定</div>
                         :[  
                             /*付款金额*/
@@ -491,12 +544,49 @@ class DetailBox extends Component{
 
                 <div style={styles.hide}>{___.recommender+'：'+d.sellerName}</div>
                 <div style={styles.hide}>{___.install_price+'：'+(a.installationFee||'--')}</div>
+
+                <SonPage open={this.payPage} back={this.payBack} >
+                    <Pay booking={this.booking} act={this.act}/>
+                </SonPage>                
             </div>
             </ThemeProvider>
         );
     }
 }
 
+class Pay extends Component {
+    constructor(props,context){
+        super(props,context);
+    }
+    componentDidMount() {
+        payView.addEventListener('show',e=>{
+            history.replaceState('','',_url);
+            this.forceUpdate();
+        })
+    }
+    cancelPay(){
+        history.back();
+    }
+    render() {
+        let booking=_booking;
+        let act=_act;
+        let main=<div></div>;
+        if(booking.objectId){
+            main=<PayBox 
+                    booking={booking} 
+                    uid={booking.userId}
+                    act={act} 
+                    onCancel={this.cancelPay}
+                    self={booking.type==0}
+                />;
+        }
+        return (
+            <AppBox>
+                {main}
+            </AppBox>
+        );
+    }
+}
 
 
 //工具方法 金额转字符

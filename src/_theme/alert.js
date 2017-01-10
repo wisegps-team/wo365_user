@@ -24,7 +24,7 @@ class Alert extends Component {
     constructor(props, context) {
         super(props, context);
         this.state={
-            title:'系统提示',
+            title:'',
             alert:'默认文本',
             confirm:'带取消的确认框',
             prompt:'带输入框的确认框',
@@ -61,7 +61,6 @@ class Alert extends Component {
 
     handleClose(ok){
         let newState={
-            title:'系统提示',            
             alert:'',
             confirm:'',
             prompt:'',
@@ -92,7 +91,6 @@ class Alert extends Component {
             newState.alert=text;
         }else{
             newState.alert=text.text;
-            newState.title=text.title;
         }
         newState.callback=callback;
         newState.alert_open=true;
@@ -104,7 +102,6 @@ class Alert extends Component {
             newState.confirm=text;
         }else{
             newState.confirm=text.text;
-            newState.title=text.title;
         }
         newState.callback=callback;
         newState.confirm_open=true;        
@@ -116,7 +113,6 @@ class Alert extends Component {
             newState.prompt=text;
         }else{
             newState.prompt=text.text;
-            newState.title=text.title;
             newState.defaultValue=text.defaultValue;
         }
         newState.callback=callback;

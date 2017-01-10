@@ -104,6 +104,7 @@ class App extends Component {
                     id='monitor_map' 
                     style={sty.w} 
                     cars={this.props.cars} 
+                    active={this.props.select_car} carClick={carClick}
                 />
                 <Sonpage open={this.state.deviceListOpen} back={this.showDeviceList}>
                     <DeviceList/>
@@ -118,8 +119,15 @@ App.childContextTypes = {
 };
 
 const ConnectAPP=connect(function select(STATE) {
-    let state={
-        cars:STATE.cars
-    };
+    let state=Object.assign({},STATE);
     return state;
 })(App);
+
+function  carClick(data) {
+    STORE.dispatch(ACT.fun.selectCar(data));
+    late(()=>thisView.goTo('home.js'));
+}
+
+function late(fun) {
+    setTimeout(fun,1000);
+}

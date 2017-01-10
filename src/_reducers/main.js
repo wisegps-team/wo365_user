@@ -4,12 +4,14 @@ import thunkMiddleware from 'redux-thunk';
 import {carsReducer,selectCarReducer} from './monitor';
 
 const initialState = {
-    cars:[]
+    cars:[],
+    select_car:0
 };
 
 function main(state = initialState, action) {
     return {
-        cars:carsReducer(state.cars,action)
+        cars:carsReducer(state.cars,action),
+        select_car:selectCarReducer(state.select_car,action),
     };
 }
 

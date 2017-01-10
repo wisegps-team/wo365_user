@@ -397,4 +397,6 @@ window.___={
 	'order_delete_success':'订单已取消！',
 	'pay_now':'支付货款',
 	'cancel_order':'取消订单',
+	'order_pay_booking':'支付款项',
+	'booking_install_success':'尊敬的合作伙伴，你有新的服务预约，请及时回复。',
 }

@@ -42,15 +42,16 @@ WCommApi.prototype=new WiStormAPI();//继承父类WiStormAPI的方法
  * @param {Object} mobile
  */
 WCommApi.prototype.sendSMS=function(callback,mobile,type,content){
-	var Data={
-		method:this.apiName+".sms.send",
-		mobile:mobile,
-		type:type,
-		'content':content,
+	let Data={
 		content_type:0,
 		content_sign:'智联车网'
-	};
-	
+	}
+	if(typeof mobile==='Object'){
+		Data=Object.assign(Data,mobile);
+	}else{
+		Data=Object.assign(Data,{mobile,type,content});
+	}
+	Data.method=this.apiName+".sms.send",
 	this.getApi(Data,callback);	
 }
 WCommApi.prototype.sendEmail=function(callback,email,type,content){

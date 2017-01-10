@@ -390,4 +390,11 @@ window.___={
 	'logined_bind':'登录绑定',
 	'pls_select':'请选择',
 	'str_order_status':['已预订待付款','待选择安装网点','已选择安装网点待回复','已预约待安装','已完成'],
+	'confirm_delete_booking':'确认取消该订单吗？',
+	'sendWeixinToBooker_bookSuccess':'点击详情选择授权安装网点',
+	'no_change_step3':'你于time已预约服务，如install工作人员2小时内未联系你确认车型和安装时间，你可更换安装网点！',
+	'no_change_step4':'你已预约time安装设备，如在约定时间内未安装注册，你可更换安装网点！',
+	'order_delete_success':'订单已取消！',
+	'pay_now':'支付货款',
+	'cancel_order':'取消订单',
 }

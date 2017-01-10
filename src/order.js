@@ -171,7 +171,7 @@ class DetailBox extends Component{
         W.confirm(___.confirm_delete_booking,b=>{
             if(b){
                 Wapi.booking.delete(res=>{
-                    W.alert('delete success',e=>{history.back()});
+                    W.alert(___.order_delete_success,e=>{history.back()});
                 },{objectId:this.booking.objectId});
             }
         });
@@ -186,9 +186,8 @@ class DetailBox extends Component{
         Wapi.customer.get(res=>{
             location.href='http://'+WiStorm.config.domain.user+'/autogps/booking.html?intent=logout'
                 +'&bookingId='+booking.objectId
-                +'&wxAppKey='+this.act.wxAppKey
-                +'&name='+booking.name
-                +'&userName='+booking.userName;
+                +'&activityId='+this.act.objectId;
+                // +'&wx_app_id='+this.act.wxAppKey;
         },{objectId:this.act.uid});
     }
     sendToBooker(){//carowner
@@ -332,8 +331,8 @@ class DetailBox extends Component{
                     </div>
 
                     <div name='step1' style={this.state.step==1 ? show : hide}>
-                        {/*客户姓名*/}
-                        <div style={styles.childLine}>{___.booker+'：'+d.name+'/'+d.mobile}</div>
+                        {/*客户姓名
+                        <div style={styles.childLine}>{___.booker+'：'+d.name+'/'+d.mobile}</div>*/}
                         {/*车主姓名*/}
                         <div style={styles.childLine}>{___.carowner_info+'：'+d.userName+'/'+d.userMobile}</div>
                         {/*产品型号*/}
@@ -344,8 +343,8 @@ class DetailBox extends Component{
 
                     <div style={(time1 && !time2) ? {} : hide}>
                         <div style={this.user.booker ? btns : hide}>
-                            <RaisedButton label="取消订单" onTouchTap={this.cancelBook} backgroundColor='#ff9900' labelColor='#ffffff' />
-                            <RaisedButton label="继续预定" onTouchTap={this.payBook} primary={true} style={{marginLeft:'10px'}}/>
+                            <RaisedButton label={___.cancel_order} onTouchTap={this.cancelBook} backgroundColor='#ff9900' labelColor='#ffffff' />
+                            <RaisedButton label={___.pay_now} onTouchTap={this.payBook} primary={true} style={{marginLeft:'10px'}}/>
                         </div>
                     </div>
 

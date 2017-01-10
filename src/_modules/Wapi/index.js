@@ -635,7 +635,7 @@ makeGetOp('area','id,name,parentId,level,areaCode,zipCode,provinceId,provinceNam
 makeGetOp('brand','objectId,name,company,uid',{limit:-1,sorts:'name',page:'name'});
 makeGetOp('product','objectId,name,company,uid,brand,brandId',{limit:-1,sorts:'name',page:'name'});
 makeGetOp('booking','userId,activityId,mobile,sellerId,sellerName,uid,status,status0,status1,status2,status3,name,carType,resTime,payTime,confirmTime,money,did,openId,installId,install,installDate,type,userName,userMobile,payMoney,payStatus,orderId,activityType,userOpenId,product,receiptDate,selectInstallDate,res,receipt,receiptId,commission,commissionId,managerId,objectId,createdAt,updatedAt');
-makeGetOp('activity','uid,type,name,url,status,reward,objectId,createdAt,updatedAt');
+makeGetOp('activity','creator,objectId,uid,type,name,url,status,reward,pay,deposit,offersDesc,price,installationFee,getCard,principal,principalId,principalTel,sellerType,sellerTypeId,product,productId,wxAppKey,count,tel,createdAt,updatedAt');
 
 
 

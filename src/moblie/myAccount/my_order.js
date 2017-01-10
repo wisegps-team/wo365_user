@@ -121,7 +121,8 @@ class App extends React.Component {
     detail(data){
         // this.setState({bookData:data});
         // location.href='http://'+WiStorm.config.domain.wx+'/autogps/order.html?intent=logout&bookingId='+data.objectId;
-        location.href=WiStorm.root+'/order.html?intent=logout&bookingId='+data.objectId;
+        history.replaceState('','','../my_account.html');
+        location.href=WiStorm.root+'order.html?intent=logout&bookingId='+data.objectId;
     }
     load(){
         let arr=this.state.books;

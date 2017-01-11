@@ -139,7 +139,7 @@ class DetailBox extends Component{
                         if(flag==2){
                             that.checkpay();
                         }
-                    },{objectId:this.act.productId});
+                    },{objectId:that.act.productId});
                     
                     if(that.booking.installId){
                         Wapi.customer.get(function(re){//获取安装网点电话

@@ -409,12 +409,12 @@ class DetailBox extends Component{
                     <div name='time2' onClick={()=>this.changeStep(2)}>
                         {/*付款时间*/}
                         {this.state.step==2 ? less : more}
-                        <div style={styles.line}>{___.order_pay_booking+'：'+time2}</div>
+                        <div style={styles.line}>{___.order_pay_date+'：'+time2}</div>
                     </div>
 
                     <div name='step2' style={this.state.step==2 ? show : hide}>
                         {time2=='未支付'?
-                            <div style={styles.childLine}>零元预定</div>
+                            <div style={styles.childLine}>零元预订</div>
                         :[  
                             /*付款金额*/
                             <div style={styles.childLine} key={1}>{___.order_pay_amount+'：'+(d.payMoney ? d.payMoney.toFixed(2) : '--')}</div>,

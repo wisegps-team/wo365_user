@@ -17,6 +17,9 @@ import SonPage from './_component/base/sonPage';
 import AppBox from './_component/booking/app_box';
 import PayBox from './_component/booking/pay_box';
 
+if(!(_user&&_user.mobile)){
+    W.alert(___.close_login,e=>W.native.close());
+}
 
 const thisView=window.LAUNCHER.getView();//第一句必然是获取view
 const payView=thisView.prefetch('#pay',3);
@@ -114,7 +117,7 @@ class DetailBox extends Component{
         // if(nextProps.data&&this.props.data!=nextProps.data){
         //_user.mobile//当前用户电话
         //nextProps.data.userMobile//车主电话
-        //nextProps.data.mobile//预定人电话
+        //nextProps.data.mobile//预订人电话
 
         if(this.booking.mobile==_user.mobile){
             this.user.booker=true;
@@ -131,7 +134,7 @@ class DetailBox extends Component{
             Wapi.activity.get(function(res){
                 if(res.data){
                     that.act=res.data;
-
+                    
                     let flag=0;
                     Wapi.product.get(res_product=>{
                         that.act.product = res_product.data.brand+' '+res_product.data.name;
@@ -139,7 +142,7 @@ class DetailBox extends Component{
                         if(flag==2){
                             that.checkpay();
                         }
-                    },{objectId:this.act.productId});
+                    },{objectId:that.act.productId});
                     
                     if(that.booking.installId){
                         Wapi.customer.get(function(re){//获取安装网点电话
@@ -234,7 +237,7 @@ class DetailBox extends Component{
         });
     }
     payBook(){//booker
-        //继续预定，跳转到booking.html
+        //继续预订，跳转到booking.html
         if(noTap)return;
         tapTimer();
         console.log('payBook');

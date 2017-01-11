@@ -402,4 +402,5 @@ window.___={
 	'wxPay':'微信支付',
 	'cash':'现金支付',
 	'pay_deposit_now':'现在支付订金XX元',
+	'close_login':'您尚未登录，请登录后再进入此页面',
 }

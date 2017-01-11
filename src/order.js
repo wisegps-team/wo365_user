@@ -131,19 +131,33 @@ class DetailBox extends Component{
             Wapi.activity.get(function(res){
                 if(res.data){
                     that.act=res.data;
+
+                    let flag=0;
+                    Wapi.product.get(res_product=>{
+                        that.act.product = res_product.data.brand+' '+res_product.data.name;
+                        flag++;
+                        if(flag==2){
+                            that.checkpay();
+                        }
+                    },{objectId:this.act.productId});
                     
                     if(that.booking.installId){
                         Wapi.customer.get(function(re){//获取安装网点电话
                             if(re.data){
                                 that.booking=Object.assign({},that.booking,{installTel:re.data.tel});
-                                that.checkpay();
+                                flag++;
+                                if(flag==2){
+                                    that.checkpay();
+                                }
                             }
                         },{
                             objectId:that.booking.installId
                         });
                     }else{
-                        that.checkpay();
-                        
+                        flag++;
+                        if(flag==2){
+                            that.checkpay();
+                        }
                     }
 
                 }

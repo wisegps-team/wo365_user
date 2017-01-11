@@ -132,14 +132,14 @@ class DetailBox extends Component{
                 if(res.data){
                     that.act=res.data;
                     
-                    if(res.data.installId){
+                    if(that.booking.installId){
                         Wapi.customer.get(function(re){//获取安装网点电话
                             if(re.data){
                                 that.booking=Object.assign({},that.booking,{installTel:re.data.tel});
                                 that.checkpay();
                             }
                         },{
-                            objectId:res.data.installId
+                            objectId:that.booking.installId
                         });
                     }else{
                         that.checkpay();
@@ -156,6 +156,7 @@ class DetailBox extends Component{
         let that=this;
         let isPay=Wapi.pay.checkWxPay(function(res){
             let booking=W.ls('booking');
+            W.setLs('booking','');
             if(res.status_code){
                 W.alert(___.pay_fail);
                 booking.payMoney=0;

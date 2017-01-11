@@ -745,7 +745,7 @@ W.wxLogin=function(s){
 	}else{
 		W.setCookie("__login_redirect_uri__",location.href,-15);
 		var u=encodeURIComponent(WiStorm.config.wx_login);
-		top.location="https://open.weixin.qq.com/connect/oauth2/authorize?appid="+WiStorm.config.wx_app_id+"&redirect_uri="+u+"&response_type=code&scope=snsapi_userinfo&state="+state+"#wechat_redirect";
+		top.location="https://open.weixin.qq.com/connect/oauth2/authorize?appid="+WiStorm.config.wx_app_id+"&redirect_uri="+u+"&response_type=code&scope=snsapi_base&state="+state+"#wechat_redirect";
 	}				
 }
 
@@ -787,7 +787,20 @@ W.errorCode=function(json){
 			}
 		});
 	}else{
+		var er={
+			'4097':'连接服务器失败',
+			'8193':'查询不到有效节点',
+			'36867':'查询不到有效节点',
+			'36868':'无效签名',
+			'36869':'方法无效',
+			'36870':'无效的Appkey'
+		}
+		var erKey=Object.keys(er);
+		
 		var text=___.error[json.status_code]||___.unknown_err;
+		if(erKey.indexOf(json.status_code.toString())!=-1){
+			text=___.error['000'];
+		}
 		W.alert("error_code："+json.status_code+"；error_msg："+text);
 	}
 }
@@ -815,44 +828,10 @@ W.err=function(fun){
 }
 
 W.login=function(){
-	if(_g.sso_login){//已经授权
-		if (!_g.access_token) {//登录不成功
-			if (_g.status_code == 1) {//未绑定
-				W.toRegister();
-				return;
-			}else{//登录失败
-				W.errorCode(_g);
-				return;
-			}
-		} else {
-			//登录成功
-			W.setSetting("openId",_g.openid);
-			W.setCookie("access_token", _g.access_token,1);
-			var gd={
-				access_token: _g.access_token
-			}
-			if(_g.cust_id){
-				gd.cust_id=_g.cust_id;
-			}else if(_g.temporary){//临时页面
-				gd.login_id=_g.openid;
-			}else{
-				W.toRegister();
-				return;
-			}
-			Wapi.user.get(function(res) {//获取用户数据
-				if (res.status_code) {
-					W.alert(res.err_msg+"；获取用户信息失败；error_code:"+res.status_code);
-					return;
-				} else {
-					W._loginSuccess(res);
-					var evt = document.createEvent("HTMLEvents");
-					evt.initEvent("W.loginSuccess", false, false);//当页面load事件触发并且已经登录成功则会触发该事件,用于某些需要不经过登录页也可以直接访问，但是又需要用户授权登录的页面
-					window.dispatchEvent(evt);
-				}
-			},gd);
-		}
-	}else{
-		W.alert("没有sso_login");
+	if(_g.sso_login&&_g.access_token){//已经授权
+		//登录成功
+		W.setSetting("openId",_g.openid);
+		W.setCookie("access_token", _g.access_token,1);
 	}
 }
 W._loginSuccess=function(res){
@@ -924,12 +903,12 @@ window.WiStorm={
 	config:{
 		"description": "WiStorm框架的配置信息",
 		"skin": "default",
-		"default_language": "en",
+		"default_language": "zh-cn",
 		"update_url": WiStorm_root+"update/version.json",
 		"wx_ticket_url":location.origin+"/WX.TokenAndTicket.php?action=ticket",
 		"wx_sdk":"http://res.wx.qq.com/open/js/jweixin-1.0.0.js",
 		"wx_login":location.origin+"/oauth2.php",
-		'languages':['zh-cn','zh-hk','zh-tw','en','zh'],
+		languages:['zh-cn','en-us'],
 		'map':'BAIDU',
 		domain:{
 			'wx':'wx.autogps.cn',
@@ -958,20 +937,7 @@ window.WiStorm={
 u=undefined;
 _d=undefined;
 
-//获取cookie中的app信息
-var keys=W.getCookie('_app_config_');
-if(keys){
-	try {
-		keys=JSON.parse(keys);
-		Object.assign(WiStorm.config,keys);
-		WiStorm.config.wx_app_id=_g.wx_app_id||keys.wxAppKey;
-		if(_g.wx_app_id)
-			WiStorm.config.wx_login=WiStorm.config.wx_login+'?wx_app_id='+WiStorm.config.wx_app_id;
-	} catch (error) {
-		alert('app key error');
-	}
-	keys=undefined;
-}
+
 	
 
 
@@ -985,6 +951,25 @@ if(location.protocol=="http:"||location.protocol=="https:"){//浏览器环境
 }
 tem=undefined;
 s=undefined;
+
+//获取cookie中的app信息
+var keys=W.getCookie('_app_config_');
+try {
+	keys=JSON.parse(keys);
+	Object.assign(WiStorm.config,keys);
+	WiStorm.config.wx_app_id=keys.wxAppKey;
+} catch (error) {
+	if(_g.intent!='logout'){
+		var loc=encodeURIComponent((location.origin+location.pathname).replace(WiStorm.root,''));
+		loc=(loc=='index.html')?'':'&location='+loc;
+		location=location.origin+(location.search||'?')+loc;
+	}
+}
+keys=undefined;
+if(_g.wx_app_id){
+	WiStorm.config.wx_app_id=_g.wx_app_id;
+	WiStorm.config.wx_login=WiStorm.config.wx_login+'?wx_app_id='+WiStorm.config.wx_app_id;	
+}
 
 /**
  * 获取本地用户存储
@@ -1028,11 +1013,8 @@ if(!W._login&&location.pathname.indexOf("index.html")<0&&_g.intent!="logout"){
 
 //获取语言资源
 var l=navigator.language.toLowerCase();
-if(WiStorm.config.languages.indexOf(l)==-1){
-	l=l.split('-')[0];
-	if(WiStorm.config.languages.indexOf(l)==-1)
-		l=WiStorm.config.default_language;
-}
+if(WiStorm.config.languages.indexOf(l)==-1)
+	l=WiStorm.config.default_language;
 var url=WiStorm.root+"language/"+l+".js";
 document.write('<script src="'+url+'"></script>');
 l=undefined;

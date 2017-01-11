@@ -441,10 +441,10 @@ class DetailBox extends Component{
                     </div>
 
                     <div style={(time2 && !time3) ? {} : hide}>
-                        <div style={(this.user.carowner && !this.user.booker) ? btns : hide}>
+                        <div style={(this.user.booker && !this.user.carowner) ? btns : hide}>
                             <RaisedButton label="发送预订信息给好友" onTouchTap={this.sendToBooker} primary={true} />
                         </div>
-                        <div style={this.user.booker ? btns : hide}>
+                        <div style={this.user.carowner ? btns : hide}>
                             <RaisedButton label="选择安装网点" onTouchTap={this.selectInstall} primary={true} />
                         </div>
                     </div>

@@ -14,6 +14,7 @@ import SocialShare from 'material-ui/svg-icons/social/share';
 import NavigationExpandLess from 'material-ui/svg-icons/navigation/expand-less';
 import NavigationExpandMore from 'material-ui/svg-icons/navigation/expand-more';
 import RaisedButton from 'material-ui/RaisedButton';
+import NavigationChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
 
 import SonPage from '../../_component/base/sonPage';
 import AppBar from '../../_component/base/appBar';
@@ -39,9 +40,22 @@ const EVENT=makeRandomEvent({
 
 
 const styles={
-    appbar:{position:'fixed',top:'0px'},
-    main:{width:'90%',paddingLeft:'5%',paddingRight:'5%',paddingTop:'60px',paddingBottom:'20px',},
-    card:{marginTop:'5px',padding:'10px',lineHeight: '30px',borderBottom:'solid 1px #999999'},
+    appbar:{
+        position:'fixed',
+        top:'0px'
+    },
+    main:{
+        width:'90%',
+        paddingLeft:'5%',
+        paddingRight:'5%',
+        paddingBottom:'20px',
+    },
+    card:{
+        marginTop:'5px',
+        padding:'10px',
+        lineHeight: '30px',
+        borderBottom:'solid 1px #999999'
+    },
     w:{
         width:'50%',
         display:'inline-block'
@@ -80,6 +94,9 @@ const styles={
         // marginTop:'20px',
         textAlign:'center'
     },
+    variable:{
+        color:'#009988'
+    }
 }
 
 let noTap=false;
@@ -149,10 +166,11 @@ class App extends React.Component {
     render(){
         return(
             <ThemeProvider>
-                <AppBar 
+                {/*<AppBar 
                     title={___.my_order} 
                     style={styles.appbar}
-                />
+                />*/}
+
                 <div style={styles.main}>
                     <Alist 
                         max={this.state.total} 
@@ -186,10 +204,22 @@ class DumbList extends React.Component{
             let strStatus=Status(ele);
             return(
                 <div key={index} style={styles.card}>
-                    <div style={{float:'right'}}><a style={styles.a} onClick={e=>this.openDetails(ele)}>{___.details}</a></div>
-                    <div>{___.order_status+'：'+strStatus}</div>
-                    <div>{___.book_date+'：'+W.dateToString(W.date(ele.createdAt)).slice(0,10)}</div>
-                    <div>{___.booking_product + '：'+ ele.product.name}</div>
+                    {/*<div style={{float:'right'}}><a style={styles.a} onClick={e=>this.openDetails(ele)}>{___.details}</a></div>*/}
+                    <div>
+                        {___.book_date+'：'}
+                        <span style={styles.variable}>{timeFormat(ele.createdAt)}</span>
+                    </div>
+                    <div>
+                        {___.booking_product + '：'}
+                        <span style={styles.variable}>{(ele.product.brand||'') +' '+ ele.product.name}</span>
+                    </div>
+                    <div style={{width:'100%',display:'block'}} onClick={e=>this.openDetails(ele)}>
+                        <div style={{float:'right',paddingTop:'5px'}}><NavigationChevronRight /></div>
+                        <div>
+                            {___.order_status+'：'}
+                            <span style={styles.variable}>{strStatus}</span>
+                        </div>
+                    </div>
                 </div>
             )
         })
@@ -227,4 +257,9 @@ function Status(data){
         return ___.str_order_status[1];
     }
     return ___.str_order_status[0];
+}
+
+//工具方法 数据库的时间转格式
+function timeFormat(time){
+    return W.dateToString(new Date(time))
 }

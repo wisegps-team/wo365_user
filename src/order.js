@@ -391,7 +391,7 @@ class DetailBox extends Component{
             <ThemeProvider>
             <div style={styles.p}>
                 {/*订单号*/}
-                <div style={styles.line}>{___.order_id+'：'+d.objectId}</div>
+                <div style={styles.line}>{___.order_id+'：'+_g.bookingId}</div>
 
                 <div>
 

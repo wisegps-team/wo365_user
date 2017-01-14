@@ -30,6 +30,7 @@ import {getOpenIdKey} from '../_modules/tool';
 import Dialog from 'material-ui/Dialog';
 
 const thisView=window.LAUNCHER.getView();//第一句必然是获取view
+thisView.setTitle(___.my_account);
 thisView.addEventListener('load',function(){
     ReactDOM.render(<App/>,thisView);
     
@@ -46,10 +47,10 @@ const sty={
         // marginTop:'50px',
     },
     p:{
-        padding: '10px',
+        // padding: '10px',
     },
     lo:{
-        width: '100%',
+        // width: '100%',
         // position: 'fixed',
         // bottom: '10%',
         // left: '10%'
@@ -89,7 +90,9 @@ const sty={
         height:'120px',
         display:'block',
         textAlign:'center',
-        paddingTop:'70px'
+        paddingTop:'40px',
+        backgroundColor:'#33ccee',
+        color:'#ffffff'
     },
     head_str:{
         fontSize:'14px',
@@ -130,7 +133,7 @@ class App extends Component {
         return (
             <ThemeProvider>
             <div>
-                <AppBar title={___.user}/>
+                {/*<AppBar title={___.user}/>*/}
                 <div style={sty.p}>
                     <ShowBox/>
                 </div>
@@ -151,7 +154,7 @@ class ForgetApp extends Component{
         return (
             <ThemeProvider>
             <div>
-                <AppBar title={___.forget_pwd}/>
+                {/*<AppBar title={___.forget_pwd}/>*/}
                 <div style={sty.p}>
                     <Paper zDepth={1} style={sty.p}>
                         <Forget onSuccess={this.resetSuccess}/>
@@ -171,6 +174,7 @@ class ShowBox extends Component{
             userName:false
         }
         this.orderNum=0;
+        this.orderNum_seller=0;
         this.reset = this.reset.bind(this);
         this.userName = this.userName.bind(this);
         this.close = this.close.bind(this);
@@ -179,10 +183,24 @@ class ShowBox extends Component{
         this.wallet = this.wallet.bind(this);
     }
     componentDidMount() {
+        let flag=0;
+
         Wapi.booking.list(res=>{
             this.orderNum=res.total;
-            this.forceUpdate();
+            flag++;
+            if(flag==2){
+                this.forceUpdate();
+            }
         },{mobile:_user.mobile});
+
+        let _sellerId=_user.employee?_user.employee.objectId:_user.customer.objectId;
+        Wapi.booking.list(re=>{
+            this.orderNum_seller=re.total;
+            flag++;
+            if(flag==2){
+                this.forceUpdate();
+            }
+        },{sellerId:_sellerId});
     }
     
 
@@ -253,6 +271,7 @@ class ShowBox extends Component{
         thisView.goTo('./myAccount/my_order.js');
     }
     render() {
+        
         const actions = [
             <FlatButton
                 label={___.cancel}
@@ -272,7 +291,7 @@ class ShowBox extends Component{
             <div>
                 <div 
                 onClick={this.personalInfo}
-                style={{textAlign:'center',padding:'10px 0px 20px'}}>
+                style={sty.head}>
                     <div style={{marginBottom:'10px',fontSize:'18px'}}>{_user.customer.name}</div>
                     <div style={{marginBottom:'10px'}}>{_user.employee && _user.employee.name}</div>
                     <div>{_user.mobile}</div>
@@ -284,13 +303,14 @@ class ShowBox extends Component{
                     {/*修改密码*/}
                     {/*<ListItem primaryText={___.reset_pwd} leftIcon={<ActionLock/>} onClick={this.reset}/>*/}
                     {/*我的订单*/}
-                    <ListItem 
+                    {/*<ListItem 
                         primaryText={___.my_order} 
                         onClick={this.toBillList}
                         rightAvatar={<span style={{marginTop:'12px',marginRight:'30px'}}>{this.orderNum}</span>}
                         rightIcon={<NavigationChevronRight />}
                         style={{borderBottom:'1px solid #dddddd'}}
-                    />
+                    />*/}
+                    {/*我的钱包*/}
                     <ListItem 
                         primaryText={___.my_wallet} 
                         onClick={this.wallet}
@@ -298,10 +318,18 @@ class ShowBox extends Component{
                         rightIcon={<NavigationChevronRight />}
                         style={{borderBottom:'1px solid #dddddd'}}
                     />
+                    {/*推荐有礼*/}
                     <ListItem 
                         primaryText={___.recommend} 
                         onClick={this.recommend}
-                        rightAvatar={<span style={{marginTop:'12px',marginRight:'30px'}}>{toMoneyFormat(0)}</span>}
+                        rightAvatar={<span style={{marginTop:'12px',marginRight:'30px'}}>{this.orderNum_seller}</span>}
+                        rightIcon={<NavigationChevronRight />}
+                        style={{borderBottom:'1px solid #dddddd'}}
+                    />
+                    {/*系统设置*/}
+                    <ListItem 
+                        primaryText={___.system_set} 
+                        onClick={this.systemSet}
                         rightIcon={<NavigationChevronRight />}
                         style={{borderBottom:'1px solid #dddddd'}}
                     />
@@ -389,5 +417,5 @@ class Logo extends Component{
 
 //工具方法 金额转字符
 function toMoneyFormat(money){
-    return '￥' + money.toFixed(2);
+    return money.toFixed(2);
 }

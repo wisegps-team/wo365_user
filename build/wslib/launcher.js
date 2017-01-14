@@ -303,6 +303,7 @@ view.prototype.show=function(animation,back){
     }
     this.dom.className=cla;
     this.show_state=1;
+    this.dom.setTitle();
 }
 
 //隐藏
@@ -480,6 +481,22 @@ var divFunction={
     },
     getCreater:function(){//获取当前模块的创建者url
         return this.creater;
+    },
+    setTitle:function(t){//设置当前页面的Title
+        if(t){
+            this.title=t;
+        }
+        document.title = this.title||' ';
+        var i = document.createElement('iframe');
+        i.src = 'http://m.baidu.com/favicon.ico';
+        // i.src = '../img/favicon.ico';
+        i.style.display = 'none';
+        i.onload = function() {
+            setTimeout(function(){
+            i.remove();
+            }, 9)
+        }
+        document.body.appendChild(i);
     }
 };
 

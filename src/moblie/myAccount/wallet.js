@@ -13,12 +13,15 @@ import MobileChecker from '../../_component/base/mobileChecker';
 
 
 const thisView=window.LAUNCHER.getView();//第一句必然是获取view
+thisView.setTitle(___.my_wallet);
 thisView.addEventListener('load',function(){
     ReactDOM.render(<WalletApp/>,thisView);
 
     let withdrawView=thisView.prefetch('#withdraw',3);
+    withdrawView.setTitle(___.my_wallet);
     ReactDOM.render(<WithdrawPage/>,withdrawView);
 });
+
 
 const styles={
     appbar:{
@@ -49,22 +52,17 @@ const styles={
         height: '100%'
     },
     income:{
-        // color:'#009900',
-        fontSize:'20px',
         float:'right'
     },
     expenses:{
         color:'#990000',
-        fontSize:'20px',
         float:'right'
     },
     bill:{
         padding:'5px 10px',
-        borderTop:'1px solid #cccccc'
+        borderBottom:'1px solid #cccccc'
     },
     bill_remark:{
-        fontSize:'14px',
-        color:'#666666',
         paddingTop:'5px'
     },
     head:{
@@ -72,18 +70,22 @@ const styles={
         height:'120px',
         display:'block',
         textAlign:'center',
-        paddingTop:'70px'
+        paddingTop:'40px',
+        backgroundColor:'#33ccee',
     },
     head_str:{
         fontSize:'14px',
-        marginBottom:'5px'
+        marginBottom:'5px',
+        color:'#ffffff'
     },
     head_num:{
         fontSize:'36px',
-        marginBottom:'10px'
+        marginBottom:'10px',
+        color:'#ffffff'
     },
     a:{
-        color:'#009988'
+        // color:'#009988'
+        color:'#FFFF8D'
     },
     sonpage_main:{
         marginLeft:'10px',
@@ -95,6 +97,16 @@ const styles={
         paddingTop:'1em',
         paddingBottom:'1em'
     },
+    hide:{
+        display:'none',
+    },
+    no_record:{
+        width:'100%',
+        textAlign:'center'
+    },
+    line:{
+        marginTop:'15px'
+    }
 }
 function vmiddle(num,sty){
     return Object.assign({marginTop:((window.innerHeight-num)/2-50)+'px'},sty);
@@ -136,7 +148,7 @@ class WalletApp extends Component {
     }
     getRecords(){
         Wapi.user.getBillList(res=>{
-            this.tota=res.total;
+            this.total=res.total;
             let _data=res.data.reverse();
             this.data=this.data.concat(_data);
             this.forceUpdate();
@@ -203,26 +215,32 @@ class WalletApp extends Component {
             <ThemeProvider>
             <div>
 
-                <AppBar 
+                {/*<AppBar 
                     style={styles.appbar}
                     title={___.my_wallet} 
-                />
+                />*/}
 
                 <div style={styles.head}>
-                    <div style={styles.head_str}>{___.balance}</div>
+                    {/*<div style={styles.head_str}>{___.balance}</div>*/}
                     <div style={styles.head_num}>{toMoneyFormat(_user.balance)}</div>
-                    <div>
+                    <div style={_user.balance>0 ? {} : styles.hide}>
                         <a style={styles.a} onTouchTap={this.inputPsw}>{___.withdraw_cash}</a>
                     </div>
                 </div>
 
                 <div style={styles.main}>
-                    <Alist 
-                        max={this.total} 
-                        limit={20} 
-                        data={this.data} 
-                        next={this.loadNextPage} 
-                    />
+                    {(_user.balance==0&&this.total==0) ? (
+                        <div style={styles.no_record}>
+                            <div style={styles.line}>{___.wallet_empty}</div>
+                            <div style={styles.line}>{___.join_get_redbag}</div>
+                        </div>):(
+                        <Alist 
+                            max={this.total} 
+                            limit={20} 
+                            data={this.data} 
+                            next={this.loadNextPage} 
+                        />
+                    )}
                 </div>
                 
                 <Dialog
@@ -359,7 +377,7 @@ class WithdrawPage extends Component {
         return (
             <ThemeProvider>
             <div>
-                <AppBar title={___.withdraw_cash}/>
+                {/*<AppBar title={___.withdraw_cash}/>*/}
 
                 <div style={this.state.isInputAmount ? vmiddle(180,styles.sonpage_main) : {display:'none'}}>
                     <div style={styles.inputGroup}>

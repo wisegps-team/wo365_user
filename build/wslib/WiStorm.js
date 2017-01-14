@@ -303,55 +303,6 @@ W.link=function(cssName){
 
 
 /**
- * @constructor
- * @description 所有ui类的超类；子类需使用伪原型继承；本身没有实际作用，主要用于被继承实现，继承例子查看下面：
- * @param {string} tag 需要创建的标签名
- * @extends {Element}
- * @example	
- *	new UI("div");
- * @property {json} prototype 基类的原型链，用于存储基类的方法
- * @return {Element}
- */
-function WiStormUI(tag){
-	var obj=document.createElement(tag);
-
-	var funObj=WiStormUI.prototype;
-	for(fun in funObj){
-		obj[fun]=funObj[fun];
-    }
-    obj._type="WiStormUI";
-    obj._parentType="Element";
-	return obj;
-}
-/**
- * 定义类方法
- */
-WiStormUI.prototype={
-	merge:function(obj){
-		var funObj=obj.__proto__;
-		for (fun in funObj) {
-			this[fun]=funObj[fun];
-	    }
-	    this._parentType=this._type;
-	    this._type=obj.constructor.name;
-	},
-	getName:function(){
-		return this._type;
-	},
-	getParentName:function(){
-		return this._parentType;
-	},
-	template:function(dom,data){
-		var htm=dom.innerHTML;
-		this.innerHTML=htm.replace(/(\<|&lt;)\%.*?\%(&gt;|\>)/g,function(word){
-			word=word.replace(/(\<|&lt;|&gt;|\>|%)/g,'');
-  			return data[word]||'';
-		});
-	}
-};
-
-
-/**
  * 框架的ajax
  * @param {String} url
  * @param {Object} options，具体可参考http://dev.dcloud.net.cn/mui/ajax/
@@ -498,124 +449,6 @@ W.setSetting=function(key,val){
 	WiStorm.setting[key]=val;
 	localStorage.setItem("_WiStormUserSetting_",JSON.stringify(WiStorm.setting));
 }
-/**
- * 返回元素的第j级祖先元素，
- * 当第二个参数是一个字符串时，那么此时相当于jq的parents()的用法
- * @param {Element} e,当前元素
- * @param {Number} j,祖先的层数或css选择器
- */
-W.parents=function(e,j){
-	if(typeof j=="number"){
-		for(var i=0;i<j;i++){
-			e=e.parentElement;
-		}
-		return e;
-	}else{//以下代码未测试过
-		var targets=document.querySelectorAll(j);//整个文档中符合选择器的元素
-		var tl=targets.length;
-		var parents=[];
-		
-		for(var p=e.parentElement;p;p=p.parentElement){
-			for(var j=0;j<tl;j++){
-				if(p==targets[j])
-					return p;
-			}
-		}
-	}
-}
-
-/**
- * 设置当前元素伪焦点，使用WiStormUI时有时需要伪焦点
- * @param {Element} dom,要设置伪焦点的元素
- */
-W.focus=function(dom){
-	dom.blur();
-	W.blur();
-	dom.setAttribute("data-w-focus","true");
-	W.focus.target=dom;
-}
-
-/**
- * 把当前获得伪焦点的元素，取消伪焦点
- * @return {Element}
- */
-W.blur=function(){
-	var input=W.getFocus();
-	if(input)
-		input.setAttribute("data-w-focus","false");
-	return input;
-}
-
-/**
- * 获取当前获得伪焦点的元素
- * @return {Element}
- */
-W.getFocus=function(){
-	return W.focus.target;
-}
-
-W.update=function(url){
-	plus.nativeUI.showWaiting("升级中...");
-	var dtask=plus.downloader.createDownload(url,{method:"GET"},function(d,status){
-	    if ( status == 200 ) { 
-	        console.log( "Download wgtu success: " + d.filename );
-		    plus.runtime.install(d.filename,{},function(){
-	        	plus.nativeUI.closeWaiting();
-	    	    plus.nativeUI.alert("Update wgtu success, restart now!",function(){
-	            	plus.runtime.restart();
-	        	});
-	        },function(e){
-	            plus.nativeUI.closeWaiting();
-	            alert("Update wgtu failed: "+e.message);
-	        });
-	    } else {
-	        plus.nativeUI.closeWaiting();
-	        alert( "Download wgtu failed: " + status ); 
-	    } 
-	});
-	dtask.addEventListener('statechanged',function(d,status){
-	    console.log("statechanged: "+d.state);
-	});
-
-	//删除旧的更新包(如果有)
-	plus.io.requestFileSystem( plus.io.PUBLIC_DOWNLOADS,function(fs){
-		fs.root.createReader().readEntries(function(entries){
-			for(var i=0;i<entries.length; i++){
-				if(entries[i].name.search(".wgt")!=-1)
-					entries[i].remove();
-			}
-		},function(e){
-			alert("Read entries failed: "+e.message);
-		});
-	},function(e){
-		alert("Request file system failed: "+e.message);
-	});
-	
-	//下载新更新包
-	dtask.start();
-}
-
-W.checkUpdate=function(){
-	var check_url=WiStorm.config.update_url;
-	W.getJSON(check_url,null,function(date){
-		if(date.version!=WiStorm.version){
-			W.confirm({
-				"title":"应用更新",
-				"content":"检测到有新版本："+date.version+"，"+date.content+"更新包大小："+date.size+"，是否现在更新？",
-				"y":"现在更新",
-				"n":"下次再说",
-				"callback":function(b){
-					if(b){
-						if(date[WiStorm.version])
-							W.update(date[WiStorm.version]);
-						else
-							W.alert("抱歉，没有您的版本升级包，请您到应用商店更新应用或到官网获取完整安装包");
-					}
-				}
-			});
-		}
-	});
-}
 
 /**
  * 把json从本地存储里获取出来，并转换成json对象，如果非json数据，第二个参数传true
@@ -745,7 +578,7 @@ W.wxLogin=function(s){
 	}else{
 		W.setCookie("__login_redirect_uri__",location.href,-15);
 		var u=encodeURIComponent(WiStorm.config.wx_login);
-		top.location="https://open.weixin.qq.com/connect/oauth2/authorize?appid="+WiStorm.config.wx_app_id+"&redirect_uri="+u+"&response_type=code&scope=snsapi_userinfo&state="+state+"#wechat_redirect";
+		top.location="https://open.weixin.qq.com/connect/oauth2/authorize?appid="+WiStorm.config.wx_app_id+"&redirect_uri="+u+"&response_type=code&scope=snsapi_base&state="+state+"#wechat_redirect";
 	}				
 }
 
@@ -787,7 +620,20 @@ W.errorCode=function(json){
 			}
 		});
 	}else{
+		var er={
+			'4097':'连接服务器失败',
+			'8193':'查询不到有效节点',
+			'36867':'查询不到有效节点',
+			'36868':'无效签名',
+			'36869':'方法无效',
+			'36870':'无效的Appkey'
+		}
+		var erKey=Object.keys(er);
+		
 		var text=___.error[json.status_code]||___.unknown_err;
+		if(erKey.indexOf(json.status_code.toString())!=-1){
+			text=___.error['000'];
+		}
 		W.alert("error_code："+json.status_code+"；error_msg："+text);
 	}
 }
@@ -815,44 +661,10 @@ W.err=function(fun){
 }
 
 W.login=function(){
-	if(_g.sso_login){//已经授权
-		if (!_g.access_token) {//登录不成功
-			if (_g.status_code == 1) {//未绑定
-				W.toRegister();
-				return;
-			}else{//登录失败
-				W.errorCode(_g);
-				return;
-			}
-		} else {
-			//登录成功
-			W.setSetting("openId",_g.openid);
-			W.setCookie("access_token", _g.access_token,1);
-			var gd={
-				access_token: _g.access_token
-			}
-			if(_g.cust_id){
-				gd.cust_id=_g.cust_id;
-			}else if(_g.temporary){//临时页面
-				gd.login_id=_g.openid;
-			}else{
-				W.toRegister();
-				return;
-			}
-			Wapi.user.get(function(res) {//获取用户数据
-				if (res.status_code) {
-					W.alert(res.err_msg+"；获取用户信息失败；error_code:"+res.status_code);
-					return;
-				} else {
-					W._loginSuccess(res);
-					var evt = document.createEvent("HTMLEvents");
-					evt.initEvent("W.loginSuccess", false, false);//当页面load事件触发并且已经登录成功则会触发该事件,用于某些需要不经过登录页也可以直接访问，但是又需要用户授权登录的页面
-					window.dispatchEvent(evt);
-				}
-			},gd);
-		}
-	}else{
-		W.alert("没有sso_login");
+	if(_g.sso_login&&_g.access_token){//已经授权
+		//登录成功
+		W.setSetting("openId",_g.openid);
+		W.setCookie("access_token", _g.access_token,1);
 	}
 }
 W._loginSuccess=function(res){
@@ -924,12 +736,12 @@ window.WiStorm={
 	config:{
 		"description": "WiStorm框架的配置信息",
 		"skin": "default",
-		"default_language": "en",
+		"default_language": "zh-cn",
 		"update_url": WiStorm_root+"update/version.json",
 		"wx_ticket_url":location.origin+"/WX.TokenAndTicket.php?action=ticket",
 		"wx_sdk":"http://res.wx.qq.com/open/js/jweixin-1.0.0.js",
 		"wx_login":location.origin+"/oauth2.php",
-		'languages':['zh-cn','zh-hk','zh-tw','en','zh'],
+		languages:['zh-cn','en-us'],
 		'map':'BAIDU',
 		domain:{
 			'wx':'wx.autogps.cn',
@@ -958,20 +770,7 @@ window.WiStorm={
 u=undefined;
 _d=undefined;
 
-//获取cookie中的app信息
-var keys=W.getCookie('_app_config_');
-if(keys){
-	try {
-		keys=JSON.parse(keys);
-		Object.assign(WiStorm.config,keys);
-		WiStorm.config.wx_app_id=_g.wx_app_id||keys.wxAppKey;
-		if(_g.wx_app_id)
-			WiStorm.config.wx_login=WiStorm.config.wx_login+'?wx_app_id='+WiStorm.config.wx_app_id;
-	} catch (error) {
-		alert('app key error');
-	}
-	keys=undefined;
-}
+
 	
 
 
@@ -985,6 +784,25 @@ if(location.protocol=="http:"||location.protocol=="https:"){//浏览器环境
 }
 tem=undefined;
 s=undefined;
+
+//获取cookie中的app信息
+var keys=W.getCookie('_app_config_');
+try {
+	keys=JSON.parse(keys);
+	Object.assign(WiStorm.config,keys);
+	WiStorm.config.wx_app_id=keys.wxAppKey;
+} catch (error) {
+	if(_g.intent!='logout'){
+		var loc=encodeURIComponent((location.origin+location.pathname).replace(WiStorm.root,''));
+		loc=(loc=='index.html')?'':'&location='+loc;
+		location=location.origin+(location.search||'?')+loc;
+	}
+}
+keys=undefined;
+if(_g.wx_app_id){
+	WiStorm.config.wx_app_id=_g.wx_app_id;
+	WiStorm.config.wx_login=WiStorm.config.wx_login+'?wx_app_id='+WiStorm.config.wx_app_id;	
+}
 
 /**
  * 获取本地用户存储
@@ -1028,11 +846,8 @@ if(!W._login&&location.pathname.indexOf("index.html")<0&&_g.intent!="logout"){
 
 //获取语言资源
 var l=navigator.language.toLowerCase();
-if(WiStorm.config.languages.indexOf(l)==-1){
-	l=l.split('-')[0];
-	if(WiStorm.config.languages.indexOf(l)==-1)
-		l=WiStorm.config.default_language;
-}
+if(WiStorm.config.languages.indexOf(l)==-1)
+	l=WiStorm.config.default_language;
 var url=WiStorm.root+"language/"+l+".js";
 document.write('<script src="'+url+'"></script>');
 l=undefined;

@@ -504,9 +504,9 @@ class DList extends Component{
                         />
                     </div>
                     <div >
-                        <span>成功推荐每单奖励红包 </span>
+                        <span>推荐朋友预订安装奖励 </span>
                         <span style={{color:'#ff9900'}}>{ele.reward}</span>
-                        <span> 元</span>
+                        <span> 元红包</span>
                     </div>
                 </div>
                 

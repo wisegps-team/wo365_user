@@ -17,9 +17,12 @@ thisView.addEventListener('load',function(){
 const styles = {
     main:{paddingTop:'50px',paddingBottom:'20px'},
     card:{margin:'10px',padding:'0px 10px 10px',borderBottom:'1px solid #cccccc'},
-    line:{paddingTop:'0.5em'},
+    line:{paddingTop:'0.5em',width:'90%',wordWrap:'break-word'},
     count:{marginRight:'1em'},
-    link:{color:'#009688',marginRight:'1em'},
+    variable:{color:'#009688',marginRight:'1em'},
+    link:{
+        color:'#0000cc'
+    },
 };
 function combineStyle(arr){
     return arr.reduce((a,b)=>Object.assign({},styles[a],styles[b]));
@@ -73,9 +76,9 @@ class App extends Component {
     render() {
         let items=this.data.map((ele,i)=>
             <div key={i} style={styles.card}>
-                <div style={styles.line}>{___.qrcode_num +' '+ ele.id}</div>
+                <div style={styles.line}>{___.data_code +' '}<span style={styles.variable}>{'http://autogps.cn/?s='+ele.id}</span></div>
                 <div style={styles.line}>
-                    <span onClick={()=>this.toScan(ele)} style={styles.link}>{___.scan_count}0</span>
+                    <span onClick={()=>this.toScan(ele)} style={styles.variable}>{___.scan_count}0</span>
                     <span onClick={()=>this.removeBind(ele)} style={styles.link}>{___.remove_bind}</span>
                 </div>
             </div>

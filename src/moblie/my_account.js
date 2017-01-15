@@ -30,7 +30,7 @@ import {getOpenIdKey} from '../_modules/tool';
 import Dialog from 'material-ui/Dialog';
 
 const thisView=window.LAUNCHER.getView();//第一句必然是获取view
-thisView.setTitle(___.my_account);
+thisView.setTitle(' ');
 thisView.addEventListener('load',function(){
     ReactDOM.render(<App/>,thisView);
     
@@ -292,9 +292,9 @@ class ShowBox extends Component{
                 <div 
                 onClick={this.personalInfo}
                 style={sty.head}>
-                    <div style={{marginBottom:'10px',fontSize:'18px'}}>{_user.customer.name}</div>
-                    <div style={{marginBottom:'10px'}}>{_user.employee && _user.employee.name}</div>
-                    <div>{_user.mobile}</div>
+                    {/*<div style={{marginBottom:'10px',fontSize:'18px'}}>{_user.customer.name}</div>*/}
+                    <div style={{marginTop:'20px',fontSize:'18px'}}>{_user.employee && _user.employee.name}</div>
+                    {/*<div>{_user.mobile}</div>*/}
                 </div>
                 <Divider/>
                 <List>
@@ -303,13 +303,13 @@ class ShowBox extends Component{
                     {/*修改密码*/}
                     {/*<ListItem primaryText={___.reset_pwd} leftIcon={<ActionLock/>} onClick={this.reset}/>*/}
                     {/*我的订单*/}
-                    {/*<ListItem 
+                    <ListItem 
                         primaryText={___.my_order} 
                         onClick={this.toBillList}
                         rightAvatar={<span style={{marginTop:'12px',marginRight:'30px'}}>{this.orderNum}</span>}
                         rightIcon={<NavigationChevronRight />}
                         style={{borderBottom:'1px solid #dddddd'}}
-                    />*/}
+                    />
                     {/*我的钱包*/}
                     <ListItem 
                         primaryText={___.my_wallet} 
@@ -327,12 +327,12 @@ class ShowBox extends Component{
                         style={{borderBottom:'1px solid #dddddd'}}
                     />
                     {/*系统设置*/}
-                    <ListItem 
+                    {/*<ListItem 
                         primaryText={___.system_set} 
                         onClick={this.systemSet}
                         rightIcon={<NavigationChevronRight />}
                         style={{borderBottom:'1px solid #dddddd'}}
-                    />
+                    />*/}
                 </List>
                 <List style={{padding:'20px 16px 8px 16px',textAlign:'canter'}}>
                     <RaisedButton label={___.logout} fullWidth={true} secondary={true} style={sty.lo} onClick={this.logout}/>                    

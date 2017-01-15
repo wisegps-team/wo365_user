@@ -324,7 +324,7 @@ class App extends Component {
                         title={___.recommend}
                         style={this.state.isShare ? styles.hide : {position:'fixed'}}
                     />*/}
-                    <div style={styles.search_head}>
+                    {/*<div style={styles.search_head}>
                         <ContentAdd style={styles.add_icon} onClick={this.add}/>
                         <div style={styles.search_box}>
                             <Input 
@@ -335,7 +335,7 @@ class App extends Component {
                                 value={this.state.keyword}
                             />
                         </div>
-                    </div>
+                    </div>*/}
                     <div name='list' style={styles.main}>
                         {/*items*/}
                         <Alist 

@@ -520,7 +520,7 @@ class DList extends Component{
                     点击
                     <img 
                         src='../../img/share.png' 
-                        style={{width:'20px',height:'20px',marginRight:'15px'}} 
+                        style={{width:'20px',height:'20px'}} 
                     />
                     后按页面提示分享
                     <p>好友打开链接即可了解活动详情并咨询预订！</p>
@@ -543,7 +543,9 @@ class SharePage extends Component {
                 <br/>
                 <div style={{textAlign:'center',display:'block',width:'100%'}}>
                     {/*___.share_detail*/}
-                    返回
+                    <div style={{width:'100px',marginLeft:(window.innerWidth-100)/2+'px',height:'30px',lineHeight:'30px',borderRadius:'4px',border:'solid 1px #ff9900',color:'#ff9900'}}>
+                        返回
+                    </div>
                 </div>
             </div>
         );

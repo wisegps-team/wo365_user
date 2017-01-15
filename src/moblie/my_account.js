@@ -303,13 +303,13 @@ class ShowBox extends Component{
                     {/*修改密码*/}
                     {/*<ListItem primaryText={___.reset_pwd} leftIcon={<ActionLock/>} onClick={this.reset}/>*/}
                     {/*我的订单*/}
-                    {/*<ListItem 
+                    <ListItem 
                         primaryText={___.my_order} 
                         onClick={this.toBillList}
                         rightAvatar={<span style={{marginTop:'12px',marginRight:'30px'}}>{this.orderNum}</span>}
                         rightIcon={<NavigationChevronRight />}
                         style={{borderBottom:'1px solid #dddddd'}}
-                    />*/}
+                    />
                     {/*我的钱包*/}
                     <ListItem 
                         primaryText={___.my_wallet} 

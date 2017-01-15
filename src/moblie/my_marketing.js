@@ -40,7 +40,7 @@ const styles = {
     share_content:{width:'90%',marginLeft:'5%',marginTop:'20px'},
     hide:{display:'none'},
     detail:{float:'right',paddingTop:'12px',paddingRight:'12px',color:'#0000cc'},
-    search_head:{width:'100%',display:'block',borderBottom:'1px solid #cccccc'},
+    search_head:{width:'100%',display:'block'},
     add_icon:{float:'right',marginRight:'15px'},
     search_box:{marginLeft:'15px',marginTop:'15px',width:'80%',display:'block'}
 };

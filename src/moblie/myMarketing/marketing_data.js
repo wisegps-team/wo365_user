@@ -54,8 +54,7 @@ const styles = {
     },
     search_head:{
         width:'100%',
-        display:'block',
-        borderBottom:'1px solid #cccccc'
+        display:'block'
     },
     add_icon:{
         float:'right',

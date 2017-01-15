@@ -484,21 +484,13 @@ class DList extends Component{
         let items=data.map((ele,i)=>
             <div key={i} style={styles.card}>
                 <div style={styles.detail} onClick={()=>this.toActivityPage(ele)}>{___.act_detail}</div>
-                <div style={combineStyle(['table','variable'])}>{ele.name}</div>
+                <div style={styles.table}>{ele.name}</div>
                 
                 <div style={styles.spans}>
-                    <div style={styles.count} >
+                    {/*<div style={styles.count} >
                         <span style={styles.variable}>{ele.principal}</span>
                         <span>{' '+___.publish}</span>
-                    </div>
-                    <div >
-                        <span>每单红包奖励 </span>
-                        <span style={styles.variable}>{ele.reward}</span>
-                        <span> 元</span>
-                    </div>
-                </div>
-
-                <div style={styles.spans}>
+                    </div>*/}
                     <div style={{float:'right',marginRight:'16px'}}>
                         <img 
                             src='../../img/share.png' 
@@ -511,14 +503,9 @@ class DList extends Component{
                             onClick={()=>this.activityData(ele)}
                         />
                     </div>
-                    <div style={styles.count} onClick={()=>this.toCountPage('booking',ele)}>
-                        <span>已有 </span>
-                        <span style={styles.link}>{ele.status0}</span>
-                        <span> 位好友预订,</span>
-                    </div>
-                    <div style={styles.count}>
-                        <span>收获红包 </span>
-                        <span style={styles.variable}>{300}</span>
+                    <div >
+                        <span>成功推荐每单奖励红包 </span>
+                        <span style={{color:'#ff9900'}}>{ele.reward}</span>
                         <span> 元</span>
                     </div>
                 </div>
@@ -529,6 +516,14 @@ class DList extends Component{
             <div>
                 {items}
                 {iframe}
+                <div style={{marginTop:'15px',padding:'15px'}}>
+                    点击
+                    <img 
+                        src='../../img/share.png' 
+                        style={{width:'20px',height:'20px',marginRight:'15px'}} 
+                    />
+                    后按页面提示发送给朋友或分享到朋友圈，好友预订安装您即可获得奖励，您的好友安装后同样可以获得免单和赚钱机会。
+                </div>
             </div>
         )
     }
@@ -542,10 +537,12 @@ let Alist=AutoList(DList);
 class SharePage extends Component {
     render() {
         return (
-            <div style={styles.share_content}>
-                <img src='../../img/shareTo.jpg' style={{width:'100%'}}/>
-                <div style={{textAlign:'center',marginTop:'15px'}}>
-                    {___.share_detail}
+            <div style={{marginTop:(window.innerHeight-240)/2+'px'}}>
+                <img src='../../img/shareTo.jpg' style={{width:'100%',display:'block'}}/>
+                <br/>
+                <div style={{textAlign:'center',display:'block',width:'100%'}}>
+                    {/*___.share_detail*/}
+                    返回
                 </div>
             </div>
         );

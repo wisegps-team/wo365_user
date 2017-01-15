@@ -419,4 +419,6 @@ window.___={
 	'edit_selling_product':'编辑营销产品',
 	'edit_seller_activity':'编辑营销活动',
 	'search':'搜索',
+	'company':'企业',
+	'mobile_phone':'手机',
 }

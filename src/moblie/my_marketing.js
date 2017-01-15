@@ -516,13 +516,14 @@ class DList extends Component{
             <div>
                 {items}
                 {iframe}
-                <div style={{marginTop:'15px',padding:'15px'}}>
+                <div style={{marginTop:'15px',width:'100%',textAlign:'center'}}>
                     点击
                     <img 
                         src='../../img/share.png' 
                         style={{width:'20px',height:'20px',marginRight:'15px'}} 
                     />
-                    后按页面提示发送给朋友或分享到朋友圈，好友预订安装您即可获得奖励，您的好友安装后同样可以获得免单和赚钱机会。
+                    后按页面提示分享
+                    <p>好友打开链接即可了解活动详情并咨询预订！</p>
                 </div>
             </div>
         )

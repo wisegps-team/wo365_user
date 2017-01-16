@@ -8,6 +8,9 @@ import React, {Component} from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
+import IconMenu from 'material-ui/IconMenu';
+import IconButton from 'material-ui/IconButton';
+import FlatButton from 'material-ui/FlatButton';
 
 import VerificationCode from '../base/verificationCode';
 import Input from '../base/input';
@@ -23,7 +26,7 @@ class Register extends Component {
             mobile:null,
             car:[],
             s_num:-1,
-            s_mob:-1
+            s_mob:1
         }
         this.formData=Object.assign({},props.formData);
         this.formData.valid_type=1;
@@ -100,6 +103,8 @@ class Register extends Component {
             }else{
                 res.carNum=this._newNum;
             }
+            console.log(res);
+            return;
             if(!res.access_token){
                 Wapi.user.login(r=>{
                     Object.assign(res,r);
@@ -122,7 +127,7 @@ class Register extends Component {
             W.alert(___.phone_err);
             return;
         }
-        if(this.formData.valid_code){
+        if(!this.formData.valid_code){
             W.alert(___.code_err);
             return;
         }
@@ -130,6 +135,8 @@ class Register extends Component {
             W.alert(___.pls_input_new_car_num);
             return;
         }
+        this.success({});
+        return;
         let data=Object.assign({},this.formData);
         if(!data.mobile&&!data.email){
             W.alert('mobile'+___.not_null);
@@ -153,89 +160,247 @@ class Register extends Component {
         this.formData[name]=val;
     }
 
-    selectMobil(event, index, s_mob){
+    selectMobil(s_mob){
         let newState={s_mob};
         if(s_mob==1){
             this.formData.mobile=this.state.mobile;
+            this.formData.valid_code=this.props.formData.valid_code
             newState.car=this._car;
         }else{
             this.formData.mobile='';
-            newState.s_num=0;
+            this.formData.valid_code='';
             newState.car=[];
         }
         this.setState(newState);
     }
-    selectNum(event, index, s_num){
-        if(this.state.s_mob!=1&&s_num!=0)return;//如果是新手机注册，不能选择现有车辆
-        if(s_num){//选择了某辆车
+    selectNum(value){
+        console.log(value);
+        let car=this.state.car.find(e=>e.name==value);
+        let s_num=0;
+        if(car){
+            //已有车辆
+            if(this.state.s_mob!=1)return;//如果是新手机注册，不能选择现有车辆
+            s_num=car.objectId;
             this._newNum='';
+            this.setState({s_num});
+        }else{
+            //新车辆
+            this.newNumChange(value);
+            return;
         }
-        this.setState({s_num});
     }
 
-    newNumChange(e,val){
+    newNumChange(val){
         this._newNum=val;
     }
 
     render() {
-        // let dis=this.props.disabled?{display:'none'}:null;
-        let mob=[
-            <MenuItem value={-1} primaryText={___.pls_select} key={-1} />,
-            <MenuItem value={0} primaryText={___.add_new_mobile} key={0} />
-        ];
-        if(this.state.mobile)
-            mob.push(<MenuItem value={1} primaryText={this.state.mobile} key={1} />);
-        let newUser=this.state.s_mob?null:
-        (<div>
-            <Input
-                name='account'
-                hintText={___.input_account}
-                floatingLabelText={___.user_mobile}
-                onChange={this.accountChange}
-                type='tel'
-            />
-            <VerificationCode 
-                name='valid_code'
-                type={1}
-                accountType={this.state.accountType}
-                account={this.state.account} 
-                onSuccess={this.change}
-                value={this.formData.valid_code}
-                clean={this.props.clean}
-            />
-        </div>);
+        let newUser=(this.state.mobile&&this.state.s_mob==1)?null:
+        (<VerificationCode 
+            name='valid_code'
+            type={1}
+            accountType={this.state.accountType}
+            account={this.state.account} 
+            onSuccess={this.change}
+            value={this.formData.valid_code}
+            clean={this.props.clean}
+        />);
 
         let cars=this.state.car||[];
-        let numList=cars.map((e,i)=><MenuItem value={e.objectId} primaryText={e.name} key={i+1} />);
-        numList.unshift(<MenuItem value={0} primaryText={___.add_new_car_num} key={0} />);
-        numList.unshift(<MenuItem value={-1} primaryText={___.pls_select} key={-1} />);
-        let newNum=this.state.s_num?null:
-        (<Input 
-            name='newNum'
-            hintText={___.input_new_car_num}
-            floatingLabelText={___.input_new_car_num}
-            onChange={this.newNumChange}
-        />);
+
         return (
             <div style={this.props.style}>
                 <div>
-                    <label>{___.user_mobile}：</label>
-                    <DropDownMenu value={this.state.s_mob} onChange={this.selectMobil}>
-                        {mob}
-                    </DropDownMenu>
+                    <MobileSelect 
+                        value={this.state.s_mob} 
+                        onChange={this.selectMobil}
+                        onNewChange={this.accountChange}
+                        mobile={this.state.mobile}
+                    />
                     {newUser}
                 </div>
-                <div>
-                    <label>{___.carNum}：</label>
-                    <DropDownMenu value={this.state.s_num} onChange={this.selectNum}>
-                        {numList}
-                    </DropDownMenu>
-                    {newNum}
-                </div>
+                
+                <CarNum data={cars} onChange={this.selectNum}/>
                 <RaisedButton label={___.register} primary={true} style={sty.but} onClick={this.submit}/>
             </div>
         );
     }
 }
+
+let styles={
+    box:{
+        position:'relative'
+    },
+    b:{
+        position: 'absolute',
+        right: '0px',
+        bottom: '8px'
+    },
+    more:{
+        color:'rgb(33, 150, 243)',
+        position:'absolute',
+        left: '5em',
+        top: 0,
+        lineHeight: '56px',
+        pointerEvents: 'none'
+    }
+}
+
+//选择车牌号组件
+class CarNum extends Component {
+    constructor(props) {
+        super(props);
+        this.state={
+            getNew:false,
+            value:this.props.data.length?this.props.data[0].name:''
+        }
+
+        this.getNew = this.getNew.bind(this);
+        this.change = this.change.bind(this);
+    }
+    componentDidMount() {
+        this.props.onChange(this.state.value);
+    }
+    componentDidUpdate(prevProps, prevState) {
+        if(this.state.value!=prevState.value)
+            this.props.onChange(this.state.value);
+    }
+    componentWillReceiveProps(nextProps) {
+        if(!this.props.data.length&&nextProps.data.length)
+            this.setState({value:nextProps.data[0].name});
+    }
+    
+    getNew(){
+        let newState={getNew:!this.state.getNew};
+        if(!newState.getNew)
+            newState.value=this.props.data[0].name;
+        this.setState(newState);
+    }
+    change(e,value){
+        this.setState({value});
+    }
+
+    render() {
+        let cars=this.props.data;
+        let select=null;
+        let b=Object.assign({},styles.b);
+        if(cars.length){
+            b.bottom='2px';
+            let item=cars.map((e,i)=><MenuItem value={e.name} primaryText={e.name} key={e.objectId}/>)
+            select=[
+                <DropDownMenu 
+                    value={this.state.value} 
+                    onChange={(e,i,v)=>this.change(e,v)} 
+                    style={{width:'100%'}} 
+                    labelStyle={{padding:'0px'}}
+                    underlineStyle={{margin:'0px'}}
+                    key='menu'
+                >
+                    {item}
+                </DropDownMenu>,
+                <span style={styles.more} key='span'>{___.more}</span>,
+                <FlatButton 
+                    label={___.bind_new_car} 
+                    primary={true} 
+                    onClick={this.getNew}
+                    style={b}
+                    key='btn'
+                />
+            ];
+        }else{
+            select=<Input
+                floatingLabelText={___.input_new_car_num}
+                onChange={this.change}
+            />;
+        }
+        if(this.state.getNew){//选择绑定新车辆，输入车牌号码
+            select=[
+                <Input
+                    floatingLabelText={___.input_new_car_num}
+                    onChange={this.change}
+                    key='input'
+                />,
+                <FlatButton 
+                    label={___.register_old_car} 
+                    primary={true} 
+                    onClick={this.getNew}
+                    style={styles.b}
+                    key='btn1'
+                />
+            ];
+        }
+        return (
+            <div style={styles.box}>
+                {select}
+            </div>
+        );
+    }
+}
+
+
+class MobileSelect extends Component{
+    constructor(props) {
+        super(props);
+        this.state={
+            getNew:props.value==1?false:true,
+            value:''
+        };
+
+        this.getNew = this.getNew.bind(this);
+        this.change = this.change.bind(this);
+    }
+    componentWillReceiveProps(nextProps) {
+        let getNew=nextProps.value==1?false:true;
+        this.setState({getNew});
+    }
+    
+    
+    getNew(){
+        let newState=!this.state.getNew?0:1;
+        this.props.onChange(newState);
+        if(newState)
+            this.setState({value:''});
+    }
+    change(e,value){
+        this.setState({value});
+        this.props.onNewChange(e,value);
+    }
+    render() {
+        let label=this.state.getNew?___.use_booking_mobile:___.add_new_mobile;
+        let disabled=this.props.mobile&&!this.state.getNew;
+        let val=this.state.getNew?this.state.value:this.props.mobile||'';
+        let btn=this.props.mobile?(<FlatButton 
+            label={label} 
+            primary={true} 
+            onClick={this.getNew}
+            style={styles.b}
+        />):null;
+        return (
+            <div style={styles.box}>
+                <Input
+                    floatingLabelText={___.input_account}
+                    value={val}
+                    onChange={this.change}
+                    disabled={disabled}
+                />
+                {btn}
+            </div>
+        );
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export default Register;

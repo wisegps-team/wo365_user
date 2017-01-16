@@ -1,14 +1,16 @@
 import React, {Component} from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import Input from './input';
+import FlatButton from 'material-ui/FlatButton';
 
 let sty={
     box:{
-        display: 'flex',
-        alignItems: 'center'
+        position:'relative'
     },
     b:{
-        flexShrink: 0
+        position: 'absolute',
+        right: '0px',
+        bottom: '8px'
     }
 }
 
@@ -85,7 +87,7 @@ class VerificationCode extends Component {
                     onChange={this.change}
                     type="tel"
                 />
-                <RaisedButton 
+                <FlatButton 
                     label={this.state.second||___.getCode} 
                     primary={!this.state.second} 
                     disabled={!!this.state.second} 

@@ -44,7 +44,8 @@ class App extends Component {
         let d={
             userOpenId:_g.openid,
             status:0,
-            installId:_g.installId
+            installId:_g.installId,
+            'product.id':_g.modelId
         };
         if(_g.bookingId&&_g.bookingId!='more'){
             d.objectId=_g.bookingId;
@@ -120,37 +121,47 @@ class App extends Component {
         }
     }
 
-    haveBooking(booking){
+    haveBooking(booking,code){
         if(booking){//有预订
-            this.setState({active:2,booking});
+            let first=booking[0];
+            first._checked=true;
+            this.setState({
+                booking,
+                active:2,
+                user:{
+                    name:first.userName,
+                    mobile:first.userMobile,
+                    valid_code:code,
+                    password:first.userMobile.slice(-6),
+                    valid_type:1
+                },
+                selectBookingId:first.objectId
+            });
         }else
-            this.setState({active:3});
+            this.setState({active:2});
     }
 
-    checkSuccess(code,booking){//校验车主手机号成功
-        let newState={
-            active:3,
-            user:{
-                name:booking.userName,
-                mobile:booking.userMobile,
-                valid_code:code,
-                password:booking.userMobile.slice(-6),
-                valid_type:1
-            },
-            selectBookingId:booking.objectId
-        };
-        // newState.start=(_g.bookingId==this.state.booking.objectId);//带bookingId进来的，直接注册
-        this.setState(newState);
+    checkSuccess(select){//校验车主手机号成功
+        let booking=this.state.booking.map(e=>{
+            e._checked=false;
+            return e;
+        });
+        select._checked=true;
+        this.setState({booking,selectBookingId:select.objectId});
     }
 
     render() {
         let boxs=[
-            <h2 style={{textAlign:'center'}}>{___.searching_booking}</h2>,
-            <BookingCheckBox onSuccess={this.haveBooking}/>,
-            <BookingBox booking={this.state.booking} onSuccess={this.checkSuccess}/>,
-            <RegisterBox success={this.registerCallback} user={this.state.user} bookingId={this.state.selectBookingId}/>
+            <h2 style={{textAlign:'center'}} key='h2'>{___.searching_booking}</h2>,
+            <BookingCheckBox onSuccess={this.haveBooking} key='cb'/>,
+            <RegisterBox success={this.registerCallback} user={this.state.user} bookingId={this.state.selectBookingId} key='rb'/>
         ];
         let box=boxs[this.state.active];
+        if(this.state.active==2&&this.state.booking&&this.state.booking.length)
+            box=[
+                <BookingBox booking={this.state.booking} onSuccess={this.checkSuccess} key='bb'/>,
+                box
+            ];
         return (
             <ThemeProvider>
                 <div className='login' style={{padding:'10px 10%'}}>
@@ -181,7 +192,7 @@ class RegisterBox extends Component{
     }
 
     componentWillReceiveProps(nextProps) {
-        this.getUser(nextProps);
+        this.getUser(nextProps,true);
         if(nextProps.user)
             this.setState({to:0});
     }
@@ -192,12 +203,15 @@ class RegisterBox extends Component{
     }
     
 
-    getUser(props){
+    getUser(props,isMounted){
         if(props.user){
             let user=Object.assign({},props.user);
             this.data.name=user.name;
             delete user.name;
-            this.state.formData=user;
+            if(isMounted)
+                this.setState({formData:user});
+            else
+                this.state.formData=user;
         }
     }
     
@@ -320,7 +334,7 @@ class RegisterBox extends Component{
 
     render() {
         return (
-            <div>
+            <div style={{marginBottom:'50px'}}>
                 <Register 
                     onSuccess={this.registerSuccess} 
                     beforRegister={this.beforRegister}
@@ -339,16 +353,7 @@ class BookingBox extends Component{
     constructor(props, context) {
         super(props, context);
         this.checkSuccess = this.checkSuccess.bind(this);
-        this.success = this.success.bind(this);
         this.select = this.select.bind(this);
-
-        this.state={
-            select:null
-        };
-
-        if(props.booking.length==1){
-            this.state.select=props.booking[0];
-        }
     }
 
     componentDidMount() {
@@ -359,55 +364,26 @@ class BookingBox extends Component{
         this._code=code;
     }
 
-    success(){
-        if(this._code)
-            this.props.onSuccess(this._code,this.state.select);
-        else
-            W.alert(___.code_err);
-    }
     select(select){
-        this.setState({select});
+        this.props.onSuccess(select);
     }
     render() {
         let bookings=this.props.booking;
-        if(!this.state.select){//没有选择,展示列表
-            let item=bookings.map(e=><BookingItem data={e} key={e.objectId} onClick={this.select} border={true}/>);
-            let des={
-                name:bookings[0].userName,
-                install:bookings[0].install,
-                count:bookings.length
-            }
-            return (
-                <div>
-                    <p>
-                        {W.replace(___.reg_des0,des)}
-                    </p>
-                    {item}
-                </div>
-            );
-        }else{//已经选择了一个预订
-            let b=this.state.select;
-            return (
-                <div>
-                    <p>
-                        <label>{___.carowner_info+'：'}</label><span>{b.userName}</span><br/>
-                        <BookingItem data={this.state.select}/>
-                    </p>
-                    <VerificationCode 
-                        name='valid_code'
-                        type={1}
-                        account={b.userMobile} 
-                        onSuccess={this.checkSuccess}
-                    />
-                    <div className="center">
-                        <RaisedButton label={___.ok} primary={true} onClick={this.success}/>
-                    </div>
-                    <p className="center">
-                        {___.r_des1.replace('xxx',b.userMobile.replace(b.userMobile.slice(-8,-4),'****'))}
-                    </p>
-                </div>
-            );
+
+        let item=bookings.map(e=><BookingItem data={e} key={e.objectId} onClick={this.select} border={true}/>);
+        let des={
+            name:bookings[0].userName,
+            install:bookings[0].install,
+            count:bookings.length
         }
+        return (
+            <div>
+                <p style={{borderBottom:'1px solid #ccc',margin:'0px',padding:'1em 0'}}>
+                    {W.replace(___.reg_des0,des)}
+                </p>
+                {item}
+            </div>
+        );
     }
 }
 
@@ -429,18 +405,25 @@ class BookingItem extends Component{
         };
         let checkbox=null;
         if(this.props.border){
-            sty.borderTop='1px solid #ccc';
+            sty.borderBottom='1px solid #ccc';
             sty.padding='1em 0';
-            checkbox=<Checkbox iconStyle={{left:'calc(100% - 24px)'}} onCheck={this.success}/>;
+            checkbox=<Checkbox 
+                labelPosition="left"
+                style={{width:'124px'}} 
+                labelStyle={{color:'#000'}}
+                label={___.register_now} 
+                onCheck={this.success}
+                checked={b._checked}
+            />;
         }
         
         return (
             <label style={sty} className={'p'}>
-                {checkbox}
                 <label>{___.order_no+'：'}</label><span>{b.objectId}</span><br/>
                 <label>{___.booking_date+'：'}</label><span>{W.dateToString(W.date(b.createdAt)).slice(0,-3)}</span><br/>
                 <label>{___.booking_p+'：'}</label><span>{b.product.name}</span><br/>
                 <label>{___.booking_pay+'：'}</label><span>{parseFloat(b.payMoney).toFixed(2)}</span><br/>
+                {checkbox}
             </label>
         );
     }
@@ -452,58 +435,52 @@ class BookingCheckBox extends Component{
         super(props, context);
         this.change = this.change.bind(this);
         this.success = this.success.bind(this);
+        this.checkSuccess = this.checkSuccess.bind(this);
+
+        this.state={
+            mobile:''
+        }
+        this._mobile='13909991430';
+        this._code='6140';
     }
     
-    componentDidMount() {
-        document.title=___.device_register;
-    }
-    change(e,value){
-        this.mobile=value;
+    change(e,mobile){
+        this._mobile=mobile;
+        if(this._mobile.length==11)
+            this.setState({mobile});
     }
     success(){
-        if(this.mobile)
+        if(this._mobile&&this._code)
             Wapi.booking.list(res=>{
                 if(res.data&&res.data.length)
-                    this.props.onSuccess(res.data);
+                    this.props.onSuccess(res.data,this._code);
                 else
                     W.alert(___.b_null);
             },{
-                userMobile:this.mobile,
+                userMobile:this._mobile,
                 status:0,
-                installId:_g.installId
+                installId:_g.installId,
+                'product.id':_g.modelId
             });
         else
             this.props.onSuccess(null);
+    }
+    checkSuccess(code){
+        this._code=code;
     }
     render() {
         return (
             <div>
                 <p>{___.r_des3}</p>
                 <Input floatingLabelText={___.b_user_mobile} onChange={this.change} type="tel" />
+                <VerificationCode 
+                    name='valid_code'
+                    type={1}
+                    account={this.state.mobile} 
+                    onSuccess={this.checkSuccess}
+                />
                 <div className="center">
                     <RaisedButton label={___.ok} primary={true} onClick={this.success}/>
-                </div>
-            </div>
-        );
-    }
-}
-
-
-//选择使用原预订车主信息注册，还是选择使用新车主信息注册
-class ChooseBox extends Component{
-    componentDidMount() {
-        document.title=___.device_register;
-    }
-    render() {
-        return (
-            <div>
-                <p className="center">
-                    {___.r_des4}<br/>
-                    {___.r_des5}
-                </p>
-                <div className="center">
-                    <FlatButton label={___.register_to_user} primary={true} onClick={e=>this.props.onChoose(0)}/><br/><br/>
-                    <FlatButton label={___.register_to_new} primary={true} onClick={e=>this.props.onChoose(1)}/>
                 </div>
             </div>
         );

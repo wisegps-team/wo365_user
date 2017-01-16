@@ -88,6 +88,10 @@ class ServerApi{
 		data.host=location.host;
 		this.get(data,callback);
 	}
+	getDevice(callback,data){
+		data.method='getDevice';
+		this.get(data,callback);
+	}
 }
 
 export default ServerApi;

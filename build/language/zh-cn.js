@@ -423,5 +423,7 @@ window.___={
 	'bind_new_car':'绑定新车辆',
 	'more':'更多',
 	'register_old_car':'注册到现有车辆',
-	'use_booking_mobile':'使用预订号码'
+	'use_booking_mobile':'使用预订号码',
+	'company':'企业',
+	'mobile_phone':'手机',
 }

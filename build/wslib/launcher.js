@@ -486,6 +486,7 @@ var divFunction={
         if(t){
             this.title=t;
         }
+        if(!this.show_state)return;
         document.title = this.title||' ';
         var i = document.createElement('iframe');
         i.src = 'http://m.baidu.com/favicon.ico';

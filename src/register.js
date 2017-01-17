@@ -45,7 +45,6 @@ class App extends Component {
             userOpenId:_g.openid,
             status:0,
             installId:_g.installId,
-            'product.id':_g.modelId
         };
         if(_g.bookingId&&_g.bookingId!='more'){
             d.objectId=_g.bookingId;
@@ -53,10 +52,7 @@ class App extends Component {
             
         Wapi.booking.list(res=>{
             if(res.data&&res.data.length){
-                this.setState({
-                    active:2,
-                    booking:res.data
-                });
+                this.haveBooking(res.data);
             }else
                 this.setState({active:1});
         },d);
@@ -65,10 +61,10 @@ class App extends Component {
     registerCallback(res,device){
         W.loading();
         if(!res._code){
-            // W.alert(___.register_success,()=>location='index.html');
             let user=res;
             Wapi.customer.get(cust=>{
                 let remark='注册成功！';
+                let link=location.origin+'/?loginLocation=%252Fwo365_user%252Forder.html%253FbookingId%253D'+this.state.selectBookingId+'&wx_app_id='+_g.wx_app_id;
                 Wapi.serverApi.sendWeixinByTemplate(function(res){
                     if(res.errcode||res.status_code){
                         W.alert(remark)
@@ -78,7 +74,7 @@ class App extends Component {
                     openId:_g.openid,
                     wxAppKey:_g.wx_app_id,
                     templateId:'OPENTM408183089',//安装成功通知'
-                    link:'#',
+                    link,
                     data:{
                         "first": {//标题
                             "value": '',
@@ -235,7 +231,7 @@ class RegisterBox extends Component{
         delete cust.did;
         cust.appId=WiStorm.config.objectId;
 
-        if(user.status_code){
+        if(user.status_code&&user.status_code!=8){
             W.errorCode(user);
             return;
         }
@@ -243,10 +239,10 @@ class RegisterBox extends Component{
         let token=user.access_token;
         cust.access_token=token;
         cust.uid=user.uid;
-        that.addCust(user,cust);
+        that.addCust(user,cust,token);
     }
 
-    addCust(user,cust){//添加客户表资料，如果有则校验parentId,绑定设备
+    addCust(user,cust,token){//添加客户表资料，如果有则校验parentId,绑定设备
         let that=this;
         W.loading(true,___.checking_device);
         Wapi.device.get(function(dev){
@@ -270,7 +266,11 @@ class RegisterBox extends Component{
                 if(cus.data){
                     cust=cus.data;
                     if(!cust.parentId.includes(parentId)){
-                        Wapi.customer.update(null,{_objectId:cust.objectId,parentId:'"+'+parentId+'"'});
+                        Wapi.customer.update(null,{
+                            _objectId:cust.objectId,
+                            parentId:'"+'+parentId+'"',
+                            access_token:token
+                        });
                     }
                     user.customer=cust;
                     that.bind(user,dev);
@@ -294,15 +294,12 @@ class RegisterBox extends Component{
         });
         let key=getOpenIdKey();
         let userDate={
-            _sessionToken:data.session_token,
             access_token:token,
-            userType:7,
-            authData:{
-                openId:_g.openid
-            }
+            _objectId:user.uid,
+            userType:7
         }
         userDate.authData[key]=_g.openid;
-        Wapi.user.updateMe(null,userDate);
+        Wapi.user.update(null,userDate);
     }
 
     bind(user,dev){//绑定设备，如果有预订则处理预订，预付款到帐，佣金分发，推送模板消息等
@@ -357,7 +354,12 @@ class BookingBox extends Component{
     }
 
     componentDidMount() {
-        document.title=___.booking_data;
+        let bookings=this.props.booking;
+        if(bookings&&bookings.length)
+            Wapi.serverApi.getBrand(res=>{
+                bookings.forEach(e=>e.product.brand=res.data.brand);
+                this.forceUpdate();
+            },{objectId:_g.modelId});
     }
 
     checkSuccess(code){
@@ -419,9 +421,7 @@ class BookingItem extends Component{
         
         return (
             <label style={sty} className={'p'}>
-                <label>{___.order_no+'：'}</label><span>{b.objectId}</span><br/>
-                <label>{___.booking_date+'：'}</label><span>{W.dateToString(W.date(b.createdAt)).slice(0,-3)}</span><br/>
-                <label>{___.booking_p+'：'}</label><span>{b.product.name}</span><br/>
+                <label>{___.booking_p+'：'}</label><span>{(b.product.brand||'获取中')+' '+b.product.name}</span><br/>
                 <label>{___.booking_pay+'：'}</label><span>{parseFloat(b.payMoney).toFixed(2)}</span><br/>
                 {checkbox}
             </label>
@@ -440,8 +440,6 @@ class BookingCheckBox extends Component{
         this.state={
             mobile:''
         }
-        this._mobile='13909991430';
-        this._code='6140';
     }
     
     change(e,mobile){
@@ -459,8 +457,7 @@ class BookingCheckBox extends Component{
             },{
                 userMobile:this._mobile,
                 status:0,
-                installId:_g.installId,
-                'product.id':_g.modelId
+                installId:_g.installId
             });
         else
             this.props.onSuccess(null);

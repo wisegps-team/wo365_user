@@ -21,11 +21,10 @@ class Register extends Component {
     constructor(props, context) {
         super(props, context);
         this.state={
-            account:null,
             accountType:'phone', //表示是用什么注册
             mobile:null,
             car:[],
-            s_num:-1,
+            s_num:0,
             s_mob:1
         }
         this.formData=Object.assign({},props.formData);
@@ -103,8 +102,7 @@ class Register extends Component {
             }else{
                 res.carNum=this._newNum;
             }
-            console.log(res);
-            return;
+
             if(!res.access_token){
                 Wapi.user.login(r=>{
                     Object.assign(res,r);
@@ -135,8 +133,7 @@ class Register extends Component {
             W.alert(___.pls_input_new_car_num);
             return;
         }
-        this.success({});
-        return;
+
         let data=Object.assign({},this.formData);
         if(!data.mobile&&!data.email){
             W.alert('mobile'+___.not_null);
@@ -153,7 +150,7 @@ class Register extends Component {
         if(phoneReg.test(val)){
             this.formData['mobile']=val;  
             delete this.formData.email;
-            this.setState({account:val,accountType:'mobile'}); 
+            this.setState({mobile:val,accountType:'mobile'}); 
         }
     }
     change(val,name){
@@ -182,12 +179,12 @@ class Register extends Component {
             if(this.state.s_mob!=1)return;//如果是新手机注册，不能选择现有车辆
             s_num=car.objectId;
             this._newNum='';
-            this.setState({s_num});
         }else{
             //新车辆
             this.newNumChange(value);
             return;
         }
+        this.setState({s_num});
     }
 
     newNumChange(val){
@@ -195,32 +192,26 @@ class Register extends Component {
     }
 
     render() {
-        let newUser=(this.state.mobile&&this.state.s_mob==1)?null:
-        (<VerificationCode 
-            name='valid_code'
-            type={1}
-            accountType={this.state.accountType}
-            account={this.state.account} 
-            onSuccess={this.change}
-            value={this.formData.valid_code}
-            clean={this.props.clean}
-        />);
-
         let cars=this.state.car||[];
 
         return (
             <div style={this.props.style}>
-                <div>
-                    <MobileSelect 
-                        value={this.state.s_mob} 
-                        onChange={this.selectMobil}
-                        onNewChange={this.accountChange}
-                        mobile={this.state.mobile}
-                    />
-                    {newUser}
-                </div>
-                
+                <MobileSelect 
+                    value={this.state.s_mob} 
+                    onChange={this.selectMobil}
+                    onNewChange={this.accountChange}
+                    mobile={this.state.mobile}
+                />
                 <CarNum data={cars} onChange={this.selectNum}/>
+                <VerificationCode 
+                    name='valid_code'
+                    type={1}
+                    accountType={this.state.accountType}
+                    account={this.formData.mobile} 
+                    onSuccess={this.change}
+                    value={this.formData.valid_code}
+                    clean={this.props.clean}
+                />
                 <RaisedButton label={___.register} primary={true} style={sty.but} onClick={this.submit}/>
             </div>
         );
@@ -286,7 +277,8 @@ class CarNum extends Component {
         let b=Object.assign({},styles.b);
         if(cars.length){
             b.bottom='2px';
-            let item=cars.map((e,i)=><MenuItem value={e.name} primaryText={e.name} key={e.objectId}/>)
+            let item=cars.map((e,i)=><MenuItem value={e.name} primaryText={e.name} key={e.objectId}/>);
+            let more=cars.length>1?<span style={styles.more} key='span'>{___.more}</span>:null;
             select=[
                 <DropDownMenu 
                     value={this.state.value} 
@@ -298,7 +290,7 @@ class CarNum extends Component {
                 >
                     {item}
                 </DropDownMenu>,
-                <span style={styles.more} key='span'>{___.more}</span>,
+                more,
                 <FlatButton 
                     label={___.bind_new_car} 
                     primary={true} 
@@ -378,10 +370,14 @@ class MobileSelect extends Component{
         return (
             <div style={styles.box}>
                 <Input
-                    floatingLabelText={___.input_account}
+                    floatingLabelText={disabled?'':___.input_account}
                     value={val}
                     onChange={this.change}
                     disabled={disabled}
+                    underlineDisabledStyle={{
+                        borderBottom: '1px solid rgba(0, 0, 0, 0.25)'
+                    }}
+                    inputStyle={{color:'#000'}}
                 />
                 {btn}
             </div>

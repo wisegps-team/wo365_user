@@ -64,7 +64,11 @@ class App extends Component {
             let user=res;
             Wapi.customer.get(cust=>{
                 let remark='注册成功！';
-                let link=location.origin+'/?loginLocation=%252Fwo365_user%252Forder.html%253FbookingId%253D'+this.state.selectBookingId+'&wx_app_id='+_g.wx_app_id;
+                let link='#';
+                if(this.state.selectBookingId){
+                    remark='订单'+this.state.selectBookingId+'注册成功！';
+                    link=location.origin+'/?loginLocation=%252Fwo365_user%252Forder.html%253FbookingId%253D'+this.state.selectBookingId+'&wx_app_id='+_g.wx_app_id;
+                }
                 Wapi.serverApi.sendWeixinByTemplate(function(res){
                     if(res.errcode||res.status_code){
                         W.alert(remark)

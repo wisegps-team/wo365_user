@@ -302,7 +302,7 @@ class RegisterBox extends Component{
             _objectId:user.uid,
             userType:7
         }
-        userDate.authData[key]=_g.openid;
+        userDate['authData.'+key]=_g.openid;
         Wapi.user.update(null,userDate);
     }
 

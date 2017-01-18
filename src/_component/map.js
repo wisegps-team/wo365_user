@@ -8,6 +8,8 @@ import Playback from './playback';
 const sty={
     pb:{
         position: 'absolute',
+        left:'0px',
+        top:'0px',
         zIndex: 1,
         background: '#fff'
     },

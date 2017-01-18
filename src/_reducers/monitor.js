@@ -38,6 +38,7 @@ export const ACT ={
                     dispatch(ACT.fun.getDevices(cars));
                 },{
                     uid:_user.customer.objectId
+                    // uid:'802394552395763700'//测试用
                 },{
                     limit:'-1'
                 })

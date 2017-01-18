@@ -61,7 +61,32 @@ const sty={
         width: '100vw',
         bottom: '0px'
     },
-    w:{width:'100%',height: 'calc(100vh - 50px)'}
+    w:{width:'100%',height: 'calc(100vh - 200px)'},
+    head:{
+        width:'100%',
+        height:'180px',
+        display:'block',
+        textAlign:'center',
+        paddingTop:'20px',
+        // backgroundColor:'#33ccee',
+        backgroundColor:'#3c9bf9',
+        color:'#ffffff'
+    },
+    head_pic:{
+        width:'100px',
+        height:'100px', 
+        borderRadius:'50%'
+    },
+    head_links:{
+        display:'table',
+        width:'100%',
+        marginTop:'15px'
+    },
+    head_link:{
+        display:'table-cell',
+        width:'33%',
+        borderRight:'1px solid #ffffff'
+    }
 }
 
 class App extends Component {
@@ -89,17 +114,42 @@ class App extends Component {
         thisView.goTo('car_manage.js');
         // this.setState({deviceListOpen:!this.state.deviceListOpen});
     }
+    personalInfo(){
+        thisView.goTo('./myAccount/personal_info.js');
+    }
+    recommend(){
+        thisView.goTo('my_marketing.js');
+    }
+    wallet(){
+        thisView.goTo('./myAccount/wallet.js');
+    }
+    toBillList(){
+        thisView.goTo('./myAccount/my_order.js');
+    }
     render() {
         return (
             <ThemeProvider>
-                <AppBar
+                {/*<AppBar
                     iconElementRight={<IconButton onClick={this.showDeviceList}>
                         <ActionList style={{
                             width:'32px',
                             height:'32px'
                         }}/>
                     </IconButton>}
-                />
+                />*/}
+                <div style={sty.head} >
+                    <div style={{fontSize:'18px'}} onClick={this.personalInfo}>
+                        <img src='../../img/head.png' style={sty.head_pic}/>
+                        <div>
+                            {_user.employee ? _user.employee.name : (_user.customer.contact||_user.customer.name)}
+                        </div>
+                    </div>
+                    <div style={sty.head_links}>
+                        <div style={sty.head_link} onClick={this.toBillList}>{___.order}</div>
+                        <div style={sty.head_link} onClick={this.recommend}>{___.recommend}</div>
+                        <div style={{display:'table-cell',width:'33%'}} onClick={this.wallet}>{___.wallet}</div>
+                    </div>
+                </div>
                 <Map 
                     id='monitor_map' 
                     style={sty.w} 

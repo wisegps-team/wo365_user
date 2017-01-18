@@ -287,7 +287,7 @@ class RegisterBox extends Component{
                     },cust);
                 }
             },{
-                uid:user.objectId,
+                uid:user.uid,
                 access_token:token,
                 appId:WiStorm.config.objectId
             });

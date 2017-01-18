@@ -105,7 +105,7 @@ class Register extends Component {
 
             if(!res.access_token){
                 Wapi.user.login(r=>{
-                    Object.assign(res,r);
+                    res.access_token=r.access_token;
                     this.props.onSuccess(res);
                 },{
                     account:this.formData.mobile,

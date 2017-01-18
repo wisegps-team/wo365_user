@@ -229,17 +229,6 @@ class AppDeviceManage extends React.Component{
                     <AppBar 
                         title={___.device_manage} 
                         style={{position:'fixed'}}
-                        iconElementRight={
-                            <IconMenu
-                                iconButtonElement={
-                                    <IconButton><MoreVertIcon/></IconButton>
-                                }
-                                targetOrigin={{horizontal: 'right', vertical: 'top'}}
-                                anchorOrigin={{horizontal: 'right', vertical: 'top'}}
-                                >
-                                <MenuItem primaryText={___.import} onTouchTap={this.deviceIn}/>
-                            </IconMenu>
-                        } 
                     />
                     <div style={styles.main}>
                         <DeviceList/>

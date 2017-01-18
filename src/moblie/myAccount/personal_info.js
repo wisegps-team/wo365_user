@@ -91,7 +91,7 @@ class ShowBox extends Component{
                     />
                     <ListItem 
                         primaryText={___.person_name}
-						rightAvatar={<span style={sty.list_right}>{_user.employee?_user.employee.name:_user.customer.contact}</span>}
+						rightAvatar={<span style={sty.list_right}>{_user.employee?_user.employee.name:(_user.customer.contact||_user.customer.name)}</span>}
                         rightIcon={<NavigationChevronRight />}
                         style={sty.list_item}
                     />

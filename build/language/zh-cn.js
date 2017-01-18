@@ -426,4 +426,6 @@ window.___={
 	'use_booking_mobile':'使用预订号码',
 	'company':'企业',
 	'mobile_phone':'手机',
+	'wallet':'钱包',
+	'order':'订单',
 }

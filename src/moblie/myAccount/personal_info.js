@@ -3,13 +3,14 @@ import ReactDOM from 'react-dom';
 import {ThemeProvider} from '../../_theme/default';
 
 import {List, ListItem} from 'material-ui/List';
+import RaisedButton from 'material-ui/RaisedButton';
 
 import NavigationChevronRight from 'material-ui/svg-icons/navigation/chevron-right';
 import ActionFace from 'material-ui/svg-icons/action/face';
 import LinearProgress from 'material-ui/LinearProgress';
 
 import AppBar from '../../_component/base/appBar';
-import {setTitle} from '../../_modules/tool';
+import {setTitle,getOpenIdKey} from '../../_modules/tool';
 
 
 const thisView=window.LAUNCHER.getView();//第一句必然是获取view
@@ -67,6 +68,16 @@ class ShowBox extends Component{
         super(props, context);
 		
     }
+
+    logout(){
+        W.loading('正在退出');
+        let key=getOpenIdKey();
+        let wxId=_user.authData[key+'_wx'];//上次登录的公众号id
+        if(wxId)
+            W.logout('&logout=true&needOpenId=true&wx_app_id='+wxId);
+        else
+            W.logout('&logout=true&needOpenId=true');
+    }
 	
     render() {
         let company_item='';
@@ -86,7 +97,6 @@ class ShowBox extends Component{
                     <ListItem 
                         primaryText={___.mobile_phone}
 						rightAvatar={<span style={sty.list_right}>{_user.mobile}</span>}
-                        rightIcon={<NavigationChevronRight />}
                         style={sty.list_item}
                     />
                     <ListItem 
@@ -106,6 +116,9 @@ class ShowBox extends Component{
                         rightIcon={<NavigationChevronRight />}
                         style={sty.list_item}
                     />*/}
+                </List>
+                <List style={{padding:'20px 16px 8px 16px',textAlign:'canter'}}>
+                    <RaisedButton label={___.logout} fullWidth={true} secondary={true} onClick={this.logout}/>                    
                 </List>
             </div>
         );

@@ -96,7 +96,7 @@ class Register extends Component {
     
     success(res){
         if(!res.status_code||res.status_code==8){
-            Object.assign(res,this.formData,this._login);
+            Object.assign(res,this.formData,this._login,res);
             if(this.state.s_num){
                 res.carId=this.state.s_num;
             }else{

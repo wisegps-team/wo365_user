@@ -25,6 +25,7 @@ import QrBox from '../../_component/booking/qr_box';
 import AppBox from '../../_component/booking/app_box';
 
 const thisView=window.LAUNCHER.getView();//第一句必然是获取view
+thisView.setTitle(___.my_order);
 // const payView=thisView.prefetch('#pay',3);
 let _par=null;
 thisView.addEventListener('load',function(e){

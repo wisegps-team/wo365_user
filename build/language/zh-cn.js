@@ -428,4 +428,5 @@ window.___={
 	'mobile_phone':'手机',
 	'wallet':'钱包',
 	'order':'订单',
+	'zhilianche':'智联车网',
 }

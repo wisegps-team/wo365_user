@@ -39,6 +39,7 @@ require('../_sass/home.scss');
 // loadDictionary();
 
 const thisView=window.LAUNCHER.getView();//第一句必然是获取view
+thisView.setTitle(___.zhilianche);
 thisView.addEventListener('load',function(){
     ReactDOM.render(
         <Provider store={STORE}>

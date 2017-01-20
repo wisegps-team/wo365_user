@@ -217,10 +217,10 @@ class RegisterBox extends Component{
     
 
     beforRegister(data){
-        if(!this.data.name){
-            W.alert(___.user_name_empty);
-            return false;
-        }
+        // if(!this.data.name){
+        //     W.alert(___.user_name_empty);
+        //     return false;
+        // }
         if(!this.data.did){
             W.alert(___.please_input_correct_device_num);
             return false;

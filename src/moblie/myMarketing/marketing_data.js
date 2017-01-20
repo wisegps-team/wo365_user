@@ -231,6 +231,8 @@ class App extends Component {
                             strOpenId='&seller_open_id='+_user.authData[idKey];
                         }
                         let data={
+                            i:0,
+                            uid:_user.customer.objectId,
                             id:code,
                             sellerId:_user.objectId,
                             act:this.activity.objectId,

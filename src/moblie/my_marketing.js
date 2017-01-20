@@ -25,7 +25,8 @@ import Input from '../_component/base/input';
 const styles = {
     main:{paddingTop:'0px',paddingBottom:'0px'},
     appbody:{padding:'10px'},
-    card:{margin:'5px',padding:'10px',borderBottom:'1px solid #cccccc'},
+    // card:{marginTop:'5px',padding:'10px',borderBottom:'1px solid #cccccc'},
+    card:{marginTop:'15px',width:'100%',backgroundColor:'#ffffff'},//170118
     td_left:{whiteSpace:'nowrap'},
     td_right:{paddingLeft:'1em'},
     line:{marginTop:'0.5em'},
@@ -42,7 +43,9 @@ const styles = {
     detail:{float:'right',paddingTop:'12px',paddingRight:'12px',color:'#0000cc'},
     search_head:{width:'100%',display:'block'},
     add_icon:{float:'right',marginRight:'15px'},
-    search_box:{marginLeft:'15px',marginTop:'15px',width:'80%',display:'block'}
+    search_box:{marginLeft:'15px',marginTop:'15px',width:'80%',display:'block'},
+    table_left:{width:window.innerWidth*0.62+'px',height:'125px',padding:'0px',backgroundColor:'#ffffff'},
+    table_right:{width:window.innerWidth*0.38+'px'}
 };
 function combineStyle(arr){
     return arr.reduce((a,b)=>Object.assign({},styles[a],styles[b]));
@@ -51,6 +54,7 @@ function combineStyle(arr){
 
 var thisView=window.LAUNCHER.getView();//第一句必然是获取view
 thisView.setTitle(___.recommend);
+thisView.style.backgroundColor='#eeeeee';
 thisView.addEventListener('load',function(){
     ReactDOM.render(<App/>,thisView);
     thisView.prefetch('booking_list.js',2);
@@ -90,7 +94,6 @@ class App extends Component {
         this.editSubmit = this.editSubmit.bind(this);
     }
     search(e,value){
-        console.log(this.activities);
         this.activities=this.originalActivities.filter(ele=>ele.name.includes(value));
         this.setState({keyword:value});
     }
@@ -108,8 +111,8 @@ class App extends Component {
         // this.getData();
     }
     getData(){
-        if(_user.employee && _user.employee.type==1){//兼职营销账号，显示所属公司的集团营销活动。
-
+        if(_user.employee && _user.employee.type==1){
+            //兼职营销账号，显示所属公司的集团营销活动。
             let par0={
                 uid:_user.employee.companyId,
                 sellerTypeId:_user.employee.departId,
@@ -142,7 +145,7 @@ class App extends Component {
                 limit:-1,
             });
 
-        }else if(_user.customer.custTypeId==8){//经销商账号，显示上一级代理商创建的渠道营销活动。
+        }else if(_user.customer.custTypeId==8||_user.customer.custTypeId==5){//经销商账号，显示上一级代理商创建的渠道营销活动。
 
             let parents=_user.customer.parentId.join('|');
             let par1={
@@ -167,10 +170,10 @@ class App extends Component {
                         ele.status2=0;
                         ele.status3=0;
                     }
-                    if(_user.customer.wxAppKey){
-                        ele.wxAppKey=_user.customer.wxAppKey;
-                        ele.uid=_user.customer.objectId;
-                    }
+                    // if(_user.customer.wxAppKey){
+                    //     ele.wxAppKey=_user.customer.wxAppKey;
+                    //     ele.uid=_user.customer.objectId;
+                    // }
                 });
                 this.originalActivities=this.originalActivities.concat(activities);
                 this.activities=this.activities.concat(activities);
@@ -180,88 +183,95 @@ class App extends Component {
                 limit:-1,
             });
 
-        }else if(_user.customer.custTypeId==5){//如果是代理商账号，显示type=2，员工营销；
+        }
+        // else if(_user.customer.custTypeId==5){//如果是代理商账号，显示type=2，员工营销；
             
-            let par2={
-                uid:_user.customer.objectId,
-                status:1,
-                type:2,
-                // sellerTypeId:_user.customer.objectId,
-            }
-            Wapi.activity.list(res=>{
-                this.total=res.total;
-                let activities=res.data;
+        //     let par2={
+        //         uid:_user.customer.objectId,
+        //         status:1,
+        //         type:2,
+        //         // sellerTypeId:_user.customer.objectId,
+        //     }
+        //     Wapi.activity.list(res=>{
+        //         this.total=res.total;
+        //         let activities=res.data;
                 
-                activities.forEach(ele=>{
-                    let booking=this.booking.find(item=>item._id.activityId==ele.objectId);
-                    if(booking){
-                        ele.status0=booking.status0;
-                        ele.status1=booking.status1;
-                        ele.status2=booking.status2;
-                        ele.status3=booking.status3;
-                    }else{
-                        ele.status0=0;
-                        ele.status1=0;
-                        ele.status2=0;
-                        ele.status3=0;
-                    }
-                });
-                this.originalActivities=this.originalActivities.concat(activities);
-                this.activities=this.activities.concat(activities);
-                this.forceUpdate();
-            },par2,{
-                sorts:'-createdAt',
-                limit:-1,
-            });
+        //         activities.forEach(ele=>{
+        //             let booking=this.booking.find(item=>item._id.activityId==ele.objectId);
+        //             if(booking){
+        //                 ele.status0=booking.status0;
+        //                 ele.status1=booking.status1;
+        //                 ele.status2=booking.status2;
+        //                 ele.status3=booking.status3;
+        //             }else{
+        //                 ele.status0=0;
+        //                 ele.status1=0;
+        //                 ele.status2=0;
+        //                 ele.status3=0;
+        //             }
+        //         });
+        //         this.originalActivities=this.originalActivities.concat(activities);
+        //         this.activities=this.activities.concat(activities);
+        //         this.forceUpdate();
+        //     },par2,{
+        //         sorts:'-createdAt',
+        //         limit:-1,
+        //     });
 
-        }else if(_user.customer.custTypeId==7){//车主账号，显示上一级所属经销商及其上级代理商创建的车主营销活动。
-            
+        // }
+        else if(_user.customer.custTypeId==7){
+            //车主账号，显示上两级创建的车主营销活动。
+            let _this=this;
             let parents=_user.customer.parentId;
             let i=parents.length;
-            parents.forEach(ele=>{//获取当前用户的所以上级id，并查找所有的上上级id
+            parents.forEach(ele=>{//获取当前用户的所有上级id，并查找所有的上上级id
                 Wapi.customer.get(re=>{
-                    parents=re.data.parentId && parents.concat(re.data.parentId);
+                    if(re.data){
+                        parents=re.data.parentId && parents.concat(re.data.parentId);
+                    }
                     i--;
                     if(i==0){//当查找玩所有上上级的时候 获取所有parents的活动
-                        let strParents=parents.join('|');
-                        let par3={
-                            uid:_user.customer.objectId + '|' + strParents,
-                            status:1,
-                            type:0
-                        }
-                        Wapi.activity.list(res=>{//type=0 车主营销的活动
-                            this.total=res.total;
-                            let activities=res.data;
-                            
-                            activities.forEach(ele=>{
-                                let booking=this.booking.find(item=>item._id.activityId==ele.objectId);
-                                if(booking){
-                                    ele.status0=booking.status0;
-                                    ele.status1=booking.status1;
-                                    ele.status2=booking.status2;
-                                    ele.status3=booking.status3;
-                                }else{
-                                    ele.status0=0;
-                                    ele.status1=0;
-                                    ele.status2=0;
-                                    ele.status3=0;
-                                }
-                                if(_user.customer.wxAppKey){
-                                    ele.wxAppKey=_user.customer.wxAppKey;
-                                    ele.uid=_user.customer.objectId;
-                                }
-                            });
-                            this.originalActivities=this.originalActivities.concat(activities);
-                            this.activities=this.activities.concat(activities);
-                            this.forceUpdate();
-                        },par3,{
-                            sorts:'-createdAt',
-                            limit:-1,
-                        });
-
+                        getIt();
                     }
                 },{objectId:ele});
             });
+            function getIt(){
+                let strParents=parents.join('|');
+                let par3={
+                    uid:_user.customer.objectId + '|' + strParents,
+                    status:1,
+                    type:0  //type=0 车主营销的活动
+                }
+                Wapi.activity.list(res=>{
+                    _this.total=res.total;
+                    let activities=res.data;
+                    
+                    activities.forEach(ele=>{
+                        let booking=_this.booking.find(item=>item._id.activityId==ele.objectId);
+                        if(booking){
+                            ele.status0=booking.status0;
+                            ele.status1=booking.status1;
+                            ele.status2=booking.status2;
+                            ele.status3=booking.status3;
+                        }else{
+                            ele.status0=0;
+                            ele.status1=0;
+                            ele.status2=0;
+                            ele.status3=0;
+                        }
+                        // if(_user.customer.wxAppKey){
+                        //     ele.wxAppKey=_user.customer.wxAppKey;
+                        //     ele.uid=_user.customer.objectId;
+                        // }
+                    });
+                    _this.originalActivities=_this.originalActivities.concat(activities);
+                    _this.activities=_this.activities.concat(activities);
+                    _this.forceUpdate();
+                },par3,{
+                    sorts:'-createdAt',
+                    limit:-1,
+                });
+            }
         }
     }
     add(){
@@ -336,6 +346,9 @@ class App extends Component {
                             />
                         </div>
                     </div>*/}
+                    <div style={{width:'100%',height:'210px',display:'block',backgroundColor:'#ffffff'}}>
+                        <img src='../../img/my_marketing_head.png' style={{width:'100%',height:'100%'}}/>
+                    </div>
                     <div name='list' style={styles.main}>
                         {/*items*/}
                         <Alist 
@@ -397,8 +410,8 @@ class DList extends Component{
         data._sellerTel=_user.employee?_user.employee.tel:_user.mobile;
 
         history.replaceState('home.html','home.html','home.html');
-        window.location=WiStorm.root+'action.html?intent=logout&action='+encodeURIComponent(data.url)
         // this.activityUrl=WiStorm.root+'action.html?intent=logout&action='+encodeURIComponent(data.url)
+        window.location='http://'+WiStorm.config.domain.wx+'/autogps/action.html?intent=logout&action='+encodeURIComponent(data.url)
             +'&title='+encodeURIComponent(data.name)
             +'&uid='+_user.customer.objectId
             +'&seller_name='+encodeURIComponent(data._seller)
@@ -481,48 +494,87 @@ class DList extends Component{
             close={this.toggleIframe}
         />:null;
         let data=this.props.data;
+        // let items=data.map((ele,i)=>
+        //     <div key={i} style={styles.card}>
+        //         <div style={styles.detail} onClick={()=>this.toActivityPage(ele)}>{___.act_detail}</div>
+        //         <div style={styles.table}>{ele.name}</div>
+                
+        //         <div style={styles.spans}>
+        //             {/*<div style={styles.count} >
+        //                 <span style={styles.variable}>{ele.principal}</span>
+        //                 <span>{' '+___.publish}</span>
+        //             </div>*/}
+        //             <div style={{float:'right',marginRight:'16px'}}>
+        //                 <img 
+        //                     src='../../img/share.png' 
+        //                     style={{width:'20px',height:'20px',marginRight:'15px'}} 
+        //                     onClick={()=>this.share(ele)}
+        //                 />
+        //                 <img 
+        //                     src='../../img/qrcode.png' 
+        //                     style={{width:'20px',height:'20px'}} 
+        //                     onClick={()=>this.activityData(ele)}
+        //                 />
+        //             </div>
+        //             <div >
+        //                 <span>推荐朋友预订安装奖励 </span>
+        //                 <span style={{color:'#ff9900'}}>{ele.reward}</span>
+        //                 <span> 元红包</span>
+        //             </div>
+        //         </div>
+        //     </div>);
+        //170118
         let items=data.map((ele,i)=>
             <div key={i} style={styles.card}>
-                <div style={styles.detail} onClick={()=>this.toActivityPage(ele)}>{___.act_detail}</div>
-                <div style={styles.table}>{ele.name}</div>
-                
-                <div style={styles.spans}>
-                    {/*<div style={styles.count} >
-                        <span style={styles.variable}>{ele.principal}</span>
-                        <span>{' '+___.publish}</span>
-                    </div>*/}
-                    <div style={{float:'right',marginRight:'16px'}}>
-                        <img 
-                            src='../../img/share.png' 
-                            style={{width:'20px',height:'20px',marginRight:'15px'}} 
-                            onClick={()=>this.share(ele)}
-                        />
-                        <img 
-                            src='../../img/qrcode.png' 
-                            style={{width:'20px',height:'20px'}} 
-                            onClick={()=>this.activityData(ele)}
-                        />
-                    </div>
-                    <div >
-                        <span>推荐朋友预订安装奖励 </span>
-                        <span style={{color:'#ff9900'}}>{ele.reward}</span>
-                        <span> 元红包</span>
-                    </div>
-                </div>
-                
-
+                <table>
+                <tbody>
+                    <tr>
+                        <td style={styles.table_left} onClick={()=>this.toActivityPage(ele)}>
+                            {ele.imgUrl?
+                            <img src={ele.imgUrl} style={{width:window.innerWidth*0.62,height:'125px'}} alt={ele.name}/>
+                            :<div style={{width:window.innerWidth*0.62,textAlign:'center'}}>{ele.name}</div>}
+                        </td>
+                        <td style={styles.table_right}>
+                            <div style={{fontSize: '12px',marginBottom: '3px', textAlign:'center'}} >
+                                <div>推荐朋友预订安装</div>
+                                <div>
+                                    <span>奖励 </span>
+                                    <span style={{color:'#ff9900'}}>{ele.reward}</span>
+                                    <span> 元红包</span>
+                                </div>
+                                <div style={{fontSize:'8px',marginTop:'5px'}}>
+                                    {'已有'+ele.status0+'位好友预订'}
+                                </div>
+                            </div>
+                            <div style={{float:'right',marginRight:'16px'}}>
+                                <div style={{float:'right',textAlign:'center'}}>
+                                    <img 
+                                        src='../../img/qrcode.png' 
+                                        style={{width:'30px',height:'30px'}} 
+                                        onClick={()=>this.activityData(ele)}
+                                    />
+                                    <div style={{fontSize:'8px'}}>营销资料</div>
+                                </div>
+                                <div style={{float:'left',textAlign:'center',marginRight:'10px'}}>
+                                    <img 
+                                        src='../../img/share.png' 
+                                        style={{width:'30px',height:'30px'}} 
+                                        onClick={()=>this.share(ele)}
+                                    />
+                                    <div style={{fontSize:'8px'}}>分享活动</div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                </tbody>
+                </table>
             </div>);
         return(
             <div>
                 {items}
                 {iframe}
                 <div style={{marginTop:'15px',width:'100%',textAlign:'center'}}>
-                    点击
-                    <img 
-                        src='../../img/share.png' 
-                        style={{width:'20px',height:'20px'}} 
-                    />
-                    后按页面提示分享
+                    <p>按提示将活动发送给朋友或分享到朋友圈，</p>
                     <p>好友打开链接即可了解活动详情并咨询预订！</p>
                 </div>
             </div>

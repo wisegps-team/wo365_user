@@ -104,7 +104,27 @@ class App extends Component {
         };
     }
     componentDidMount() {
-        this.getData();
+        let par={
+            "group":{
+                "_id":{"activityId":"$activityId"},
+                "status0":{"$sum":"$status0"},
+                "status1":{"$sum":"$status1"},
+                "status2":{"$sum":"$status2"},
+                "status3":{"$sum":"$status3"}
+            },
+            "sorts":"activityId",
+            sellerId:_user.employee?_user.employee.objectId:_user.customer.objectId,
+        }
+        Wapi.booking.aggr(resAggr=>{
+            this.booking=resAggr.data;
+            Wapi.customer.list(res=>{
+                this._parents=res.data||[];
+                this.getData();
+            },{
+                objectId:_user.customer.parentId.join('|')+'|'+_user.customer.objectId
+            });
+        },par);
+        // this.getData();
     }
     nextPage(){
         // this.page_no++;
@@ -418,6 +438,9 @@ class DList extends Component{
             +'&sellerId='+data._sellerId
             +'&mobile='+data._sellerTel
             +'&agent_tel='+_user.customer.tel
+            +'&wxAppKey='+data.wxAppKey
+            +'&activityId='+data.objectId
+            +'&seller_open_id='+_user.authData.openId
             +'&timerstamp='+Number(new Date());
             
         // this.setState({iframe:true});
@@ -452,7 +475,8 @@ class DList extends Component{
             var op={
                 title: data.name, // 分享标题
                 desc: data.booking_offersDesc, // 分享描述
-                link:WiStorm.root+'action.html?intent=logout&action='+encodeURIComponent(data.url)
+                // link:WiStorm.root+'action.html?intent=logout&action='+encodeURIComponent(data.url)
+                link:'http://'+WiStorm.config.domain.wx+'/autogps/action.html?intent=logout&action='+encodeURIComponent(data.url)
                     +'&title='+encodeURIComponent(data.name)
                     +'&uid='+data.uid
                     +'&seller_name='+encodeURIComponent(data._seller)
@@ -546,23 +570,13 @@ class DList extends Component{
                                     {'已有'+ele.status0+'位好友预订'}
                                 </div>
                             </div>
-                            <div style={{float:'right',marginRight:'16px'}}>
-                                <div style={{float:'right',textAlign:'center'}}>
-                                    <img 
-                                        src='../../img/qrcode.png' 
-                                        style={{width:'30px',height:'30px'}} 
-                                        onClick={()=>this.activityData(ele)}
-                                    />
-                                    <div style={{fontSize:'8px'}}>营销资料</div>
-                                </div>
-                                <div style={{float:'left',textAlign:'center',marginRight:'10px'}}>
-                                    <img 
-                                        src='../../img/share.png' 
-                                        style={{width:'30px',height:'30px'}} 
-                                        onClick={()=>this.share(ele)}
-                                    />
-                                    <div style={{fontSize:'8px'}}>分享活动</div>
-                                </div>
+                            <div style={{textAlign:'center'}}>
+                                <img 
+                                    src='../../img/share.png' 
+                                    style={{width:'30px',height:'30px'}} 
+                                    onClick={()=>this.share(ele)}
+                                />
+                                <div style={{fontSize:'8px'}}>分享活动</div>
                             </div>
                         </td>
                     </tr>

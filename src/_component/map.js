@@ -52,6 +52,7 @@ class Map extends Component {
     componentDidUpdate(prevProps, prevState) {
         if(this.state.cars.length!=prevState.cars.length&&this.map){
             let view=this.state.cars.map(function (ele) {
+                W.setLS('lon&lat',{lon:ele._device.activeGpsData.lon,lat:ele._device.activeGpsData.lat});
                 return new WMap.Point(ele._device.activeGpsData.lon, ele._device.activeGpsData.lat);
             });
             this.map.setViewport(view);//设置合适的层级大小
@@ -61,6 +62,10 @@ class Map extends Component {
     
     mapinit(){
         this.map=new WMap.Map(this.props.id);
+        let lastCenter=W.ls('lon&lat');
+        if(lastCenter){
+            this.map.centerAndZoom((lastCenter.lon,lastCenter.lat),5);
+        }
         if(WiStorm.agent.mobile){
             this.map.addControl(new WMap.NavigationControl({type:BMAP_NAVIGATION_CONTROL_ZOOM,anchor:BMAP_ANCHOR_BOTTOM_RIGHT,offset: new WMap.Size(5, 20)}));//添加缩放控件
         }else

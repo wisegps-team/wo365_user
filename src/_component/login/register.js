@@ -30,6 +30,7 @@ class Register extends Component {
         this.formData=Object.assign({},props.formData);
         this.formData.valid_type=1;
         this.state.mobile=this.formData.mobile;
+        this.state.s_mob=(this.formData.mobile?1:0);
 
         this.change = this.change.bind(this);
         this.accountChange = this.accountChange.bind(this);
@@ -200,7 +201,7 @@ class Register extends Component {
                     value={this.state.s_mob} 
                     onChange={this.selectMobil}
                     onNewChange={this.accountChange}
-                    mobile={this.state.mobile}
+                    mobile={this.props.formData&&this.props.formData.mobile}
                 />
                 <CarNum data={cars} onChange={this.selectNum}/>
                 <VerificationCode 
@@ -377,7 +378,8 @@ class MobileSelect extends Component{
                     underlineDisabledStyle={{
                         borderBottom: '1px solid rgba(0, 0, 0, 0.25)'
                     }}
-                    inputStyle={{color:'#000'}}
+                    inputStyle={{color:'#000',height:'40px'}}
+                    type={'number'}
                 />
                 {btn}
             </div>

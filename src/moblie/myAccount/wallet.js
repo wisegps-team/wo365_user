@@ -71,7 +71,7 @@ const styles={
         display:'block',
         textAlign:'center',
         paddingTop:'40px',
-        backgroundColor:'#33ccee',
+        backgroundColor:'#3c9bf9',
     },
     head_str:{
         fontSize:'14px',

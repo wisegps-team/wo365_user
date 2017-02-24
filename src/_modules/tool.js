@@ -69,3 +69,33 @@ export function getOpenIdKey(host){
     host=host.replace(/\./g,'_');
     return host+'_openId';
 }
+
+/**
+ * 10进制整数转任意进制
+ * 返回一个数组
+ * @param i 要转换的10进制数字
+ * @param b 目标进制数
+ */
+export function intTo(i,b){
+    let last;
+    if(i>=b){
+        let a=i%b;
+        last=intTo((i-a)/b,b);
+        last.push(a);
+    }else
+        last=[i];
+    return last;
+}
+
+/**
+ * 输入一个整数，转换为字母串
+ */
+export function changeToLetter(i){
+    const STRING='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    i=parseInt(i);
+    if(isNaN(i))i=0;
+    let arr=intTo(i,52);
+    return arr.reduce((str,b)=>{
+        return str+=STRING[b];
+    },'');
+}

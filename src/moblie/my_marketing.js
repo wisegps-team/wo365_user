@@ -17,9 +17,9 @@ import MenuItem from 'material-ui/MenuItem';
 import SonPage from '../_component/base/sonPage';
 import AutoList from '../_component/base/autoList';
 import EditActivity from '../_component/editActivity';
-import {getOpenIdKey} from '../_modules/tool';
 import Iframe from '../_component/base/iframe';
 import Input from '../_component/base/input';
+import {getOpenIdKey,changeToLetter} from '../_modules/tool';
 
 
 const styles = {
@@ -165,7 +165,7 @@ class App extends Component {
                 limit:-1,
             });
 
-        }else if(_user.customer.custTypeId==8||_user.customer.custTypeId==5){//经销商账号，显示上一级代理商创建的渠道营销活动。
+        }else if(_user.customer.custTypeId==8||_user.customer.custTypeId==5){//经销商和代理商账号，显示上一级创建的渠道营销活动。
 
             let parents=_user.customer.parentId.join('|');
             let par1={
@@ -428,22 +428,66 @@ class DList extends Component{
         data._seller=_user.employee?_user.employee.name:_user.customer.contact;
         data._sellerId=_user.employee?_user.employee.objectId:_user.customer.objectId;
         data._sellerTel=_user.employee?_user.employee.tel:_user.mobile;
+        let strOpenId='';
+        let idKey=getOpenIdKey();
+        if(_user.authData && _user.authData[idKey]){
+            strOpenId='&seller_open_id='+_user.authData[idKey];
+        }
 
-        history.replaceState('home.html','home.html','home.html');
-        // this.activityUrl=WiStorm.root+'action.html?intent=logout&action='+encodeURIComponent(data.url)
-        window.location='http://'+WiStorm.config.domain.wx+'/autogps/action.html?intent=logout&action='+encodeURIComponent(data.url)
-            +'&title='+encodeURIComponent(data.name)
-            +'&uid='+_user.customer.objectId
-            +'&seller_name='+encodeURIComponent(data._seller)
-            +'&sellerId='+data._sellerId
-            +'&mobile='+data._sellerTel
-            +'&agent_tel='+_user.customer.tel
-            +'&wxAppKey='+data.wxAppKey
-            +'&activityId='+data.objectId
-            +'&seller_open_id='+_user.authData.openId
-            +'&timerstamp='+Number(new Date());
+        
+        Wapi.qrLink.get(res=>{//获取与[当前活动和seller]对应的短码，如没有则新建
+            let linkUrl='';
+            if(res.data){
+                linkUrl='http://autogps.cn/?s='+res.data.id;
+                history.replaceState('home.html','home.html','home.html');
+                window.location=linkUrl;
+                // console.log(linkUrl);
+            }else{
+                Wapi.qrLink.add(re=>{
+                    let _id=changeToLetter(re.autoId);
+                    linkUrl='http://autogps.cn/?s='+_id;
+                    Wapi.qrLink.update(json=>{
+                        history.replaceState('home.html','home.html','home.html');
+                        window.location=linkUrl;
+                        // console.log(linkUrl);
+                    },{
+                        _objectId:re.objectId,
+                        id:_id
+                    })
+                },{
+                    i:1,
+                    act:String(data.objectId),
+                    sellerId:String(data._sellerId),
+                    uid:String(data.uid),
+                    type:3,
+                    url:WiStorm.root+'action.html?intent=logout&action='+encodeURIComponent(data.url)
+                        +'&uid='+data.uid
+                        +'&sellerId='+data._sellerId
+                        +'&activityId='+data.objectId
+                        +strOpenId
+                        +'&timerstamp='+Number(new Date()),
+                });
+            }
+        },{
+            act:data.objectId,
+            sellerId:data._sellerId,
+            uid:data.uid,
+            type:3
+        });
+
+        // history.replaceState('home.html','home.html','home.html');
+        // window.location='http://'+WiStorm.config.domain.wx+'/autogps/action.html?intent=logout&action='+encodeURIComponent(data.url)
+        //     +'&title='+encodeURIComponent(data.name)
+        //     +'&wxAppKey='+data.wxAppKey
+        //     +'&activityId='+data.objectId
+        //     +'&seller_name='+encodeURIComponent(data._seller)
+        //     +'&sellerId='+data._sellerId
+        //     +'&mobile='+data._sellerTel
+        //     +'&uid='+_user.customer.objectId
+        //     +'&agent_tel='+_user.customer.tel
+        //     +'&seller_open_id='+_user.authData.openId
+        //     +'&timerstamp='+Number(new Date());
             
-        // this.setState({iframe:true});
     }
     toCountPage(page,data){
         let par={
@@ -472,30 +516,81 @@ class DList extends Component{
             if(_user.authData && _user.authData[idKey]){
                 strOpenId='&seller_open_id='+_user.authData[idKey];
             }
-            var op={
-                title: data.name, // 分享标题
-                desc: data.booking_offersDesc, // 分享描述
-                // link:WiStorm.root+'action.html?intent=logout&action='+encodeURIComponent(data.url)
-                link:'http://'+WiStorm.config.domain.wx+'/autogps/action.html?intent=logout&action='+encodeURIComponent(data.url)
-                    +'&title='+encodeURIComponent(data.name)
-                    +'&uid='+data.uid
-                    +'&seller_name='+encodeURIComponent(data._seller)
-                    +'&sellerId='+data._sellerId
-                    +'&mobile='+data._sellerTel
-                    +'&agent_tel='+_user.customer.tel
-                    +'&wxAppKey='+data.wxAppKey
-                    +'&activityId='+data.objectId
-                    +strOpenId
-                    +'&timerstamp='+Number(new Date()),
-                imgUrl:'http://h5.bibibaba.cn/wo365/img/s.jpg', // 分享图标
-                success: function(){},
-                cancel: function(){}
+
+            Wapi.qrLink.get(res=>{//获取与当前活动和seller对应的短码，如没有则新建
+                let linkUrl='';
+                if(res.data){
+                    linkUrl='http://autogps.cn/?s='+res.data.id;
+                    setWxShare(linkUrl);
+                }else{
+                    Wapi.qrLink.add(re=>{
+                        let _id=changeToLetter(re.autoId);
+                        linkUrl='http://autogps.cn/?s='+_id;
+                        Wapi.qrLink.update(json=>{
+                            setWxShare(linkUrl);
+                        },{
+                            _objectId:re.objectId,
+                            id:_id
+                        });
+                    },{
+                        i:1,
+                        act:String(data.objectId),
+                        sellerId:String(_user.employee.objectId),
+                        uid:String(data.uid),
+                        type:3,
+                        url:WiStorm.root+'action.html?intent=logout&action='+encodeURIComponent(data.url)
+                            +'&uid='+data.uid
+                            +'&sellerId='+_user.employee.objectId
+                            +'&activityId='+data.objectId
+                            +strOpenId
+                            +'&timerstamp='+Number(new Date()),
+                    });
+                }
+            },{
+                act:data.objectId,
+                sellerId:_user.employee.objectId,
+                uid:data.uid,
+                type:3
+            });
+            
+            function setWxShare(url){
+                var op={
+                    title: data.name, // 分享标题
+                    desc: data.booking_offersDesc, // 分享描述
+                    link: url,
+                    imgUrl:'http://h5.bibibaba.cn/wo365/img/s.jpg', // 分享图标
+                    success: function(){},
+                    cancel: function(){}
+                }
+                wx.onMenuShareTimeline(op);
+                wx.onMenuShareAppMessage(op);
+                setShare=null;
+                that.context.share(data);
             }
-            wx.onMenuShareTimeline(op);
-            wx.onMenuShareAppMessage(op);
-            setShare=null;
-            that.context.share(data);
-            // W.alert(___.share_activity);
+
+
+            // var op={
+            //     title: data.name, // 分享标题
+            //     desc: data.booking_offersDesc, // 分享描述
+            //     link:'http://'+WiStorm.config.domain.wx+'/autogps/action.html?intent=logout&action='+encodeURIComponent(data.url)
+            //         +'&title='+encodeURIComponent(data.name)
+            //         +'&uid='+data.uid
+            //         +'&seller_name='+encodeURIComponent(data._seller)
+            //         +'&sellerId='+data._sellerId
+            //         +'&mobile='+data._sellerTel
+            //         +'&agent_tel='+_user.customer.tel
+            //         +'&wxAppKey='+data.wxAppKey
+            //         +'&activityId='+data.objectId
+            //         +strOpenId
+            //         +'&timerstamp='+Number(new Date()),
+            //     imgUrl:'http://h5.bibibaba.cn/wo365/img/s.jpg', // 分享图标
+            //     success: function(){},
+            //     cancel: function(){}
+            // }
+            // wx.onMenuShareTimeline(op);
+            // wx.onMenuShareAppMessage(op);
+            // setShare=null;
+            // that.context.share(data);
         }
         if(W.native){
             setShare();
@@ -518,44 +613,14 @@ class DList extends Component{
             close={this.toggleIframe}
         />:null;
         let data=this.props.data;
-        // let items=data.map((ele,i)=>
-        //     <div key={i} style={styles.card}>
-        //         <div style={styles.detail} onClick={()=>this.toActivityPage(ele)}>{___.act_detail}</div>
-        //         <div style={styles.table}>{ele.name}</div>
-                
-        //         <div style={styles.spans}>
-        //             {/*<div style={styles.count} >
-        //                 <span style={styles.variable}>{ele.principal}</span>
-        //                 <span>{' '+___.publish}</span>
-        //             </div>*/}
-        //             <div style={{float:'right',marginRight:'16px'}}>
-        //                 <img 
-        //                     src='../../img/share.png' 
-        //                     style={{width:'20px',height:'20px',marginRight:'15px'}} 
-        //                     onClick={()=>this.share(ele)}
-        //                 />
-        //                 <img 
-        //                     src='../../img/qrcode.png' 
-        //                     style={{width:'20px',height:'20px'}} 
-        //                     onClick={()=>this.activityData(ele)}
-        //                 />
-        //             </div>
-        //             <div >
-        //                 <span>推荐朋友预订安装奖励 </span>
-        //                 <span style={{color:'#ff9900'}}>{ele.reward}</span>
-        //                 <span> 元红包</span>
-        //             </div>
-        //         </div>
-        //     </div>);
-        //170118
         let items=data.map((ele,i)=>
             <div key={i} style={styles.card}>
-                <table>
+                <table style={{borderCollapse: 'collapse'}}>
                 <tbody>
                     <tr>
                         <td style={styles.table_left} onClick={()=>this.toActivityPage(ele)}>
                             {ele.imgUrl?
-                            <img src={ele.imgUrl} style={{width:window.innerWidth*0.62,height:'125px'}} alt={ele.name}/>
+                            <img src={ele.imgUrl} style={{width:window.innerWidth*0.62,height:'125px',verticalAlign: 'middle'}} alt={ele.name}/>
                             :<div style={{width:window.innerWidth*0.62,textAlign:'center'}}>{ele.name}</div>}
                         </td>
                         <td style={styles.table_right}>
@@ -570,13 +635,23 @@ class DList extends Component{
                                     {'已有'+ele.status0+'位好友预订'}
                                 </div>
                             </div>
-                            <div style={{textAlign:'center'}}>
-                                <img 
-                                    src='../../img/share.png' 
-                                    style={{width:'30px',height:'30px'}} 
-                                    onClick={()=>this.share(ele)}
-                                />
-                                <div style={{fontSize:'8px'}}>分享活动</div>
+                            <div style={{height:'53px',width:window.innerWidth*0.38,position:'relative'}}>
+                                <div style={{textAlign:'center',position:'absolute',left:'50%'}}>
+                                    <img 
+                                        src='../../img/qrcode.png' 
+                                        style={{width:'30px',height:'30px'}} 
+                                        onClick={()=>this.activityData(ele)}
+                                    />
+                                    <div style={{fontSize:'8px'}}>营销资料</div>
+                                </div>
+                                <div style={{textAlign:'center',position:'absolute',left:'50%',marginLeft: '-50px'}}>
+                                    <img 
+                                        src='../../img/share.png' 
+                                        style={{width:'30px',height:'30px'}} 
+                                        onClick={()=>this.share(ele)}
+                                    />
+                                    <div style={{fontSize:'8px'}}>分享活动</div>
+                                </div>
                             </div>
                         </td>
                     </tr>

@@ -377,6 +377,9 @@ class App extends Component {
                             data={this.activities} 
                             next={this.nextPage} 
                         />
+                        <div style={this.noData?{marginTop:'30px',textAlign:'center'}:styles.hide}>
+                            暂无活动
+                        </div>
                     </div>
                     
                     <SonPage title={___.seller_activity} open={this.state.isEdit} back={this.editBack}>
@@ -663,7 +666,11 @@ class DList extends Component{
                 {items}
                 {iframe}
                 <div style={{marginTop:'15px',width:'100%',textAlign:'center'}}>
-                    <p>按提示将活动发送给朋友或分享到朋友圈，</p>
+                    <p>
+                        点击
+                        <img src='../../img/share.png' style={{width:'20px',height:'20px'}} />
+                        按提示将活动发送给朋友或分享到朋友圈，
+                    </p>
                     <p>好友打开链接即可了解活动详情并咨询预订！</p>
                 </div>
             </div>

@@ -142,7 +142,7 @@ class App extends Component {
                     <div style={{fontSize:'18px'}} onClick={this.personalInfo}>
                         <img src='../../img/head.png' style={sty.head_pic}/>
                         <div>
-                            {_user.employee ? _user.employee.name : (_user.customer.contact||_user.customer.name)}
+                            {_user.employee ? _user.employee.name : (_user.customer.contact||_user.customer.name||'')}
                         </div>
                     </div>
                     <div style={sty.head_links}>

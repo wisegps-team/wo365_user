@@ -132,6 +132,7 @@ class App extends Component {
             <ThemeProvider>
                 <div className='login' style={_sty}>
                     {actives[this.state.active]}
+                    {/*{actives[3]}*/}
                     <div style={{
                         textAlign: 'right',
                         marginTop: '10px'

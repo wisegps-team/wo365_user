@@ -434,4 +434,5 @@ window.___={
 	'no_bind':'扫描营销资料二维码绑定当前营销活动后，有意向的车主无需通过微信好友分享，扫码即可了解活动详情并预订！',
 	'verification_code':'验证码',
 	'ready_activity_url':'正在准备活动链接……',
+	'phone_not_user':'此用户不属于本平台',
 }

@@ -341,11 +341,11 @@ function WFeatureApi(token){
 }
 WFeatureApi.prototype=new WiStormAPI();//继承父类WiStormAPI
 
-function WCacheApi(){
-	WiStormAPI.call(this,'cache');
+function WCacheApi(token){
+	WiStormAPI.call(this,'cache',token,config.app_key,config.app_secret);
 }
-WFeatureApi.prototype=new WiStormAPI();//继承父类WiStormAPI
-WFeatureApi.prototype.get=function(callback,key){
+WCacheApi.prototype=new WiStormAPI();//继承父类WiStormAPI
+WCacheApi.prototype.get=function(callback,key){
 	var data={
 		'key':key,
 		'method':this.apiName+".getObj"
@@ -578,6 +578,7 @@ const Wapi={
 	role:new WRoleApi(_user?_user.access_token:null),
 	page:new WPageApi(_user?_user.access_token:null),
 	feature:new WFeatureApi(_user?_user.access_token:null),
+	cache:new WCacheApi(_user?_user.access_token:null),
 	service:new WServiceApi(_user?_user.access_token:null),
 	crash:new WCrashApi(),
 	//以下为非核心功能表

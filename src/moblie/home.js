@@ -128,6 +128,14 @@ class App extends Component {
         thisView.goTo('./myAccount/my_order.js');
     }
     render() {
+        // let name='_user.customer.name';
+        let name=_user.customer.name;
+        if(_user.employee){
+            name=_user.employee.name;
+        }
+        if(_user.customer.custTypeId!=7){
+            name=_user.customer.contact;
+        }
         return (
             <ThemeProvider>
                 {/*<AppBar
@@ -142,7 +150,7 @@ class App extends Component {
                     <div style={{fontSize:'18px'}} onClick={this.personalInfo}>
                         <img src='../../img/head.png' style={sty.head_pic}/>
                         <div>
-                            {_user.employee ? _user.employee.name : (_user.customer.contact||_user.customer.name||'')}
+                            {name}
                         </div>
                     </div>
                     <div style={sty.head_links}>

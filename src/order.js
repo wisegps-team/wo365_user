@@ -22,6 +22,7 @@ if(!(_user&&_user.mobile)){
 }
 
 const thisView=window.LAUNCHER.getView();//第一句必然是获取view
+thisView.setTitle(___.order_detail);
 const payView=thisView.prefetch('#pay',3);
 thisView.addEventListener('load',function(e){
     ReactDOM.render(<DetailBox/>,thisView);
@@ -466,7 +467,7 @@ class DetailBox extends Component{
                         <div style={styles.childLine}>{___.order_book_shop_tel+'：'+(d.installTel||'--')}</div>
                     </div>
 
-                    <div style={(time3 && !time4) ? {} : hide}>
+                    <div style={(time3 && !time4 && !time5) ? {} : hide}>
                         <div style={this.user.installer ? btns : hide}>
                             <RaisedButton label="服务预约确认" onTouchTap={this.confirmInstall} primary={true} />
                         </div>
@@ -527,7 +528,7 @@ class DetailBox extends Component{
 
                     <div name='step6' style={this.state.step==6 ? show : hide}>
                         {/*支付金额*/}
-                        <div style={styles.childLine}>{___.paid_amount+'：'+(d.money ? d.money.toFixed(2) : '--')}</div>
+                        <div style={styles.childLine}>{___.paid_amount+'：'+(d.receipt ? d.receipt.toFixed(2) : '--')}</div>
                     </div>
 
                     <div style={(time6 && !time7) ? {} : hide}>

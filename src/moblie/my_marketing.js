@@ -117,11 +117,13 @@ class App extends Component {
         }
         Wapi.booking.aggr(resAggr=>{
             this.booking=resAggr.data;
+            console.log(resAggr,'res1')
             Wapi.customer.list(res=>{
+                console.log(res,'res2')
                 this._parents=res.data||[];
                 this.getData();
             },{
-                objectId:_user.customer.parentId.join('|')+'|'+_user.customer.objectId
+                objectId:_user.customer.parentId.length==0?_user.customer.objectId : _user.customer.parentId.join('|')+'|'+_user.customer.objectId
             });
         },par);
         // this.getData();

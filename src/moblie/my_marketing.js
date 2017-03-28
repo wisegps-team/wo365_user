@@ -540,12 +540,12 @@ class DList extends Component{
                     },{
                         i:1,
                         act:String(data.objectId),
-                        sellerId:String(_user.employee.objectId),
+                        sellerId:String(data._sellerId),
                         uid:String(data.uid),
                         type:3,
-                        url:WiStorm.root+'action.html?intent=logout&action='+encodeURIComponent(data.url)
+                        url:'http://'+WiStorm.config.domain.wx+'/autogps/action.html?intent=logout&action='+encodeURIComponent(data.url)
                             +'&uid='+data.uid
-                            +'&sellerId='+_user.employee.objectId
+                            +'&sellerId='+data._sellerId
                             +'&activityId='+data.objectId
                             +strOpenId
                             +'&timerstamp='+Number(new Date()),
@@ -553,7 +553,7 @@ class DList extends Component{
                 }
             },{
                 act:data.objectId,
-                sellerId:_user.employee.objectId,
+                sellerId:data._sellerId,
                 uid:data.uid,
                 type:3
             });
@@ -567,6 +567,8 @@ class DList extends Component{
                     success: function(){},
                     cancel: function(){}
                 }
+                
+                history.replaceState('home.html','home.html','home.html');
                 wx.onMenuShareTimeline(op);
                 wx.onMenuShareAppMessage(op);
                 setShare=null;
@@ -640,23 +642,13 @@ class DList extends Component{
                                     {'已有'+ele.status0+'位好友预订'}
                                 </div>
                             </div>
-                            <div style={{height:'53px',width:window.innerWidth*0.38,position:'relative'}}>
-                                <div style={{textAlign:'center',position:'absolute',left:'50%'}}>
-                                    <img 
-                                        src='../../img/qrcode.png' 
-                                        style={{width:'30px',height:'30px'}} 
-                                        onClick={()=>this.activityData(ele)}
-                                    />
-                                    <div style={{fontSize:'8px'}}>营销资料</div>
-                                </div>
-                                <div style={{textAlign:'center',position:'absolute',left:'50%',marginLeft: '-50px'}}>
-                                    <img 
-                                        src='../../img/share.png' 
-                                        style={{width:'30px',height:'30px'}} 
-                                        onClick={()=>this.share(ele)}
-                                    />
-                                    <div style={{fontSize:'8px'}}>分享活动</div>
-                                </div>
+                            <div style={{textAlign:'center'}}>
+                                <img 
+                                    src='../../img/share.png' 
+                                    style={{width:'30px',height:'30px'}} 
+                                    onClick={()=>this.share(ele)}
+                                />
+                                <div style={{fontSize:'8px'}}>分享活动</div>
                             </div>
                         </td>
                     </tr>
@@ -667,7 +659,7 @@ class DList extends Component{
             <div>
                 {items}
                 {iframe}
-                <div style={{marginTop:'15px',width:'100%',textAlign:'center'}}>
+                <div style={data.length?{marginTop:'15px',width:'100%',textAlign:'center',fontSize:'12px'}:styles.hide}>
                     <p>
                         点击
                         <img src='../../img/share.png' style={{width:'20px',height:'20px'}} />

@@ -609,16 +609,18 @@ W.errorCode=function(json){
 	if(!json.status_code)return;
 	W.loading?W.loading():null;
 	if(json.status_code==3){
-		W.confirm(___.reLogin,function(b){
-			if(b){
-				if(WiStorm.agent.weixin){
-					W.wxLogin();
-				}else{
-					W.setCookie("__login_redirect_uri__",location.href,-15);
-					top.location=WiStorm.root+"index.html";
-				}
-			}
-		});
+		W.setCookie("__login_redirect_uri__",location.href,-15);
+		top.location=WiStorm.root+"index.html";
+		// W.confirm(___.reLogin,function(b){
+		// 	if(b){
+		// 		if(WiStorm.agent.weixin){
+		// 			W.wxLogin();
+		// 		}else{
+		// 			W.setCookie("__login_redirect_uri__",location.href,-15);
+		// 			top.location=WiStorm.root+"index.html";
+		// 		}
+		// 	}
+		// });
 	}else{
 		var er={
 			'4097':'连接服务器失败',

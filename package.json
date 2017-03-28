@@ -1,0 +1,32 @@
+{
+  "name": "wisegps",
+  "version": "1.0.0",
+  "description": "车联在线react重构版，顺便摸索组件化框架，采用了redux做信息流处理，material-ui做基本组件",
+  "main": "index.js",
+  "scripts": {
+    "build": "webpack --progress --colors --watch",
+    "watch": "webpack-dev-server --hot --progress --colors",
+    "dist": "NODE_ENV=production webpack --progress --colors"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "babel-core": "^6.10.4",
+    "babel-loader": "^6.2.4",
+    "css-loader": "^0.23.1",
+    "express": "^4.14.0",
+    "material-ui": "^0.15.1",
+    "md5": "^2.1.0",
+    "node-sass": "^3.8.0",
+    "react": "^15.1.0",
+    "react-addons-css-transition-group": "^15.1.0",
+    "react-dom": "^15.1.0",
+    "react-redux": "^4.4.5",
+    "react-tap-event-plugin": "^1.0.0",
+    "redux": "^3.5.2",
+    "redux-thunk": "^2.1.0",
+    "sass-loader": "^4.0.0",
+    "style-loader": "^0.13.1",
+    "webpack": "^1.13.1"
+  }
+}

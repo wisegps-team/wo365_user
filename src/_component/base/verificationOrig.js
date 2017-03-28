@@ -46,7 +46,7 @@ class VerificationOrig extends Component {
                         this.accountFormat=true;
                         this.forceUpdate();
                     }else{
-                        W.toast('此号码非本平台用户');
+                        W.toast(___.phone_not_user);
                     }
                 },{mobile:account});
             }else{

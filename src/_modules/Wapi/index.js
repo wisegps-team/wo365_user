@@ -341,11 +341,11 @@ function WFeatureApi(token){
 }
 WFeatureApi.prototype=new WiStormAPI();//继承父类WiStormAPI
 
-function WCacheApi(){
-	WiStormAPI.call(this,'cache');
+function WCacheApi(token){
+	WiStormAPI.call(this,'cache',token,config.app_key,config.app_secret);
 }
-WFeatureApi.prototype=new WiStormAPI();//继承父类WiStormAPI
-WFeatureApi.prototype.get=function(callback,key){
+WCacheApi.prototype=new WiStormAPI();//继承父类WiStormAPI
+WCacheApi.prototype.get=function(callback,key){
 	var data={
 		'key':key,
 		'method':this.apiName+".getObj"
@@ -578,6 +578,7 @@ const Wapi={
 	role:new WRoleApi(_user?_user.access_token:null),
 	page:new WPageApi(_user?_user.access_token:null),
 	feature:new WFeatureApi(_user?_user.access_token:null),
+	cache:new WCacheApi(_user?_user.access_token:null),
 	service:new WServiceApi(_user?_user.access_token:null),
 	crash:new WCrashApi(),
 	//以下为非核心功能表
@@ -636,7 +637,7 @@ makeGetOp('custType','id,name,appId,useType,userType,role,roleId',{limit:-1,sort
 makeGetOp('area','id,name,parentId,level,areaCode,zipCode,provinceId,provinceName',{limit:-1,sorts:'id',page:'id'});
 makeGetOp('brand','objectId,name,company,uid',{limit:-1,sorts:'name',page:'name'});
 makeGetOp('product','objectId,name,company,uid,brand,brandId',{limit:-1,sorts:'name',page:'name'});
-makeGetOp('booking','userId,activityId,mobile,sellerId,sellerName,uid,status,status0,status1,status2,status3,name,carType,resTime,payTime,confirmTime,money,did,openId,installId,install,installDate,type,userName,userMobile,payMoney,payStatus,orderId,activityType,userOpenId,product,receiptDate,selectInstallDate,res,receipt,receiptId,commission,commissionId,managerId,objectId,createdAt,updatedAt');
+makeGetOp('booking','userId,activityId,mobile,sellerId,sellerName,uid,status,status0,status1,status2,status3,name,carType,resTime,payTime,confirmTime,money,did,openId,installId,install,installDate,type,userName,userMobile,payMoney,payStatus,orderId,activityType,userOpenId,product,receiptDate,selectInstallDate,res,receipt,receiptId,commission,commissionId,commissionDate,managerId,objectId,createdAt,updatedAt');
 makeGetOp('activity','creator,objectId,uid,type,name,url,imgUrl,status,reward,pay,deposit,offersDesc,price,installationFee,getCard,principal,principalId,principalTel,sellerType,sellerTypeId,brand,product,productId,wxAppKey,count,tel,createdAt,updatedAt');
 makeGetOp('qrLink','objectId,id,uid,url,act,sellerId,i,type,batchId,batchName,status');
 

@@ -67,7 +67,18 @@ class BindBox extends Component{
                 W.errorCode(res);
                 return;
             }
-            this.props.onSuccess();
+
+            W.setSetting("account", this.state.mobile);
+            W.setSetting("openId", this.props.openId);
+            let that = this;
+            Wapi.user.get(function(result) {
+                Object.assign(result.data, res);
+                that.props.onSuccess(result);
+            }, {
+                objectId: res.uid,
+                access_token: res.access_token
+            });
+            // this.props.onSuccess();
         },data);
     }
     render() {

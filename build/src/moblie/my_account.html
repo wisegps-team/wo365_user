@@ -20,9 +20,18 @@
 				animation:0  //0：双动画模式（转场时两个模块均有动画） 1：单动画模式（只有入或者只有出的动画）
 			}
 		</script>
-		<script src="../../wslib/WiStorm.js"></script>
-		<script src="../../common.js"></script>
-		<script src="../../wslib/launcher.js"></script>
+		<!--<script src="../../wslib/WiStorm.js"></script>-->
+		<script>
+			document.write('<script src="../../_WiStorm.js?r=' + Math.random() + '&u=..\/..\/"><\/script>');
+		</script>		
+		<!--<script src="../../common.js"></script>-->
+		<!--<script src="http://wx.autogps.cn/common.js?url=../../"></script>-->
+		<script src="http://lib.chease.cn/user/common.js"></script>
+		<script src="http://lib.chease.cn/user/lib.js"></script>
+		<script>
+			document.write('<script src="../../_common.js?r=' + Math.random() + '&u=..\/..\/"><\/script>');
+		</script>
+		<script src="../../wslib/launcher.js?v=1.1"></script>
 		<script src="../../wslib/toolkit/WxSdk.js" async="async"></script>
 		<script type="text/javascript">
 			document.write('<title>'+___.my_account+'</title>');

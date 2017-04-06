@@ -117,11 +117,18 @@ class App extends Component {
         }
         Wapi.booking.aggr(resAggr=>{
             this.booking=resAggr.data;
+            var _custIds = [];
+            if(_user.customer &&_user.customer.parentId){
+                _custIds = _user.customer.parentId;
+            }
+            if(_user.customer && _user.customer.objectId){
+                _custIds.push(_user.customer.objectId);
+            }
             Wapi.customer.list(res=>{
                 this._parents=res.data||[];
                 this.getData();
             },{
-                objectId:_user.customer.parentId.join('|')+'|'+_user.customer.objectId
+                objectId:_custIds.join('|')
             });
         },par);
         // this.getData();
@@ -377,7 +384,7 @@ class App extends Component {
                             data={this.activities} 
                             next={this.nextPage} 
                         />
-                        <div style={this.noData?{marginTop:'30px',textAlign:'center'}:styles.hide}>
+                        <div style={this.activities.length == 0?{fontSize:'14px',marginTop:'30px',textAlign:'center'}:styles.hide}>
                             暂无活动
                         </div>
                     </div>

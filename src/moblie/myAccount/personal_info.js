@@ -173,7 +173,7 @@ class ShowBox extends Component{
                     />*/}
                 </List>
                 <List style={{padding:'20px 16px 8px 16px',textAlign:'canter'}}>
-                    <RaisedButton label={___.logout} fullWidth={true} secondary={true} onClick={this.logout}/>                    
+                    <RaisedButton label={___.logout} fullWidth={true} secondary={true} onClick={this.logout} style={{minWidth:'100%'}}/>                    
                 </List>
                 <Dialog
                     title={___.edit_user_name}

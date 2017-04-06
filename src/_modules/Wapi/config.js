@@ -6,5 +6,4 @@ const config={
     app_secret:CONFIG.appSecret
 }
 
-
 export default config;

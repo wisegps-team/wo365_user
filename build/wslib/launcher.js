@@ -266,7 +266,12 @@ view.prototype.loadScript=function(){
 	script.onerror=view.scriptError;
     script.async=true;
     document.head.appendChild(script);
-    script.src=this.data.url;
+    var v = W.version || '1.0';
+    if(this.data.url.indexOf('?') > -1){
+        script.src=this.data.url + '&v=' + v;
+    }else{
+        script.src=this.data.url + '?v=' + v; 
+    }
     STATE.moduleList.push(script.src);
     window.LAUNCHER.moduleList=STATE.moduleList.concat();
 
@@ -331,8 +336,8 @@ view.prototype.static=function(){
 view.prototype.onDom=function(type,callback,useCapture){
     var that=this;
     var _type='dom-'+type;
-    this.dom.addEventListener(type,function(){
-        that.emit(_type);
+    this.dom.addEventListener(type,function(e){
+        that.emit(_type,e);
     },useCapture);
     this.on(_type,callback);
 }
@@ -360,7 +365,7 @@ view.scriptError=function(e){
 /**
  * 处理view显示或者消失的动画结束事件
  */
-view.animationend= function () {
+view.animationend= function (event) {
     if(event.target!==this.dom)return;//避免子节点事件冒泡误触发
     var that=this;
     switch(this.state){
@@ -489,7 +494,7 @@ var divFunction={
         if(!this.show_state)return;
         document.title = this.title||' ';
         var i = document.createElement('iframe');
-        i.src = 'http://m.baidu.com/favicon.ico';
+        // i.src = 'http://m.baidu.com/favicon.ico';
         // i.src = '../img/favicon.ico';
         i.style.display = 'none';
         i.onload = function() {
@@ -512,7 +517,14 @@ window.addEventListener('load',function(){
 });
 window.addEventListener('popstate',function(e){
     var name=e.state;//跳转之后的地址
-    var i=window.LAUNCHER.moduleList.indexOf(name);
+    var v = W.version || '1.0';
+    var _url = name;
+    if(_url.indexOf('?') > -1){
+        _url=name + '&v=' + v;
+    }else{
+        _url=name + '?v=' + v; 
+    }
+    var i=window.LAUNCHER.moduleList.indexOf(_url);
     //判断这个地址是不是一个模块地址
     if(i!=-1){
         if(!i||window.LAUNCHER.historyList[window.LAUNCHER.historyIndex-1]==name){

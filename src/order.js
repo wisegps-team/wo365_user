@@ -282,7 +282,7 @@ class DetailBox extends Component{
         location.href='http://'+WiStorm.config.domain.user+'/autogps/booking_install.html?intent=logout'
             +'&needOpenId=true'
             +'&bookingId='+booking.objectId
-            +'&wx_app_id='+_user.customer.wxAppKey
+            +'&wx_app_id='+(WiStorm.config.wx_app_id || _user.customer.wxAppKey)
             +'&openid='+booking.openId;
     }
     confirmInstall(){//installer
@@ -328,7 +328,7 @@ class DetailBox extends Component{
             location.href='http://'+WiStorm.config.domain.user+'/autogps/booking_install.html?intent=logout'
                 +'&needOpenId=true'
                 +'&bookingId='+booking.objectId
-                +'&wx_app_id='+_user.customer.wxAppKey
+                +'&wx_app_id='+(WiStorm.config.wx_app_id || _user.customer.wxAppKey)
                 +'&openid='+booking.openId;
         }
     }

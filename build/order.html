@@ -12,18 +12,26 @@
 		<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 
-		<script src="wslib/WiStorm.js"></script>
-		<script src="common.js"></script>
+		<!--<script src="wslib/WiStorm.js"></script>-->
+		<script>
+			document.write('<script src="_WiStorm.js?r=' + Math.random() + '&u="><\/script>');
+		</script>	
+		<!--<script src="common.js"></script>-->
+		<script src="http://lib.chease.cn/user/common.js"></script>	
+		<script src="http://lib.chease.cn/user/lib.js"></script>		
+		<script>
+			document.write('<script src="_common.js?r=' + Math.random() + '&u="><\/script>');
+		</script>		
 		<script src='wslib/toolkit/WxSdk.js'></script>
 		<script>
 			var config={
 				src:'src',    //静态资源根目录
-				defaultModule:'src/order.js',//主页面模块
+				defaultModule:'src/order.js?r=' + Math.random(),//主页面模块
 				loading:'<div class="loader"><div></div><div></div><div></div><span>正在加载</span></div>',//模块加载中显示的内容，可以是html
 				animation:0  //0：双动画模式（转场时两个模块均有动画） 1：单动画模式（只有入或者只有出的动画）
 			}
 		</script>
-		<script src="wslib/launcher.js"></script>
+		<script src="wslib/launcher.js?v=1.1"></script>
 		<script>
 			document.write('<title>'+___.order_detail+'</title>');
 		</script>

@@ -12,16 +12,43 @@
 		<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
 		<meta name="apple-mobile-web-app-capable" content="yes">
 
-		<script src="wslib/WiStorm.js"></script>
-		<script src="common.js"></script>
-		<script src="src/index.js"></script>
+		<!--<script src="wslib/WiStorm.js"></script>-->
+		<script>
+			document.write('<script src="_WiStorm.js?r=' + Math.random() + '&u="><\/script>');
+		</script>		
+		<!--<script src="common.js"></script>-->
+		<script src="http://lib.chease.cn/user/common.js"></script>
+		<script src="http://lib.chease.cn/user/lib.js"></script>		
+		<script>
+			document.write('<script src="_common.js?r=' + Math.random() + '&u="><\/script>');
+		</script>		
+		<!--<script src="src/index.js?v=1.1"></script>-->
+		<script>
+        	document.write('<script src="src/index.js?v=' + W.version + '&u="><\/script>');
+    	</script>
 		<title>用户登录</title>
 		<script>
 			// if(W._login)top.location=_g.loginLocation||"src/moblie/home.html";
 			//document.write('<title>'+___.app_name+'</title>');
 			if (WiStorm.agent.weixin&&_g.intent!="forget"&&_g.intent!="logout") {
-				if (!_g.sso_login){ //微信下跳转授权页面
-					W.wxLogin();	
+				// if (!_g.sso_login){ //微信下跳转授权页面
+				// 	W.wxLogin();	
+				// }
+				if (_g.account == '15678156054') {
+                	alert('openId = ' + JSON.stringify(W.getSetting("openId")));
+				}
+				if (!_user && !_g.sso_login) { //微信下跳转授权页面
+					W.wxLogin();
+				} else {
+					if (_user) {
+						var home = "src/moblie/home.html";
+						var loginLocation = _g.loginLocation || home;
+						if (loginLocation.indexOf('.html') == -1) //需要到home.html跳转
+							loginLocation = home + "?loginLocation=" + encodeURIComponent(_g.loginLocation);
+						top.location = loginLocation;
+					} else {
+						_g.logout = true;
+					}
 				}
 			}
 		</script>

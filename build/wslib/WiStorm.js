@@ -561,6 +561,8 @@ W._getSeting=function(){
 W.logout=function(param){
 	W.setCookie("access_token","");
 	W.setSetting("user",null);
+	// 2017-03-31 删除公众号对应的用户信息
+    W.setSetting("user" + WiStorm.config.wx_app_id, null);
 	W.setSetting("pwd",null);
 	W._login=false;
 	top.location=WiStorm.root+'index.html?intent=logout'+param;
@@ -673,6 +675,7 @@ W._loginSuccess=function(res){
 	W._login = true;//表示已登录
 	_user=res;
 	W.setSetting("user",res);
+	W.setSetting("user" + WiStorm.config.wx_app_id, res);
 }
 
 W.toRegister=function(){
@@ -772,10 +775,7 @@ window.WiStorm={
 u=undefined;
 _d=undefined;
 
-
-	
-
-
+debugger;
 //根据页面路径获取绝对路径
 var tem=location.href;
 var s=tem.search("/www/")+5;
@@ -796,14 +796,18 @@ try {
 } catch (error) {
 	if(_g.intent!='logout'){
 		var loc=encodeURIComponent((location.origin+location.pathname).replace(WiStorm.root,''));
-		loc=(loc=='index.html')?'':'&location='+loc;
+		loc=(loc=='index.html')?'intent=logout':'&intent=logout&location='+loc;
 		location=location.origin+(location.search||'?')+loc;
 	}
 }
 keys=undefined;
-if(_g.wx_app_id){
-	WiStorm.config.wx_app_id=_g.wx_app_id;
-	WiStorm.config.wx_login=WiStorm.config.wx_login+'?wx_app_id='+WiStorm.config.wx_app_id;	
+if (_g.wx_app_id) {
+    W.setSetting("wx_app_id", _g.wx_app_id);
+    WiStorm.config.wx_app_id = _g.wx_app_id;
+    WiStorm.config.wx_login = WiStorm.config.wx_login + '?wx_app_id=' + WiStorm.config.wx_app_id;
+} else {
+    WiStorm.config.wx_app_id = W.getSetting("wx_app_id") || WiStorm.config.wx_app_id;
+    WiStorm.config.wx_login = WiStorm.config.wx_login + '?wx_app_id=' + WiStorm.config.wx_app_id;
 }
 
 /**

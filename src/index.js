@@ -123,7 +123,7 @@ class App extends Component {
             <Login onSuccess={this.loginSuccess} style={login_sty} ssoLoginFail={this.showBind}/>,
             <div/>,
             null,
-            <BindBox onSuccess={this.bindSuccess} openId={_g.openid}/>
+            <BindBox onSuccess={this.loginSuccess} openId={_g.openid}/>
         ]
         let buttons=(this.state.active&&this.state.active!=3)?
             (<FlatButton label={___.login} primary={true} onClick={()=>this.setState({active:0})} key='login'/>)

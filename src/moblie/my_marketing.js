@@ -117,7 +117,6 @@ class App extends Component {
         }
         Wapi.booking.aggr(resAggr=>{
             this.booking=resAggr.data;
-<<<<<<< HEAD
             var _custIds = [];
             if(_user.customer &&_user.customer.parentId){
                 _custIds = _user.customer.parentId;
@@ -125,19 +124,12 @@ class App extends Component {
             if(_user.customer && _user.customer.objectId){
                 _custIds.push(_user.customer.objectId);
             }
-=======
-            console.log(resAggr,'res1')
->>>>>>> 55e50298d33847948a16d2463800c4b67cba3f59
             Wapi.customer.list(res=>{
                 console.log(res,'res2')
                 this._parents=res.data||[];
                 this.getData();
             },{
-<<<<<<< HEAD
                 objectId:_custIds.join('|')
-=======
-                objectId:_user.customer.parentId.length==0?_user.customer.objectId : _user.customer.parentId.join('|')+'|'+_user.customer.objectId
->>>>>>> 55e50298d33847948a16d2463800c4b67cba3f59
             });
         },par);
         // this.getData();

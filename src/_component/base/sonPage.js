@@ -104,10 +104,10 @@ class Sonpage extends Component {
                 open={this.props.open} 
                 {...this.props.drawer}
             >
-                <AppBar
+                {/*<AppBar
                     title={this.props.title}
                     iconElementLeft={<IconButton onClick={this.back}><NavigationArrowBack/></IconButton>}
-                />
+                />*/}
                 {this.props.children}
             </Drawer>
         );

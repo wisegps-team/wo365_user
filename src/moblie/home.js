@@ -129,12 +129,18 @@ class App extends Component {
     }
     render() {
         // let name='_user.customer.name';
-        let name=_user.customer.name;
+        let name = null;
+        if(_user.customer){
+            name=_user.customer.name
+        }
+        // let ;
         if(_user.employee){
             name=_user.employee.name;
         }
-        if(_user.customer.custTypeId!=7){
-            name=_user.customer.contact;
+        if(_user.customer){
+            if(_user.customer.custTypeId!=7){
+                name=_user.customer.contact;
+            } 
         }
         return (
             <ThemeProvider>

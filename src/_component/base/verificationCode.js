@@ -50,6 +50,8 @@ class VerificationCode extends Component {
                     that.setState({code_err:___.code_err});
                 }
             },data);
+        }else{
+            this.props.onChange(0)
         }
     }
     getCode(){
@@ -78,6 +80,8 @@ class VerificationCode extends Component {
     }
     
     render() {
+        let show = this.props.account?!!this.state.second:true
+        console.log(show,'show')
         let box=Object.assign({},sty.box,this.props.style);
         return (
             <div style={box}>
@@ -90,7 +94,7 @@ class VerificationCode extends Component {
                 <FlatButton 
                     label={this.state.second||___.getCode} 
                     primary={!this.state.second} 
-                    disabled={!!this.state.second} 
+                    disabled={show} 
                     onClick={this.getCode}
                     style={sty.b}
                 />

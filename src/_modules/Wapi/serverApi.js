@@ -5,6 +5,7 @@ import WiStormAPI from './WiStormAPI.js';
 
 class ServerApi{
     constructor(props, context) {
+		// this.url = 'http://h5test.bibibaba.cn/server_api.php'
 		this.url='http://h5.bibibaba.cn/server_api.php';
 		// this.url='http://192.168.3.233:8080/test/server_api.php';
 		this.ajax=WiStormAPI.prototype.ajax;
@@ -90,6 +91,18 @@ class ServerApi{
 	}
 	getDevice(callback,data){
 		data.method='getDevice';
+		this.get(data,callback);
+	}
+	checkVehicleExists(callback,data){
+		data.method='checkVehicleExists';
+		this.get(data,callback);
+	}
+	getUserWeixinKey(callback,data){
+		data.method='getUserWeixinKey';
+		this.get(data,callback);
+	}
+	getMoveCarInfo(callback,data){
+		data.method='getMoveCarInfo';
 		this.get(data,callback);
 	}
 }

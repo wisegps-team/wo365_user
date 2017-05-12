@@ -54,6 +54,20 @@ WCommApi.prototype.sendSMS=function(callback,mobile,type,content){
 	Data.method=this.apiName+".sms.send",
 	this.getApi(Data,callback);	
 }
+WCommApi.prototype.voiceCall=function(callback,event_type,event_data){
+	let Data ={};
+	Data = Object.assign(Data,{event_type,event_data});
+	Data.method = "wicare.event.create",
+	this.getApi(Data,callback)
+}
+
+WCommApi.prototype.voiceBind=function(callback,event_type,event_data){
+	let Data ={};
+	Data = Object.assign(Data,{event_type,event_data});
+	Data.method = "wicare.event.create",
+	this.getApi(Data,callback)
+}
+
 WCommApi.prototype.sendEmail=function(callback,email,type,content){
 	var Data={
 		method:this.apiName+".email.send",
@@ -323,6 +337,17 @@ function WPageApi(token){
 }
 WPageApi.prototype=new WiStormAPI();//继承父类WiStormAPI
 
+/**
+ * 语音呼叫
+ */
+function WCallApi(token){
+	WiStormAPI.call(this,'call',token,config.app_key,config.app_secret);
+	this.get_op={
+		fields:'mobile,callid,content,result'//默认返回的字段
+	}
+}
+WCallApi.prototype=new WiStormAPI();//继承父类WiStormAPI
+
 
 /**
  * 功能表
@@ -572,6 +597,7 @@ const Wapi={
     user:new WUserApi(_user?_user.access_token:null,_user?_user.session_token:null),
     developer:new WDeveloperApi(_user?_user.access_token:null),
     app:new WAppApi(_user?_user.access_token:null),
+	call:new WCallApi(_user?_user.access_token:null),
     table:new WTableApi(_user?_user.access_token:null),
     file:new WFileApi(_user?_user.access_token:null),
     comm:new WCommApi(_user?_user.access_token:null),
@@ -606,6 +632,7 @@ const Wapi={
 	pay:new WPayApi(_user?_user.access_token:null),
 	activityProduct:new WAPI('activityProduct',_user?_user.access_token:null),
 	qrLink:new WAPI('qrLink',_user?_user.access_token:null),
+	qrDistribution:new WAPI('qrDistribution',_user?_user.access_token:null)
 };
 
 
@@ -622,10 +649,10 @@ function makeGetOp(name,fields,lop){
 	Object.assign(Wapi[name].list_op,lop);
 }
 
-makeGetOp('customer','objectId,uid,name,treePath,parentId,tel,custTypeId,custType,province,provinceId,city,cityId,area,areaId,address,contact,logo,sex,dealer_id,other');
+makeGetOp('customer','objectId,uid,name,treePath,parentId,tel,custTypeId,custType,province,provinceId,city,cityId,area,areaId,address,contact,logo,sex,dealer_id,other,onecar_bind,onecar_move,car_move,car_bind');
 makeGetOp('deviceLog','objectId,uid,did,type,createdAt,from,to');
 makeGetOp('deviceTotal','custId,type,inNet,register,onLine,woGuanChe,zhangWoChe');
-makeGetOp('vehicle','objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did,drivers,managers');
+makeGetOp('vehicle','objectId,name,uid,departId,brandId,brand,model,modelId,type,typeId,desc,frameNo,engineNo,buyDate,mileage,maintainMileage,insuranceExpireIn,inspectExpireIn,serviceType,feeType,serviceRegDate,serviceExpireIn,did,drivers,managers,mid');
 makeGetOp('device','did,uid,status,commType,commSign,model,hardwareVersion,softwareVersion,activedIn,expiredIn,activeGpsData,activeObdData,params,ip,port,binded,bindDate,vehicleName,vehicleId,createdAt');
 makeGetOp('alert','objectId,did,alertType,speedLimit,poild,lon,lat,speed,direct,mileage,fuel,createdAt');
 makeGetOp('stat','did,day,distance,duration,fuel,avgSpeed,alertTotal,createdAt,day');

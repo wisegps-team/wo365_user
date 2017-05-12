@@ -754,6 +754,12 @@ window.WiStorm={
 			'wo':'w.wo365.net',
 			'wowx':'wx.wo365.net'
 		}
+		// domain:{
+		// 	'wx':'wx.autogps.chease.cn',
+		// 	'user':'user.autogps.chease.cn',
+		// 	'wo':'w.wo365.chease.cn',
+		// 	'wxwo':'wx.wo365.chease.cn'
+		// }
 	},
 	setting:{},//用户设置，由W.getSetting(name)和W.setSetting(key,val)操作
 	included:[],//当前页面使用include(url)来包含的文件名
@@ -820,8 +826,20 @@ window._user=W.getSetting("user");
 if(_user&&W.getCookie("access_token")){
 	_user.access_token=W.getCookie("access_token");
 	W._login=true;
-}else 
-	W._login=false;
+}else {
+	if(_g.status_code == 0){
+		window._user = {
+			access_token: _g.access_token,
+			session_token: _g.session_token,
+			refresh_token: _g.refresh_token,
+			uid: _g.uid,
+			openid: _g.openid
+		};
+		W._login=true;
+	}else{
+		W._login=false;
+	}
+}
 
 //处理用户登录
 if(_g.needUser&&!_g.openid){

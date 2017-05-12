@@ -846,7 +846,11 @@ class MoveCar extends Component {
     }
     componentDidMount() {   
         let plate =  W.getCookie('plate')
-        let head = plate.slice(0,1);
+        let head = null;
+        if(plate){
+             head = plate.slice(0,1);
+        }
+        // let head = plate.slice(0,1);
         if(head){
             this.setState({addplateCar:head})
         }

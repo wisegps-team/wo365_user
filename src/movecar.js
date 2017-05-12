@@ -299,7 +299,8 @@ class BindCar extends Component {
                 });
                 if(this.state.subWx.subWx.indexOf(_g.wx_app_id) != -1){ //发送模板消息
                     let value = '挪车卡绑定成功，他人扫码挪车时平台将通过拨打'+mobile+'通知您！';
-                    sendTemplate(plate,value);
+                    let title = '绑定成功通知'
+                    sendTemplate(plate,value,null,title);
                     // history.back();
                     W.alert('绑定成功',()=>{wx.closeWindow();})
                 }else {
@@ -399,6 +400,7 @@ class BindCar extends Component {
             let key = getOpenIdKey();
              //注册成为本平台用户
             let value;
+            let title = "绑定成功通知";
             //  let authData = 'authData'+WiStorm.config.domain.user.split('.').join('_')+'_openid'
             Wapi.user.register(reg => {
                 console.log('注册',reg)
@@ -498,7 +500,8 @@ class BindCar extends Component {
                                                 //推送模板消息
                                                 if(us.data.subWx.indexOf(_g.wx_app_id) != -1){
                                                     value = '挪车卡绑定成功，他人扫码挪车时平台将通过拨打'+data.mobile+'通知您！';
-                                                    sendTemplate(plate,value);
+                                                    
+                                                    sendTemplate(plate,value,null,title);
                                                     // history.back();
                                                     wx.closeWindow();
                                                 }else {
@@ -516,7 +519,8 @@ class BindCar extends Component {
                                                 console.log('普通二维码新增车辆',veh)
                                                 if(us.data.subWx.indexOf(_g.wx_app_id) != -1){
                                                     value = '挪车卡绑定成功，他人扫码挪车时平台将通过拨打'+data.mobile+'通知您！';
-                                                    sendTemplate(plate,value);
+                                                   
+                                                    sendTemplate(plate,value,null,title);
                                                     // history.back();
                                                     wx.closeWindow();
                                                 }else {
@@ -544,7 +548,7 @@ class BindCar extends Component {
                                                     //推送模板消息
                                                     if(us.data.subWx.indexOf(_g.wx_app_id) != -1){
                                                         value = '挪车卡绑定成功，他人扫码挪车时平台将通过拨打'+data.mobile+'通知您！';
-                                                        sendTemplate(plate,value);
+                                                        sendTemplate(plate,value,null,title);
                                                         // history.back();
                                                         wx.closeWindow();
                                                     }else {
@@ -562,7 +566,7 @@ class BindCar extends Component {
                                                     console.log('普通二维码新增车辆',veh)
                                                     if(us.data.subWx.indexOf(_g.wx_app_id) != -1){
                                                         value = '挪车卡绑定成功，他人扫码挪车时平台将通过拨打'+data.mobile+'通知您！';
-                                                        sendTemplate(plate,value);
+                                                        sendTemplate(plate,value,null,title);
                                                         // history.back();
                                                         wx.closeWindow();
                                                     }else {
@@ -842,6 +846,10 @@ class MoveCar extends Component {
     }
     componentDidMount() {   
         let plate =  W.getCookie('plate')
+        let head = plate.slice(0,1);
+        if(head){
+            this.setState({addplateCar:head})
+        }
         if(plate){
             Wapi.serverApi.getMoveCarInfo(res => {
                 if(res){
@@ -1023,10 +1031,11 @@ class MoveCar extends Component {
         //更新挪车次数
        
         //发送给车主的模板消息
-        if(this.state.carMobile){
-            let mes = this.state.default1
-            sendTemplate(plate,mes,openid); //发送给车主
-        }
+        // if(this.state.carMobile){
+            // let mes = '对方留言:'+this.state.default1
+            // let title = "挪车通知"
+            // sendTemplate(plate,mes,openid,title); //发送给车主
+        // }
 
         let mobile = this.state.user//（扫码用户）
         let tel = null   //车主号码
@@ -1054,7 +1063,7 @@ class MoveCar extends Component {
                             did: _g.did?_g.did:'',
                             mobile: this.state.carMobile,
                             plate: plate,
-                            message: this.state.default1,
+                            message: '对方留言：'+this.state.default1,
                             wxAppKey: _g.wx_app_id,
                             uid: _g.creator,
                     })
@@ -1121,7 +1130,7 @@ class MoveCar extends Component {
                                             did: _g.did?_g.did:'',
                                             mobile: that.state.carMobile,
                                             plate: plate,
-                                            message: that.state.default1,
+                                            message: '对方留言：'+that.state.default1,
                                             wxAppKey: _g.wx_app_id,
                                             uid: _g.creator,
                                     })
@@ -1392,7 +1401,7 @@ class MoveCar extends Component {
 }
 
 //挪车模板通知
-function sendTemplate(plate,value,openid){
+function sendTemplate(plate,value,openid,title){
     let car_openid=null;
     if(openid){
         car_openid = openid
@@ -1409,7 +1418,7 @@ function sendTemplate(plate,value,openid){
         type:'0',
         data:{
             "first": {//标题
-                "value": '挪车通知',
+                "value": title,
                 "color": "#173177"
             },
             "keyword1": {//车牌号
@@ -1526,7 +1535,7 @@ class ShowMove extends Component {
                 plate:nextprops.data.plate,
                 uid:_g.creator,
                 driver_openid: driver_openid,
-                message:nextprops.data.message
+                message:'对方留言：'+nextprops.data.message
             }
             console.log(op,'p[p')
             Wapi.serverApi.getAnyQrcode(res=>{//获取二维码
@@ -1560,7 +1569,7 @@ class ShowMove extends Component {
                 {/*<QrImg data={this.state.url} style={{display:'inline-block',marginTop:'10px'}}/>*/}
                 <div style={{marginTop:'70%'}}>
                     <img style={{width:'128px',height:'128px'}} src={this.state.url}/>
-                    <h4 style={{fontWeight:600}}>{'平台正在拨打'+plate+'预留电话，'}</h4>                    
+                    <h4 style={{fontWeight:600}}>{'平台正在拨打'+plate+'预留电话...'}</h4>                    
                     <p>{'['+'长按识别二维码，关注公众号接收挪车回复!'+']'}</p>
                 </div>
             </div>

@@ -15,63 +15,65 @@ window.onerror=function(msg,url,l){
     var flieName=flie[flie.length-2];
     url=url.split(/[\\\/.]/);
     url=url[url.length-2];
-    var text="错误："+msg+";\n界面："+flieName+";\n文件："+url+";\n行数："+l;
-    if((msg.indexOf("WeixinJSBridge")!=-1&&l==1)||
-		(msg=="Uncaught TypeError: Cannot read property 'classList' of null"&&url=="WiStorm"&&l==1))
-		return;
-	if(WiStorm.debug){
-		alert(text);
-	}else{
-		var userText=localStorage.getItem("_WiStormUserSetting_");
-		var user,account;
-		if(userText){
-			try{
-				user=JSON.parse(userText);
-			}catch(e){
-				//TODO handle the exception
-				user={account:"解析用户信息出错"};
-			}
-			account=user.account||"未登录";
-		}else{
-			account="未登录";
-		}
-		var errorJson={"bug_report":text,"account":account};
-		if(typeof Wapi=="object"){//如果已经加载了api文件，则直接发送错误
-			Wapi.crash.add(function(res){},errorJson);
-		}else{//否则存在本地，等Wapi加载完会自动发送
-			var errorLog=localStorage.getItem("errorList");
-			var errorList;
-			if(errorLog){
-				try{
-					errorList=JSON.parse(errorLog);
-				}catch(e){
-					//TODO handle the exception
-					errorList=[];
-				}
-			}else{
-				errorList=[];
-			}
-			errorList.push(errorJson);
-			localStorage.setItem("errorList",JSON.stringify(errorList));
-		}
-	}
+    // var text="错误："+msg+";\n界面："+flieName+";\n文件："+url+";\n行数："+l;
+	var text="错误："+msg+";\n文件："+url+";\n行数："+l;
+	// alert(text);
+    // if((msg.indexOf("WeixinJSBridge")!=-1&&l==1)||
+	// 	(msg=="Uncaught TypeError: Cannot read property 'classList' of null"&&url=="WiStorm"&&l==1))
+	// 	return;
+	// if(WiStorm.debug){
+	// 	alert(text);
+	// }else{
+	// 	var userText=localStorage.getItem("_WiStormUserSetting_");
+	// 	var user,account;
+	// 	if(userText){
+	// 		try{
+	// 			user=JSON.parse(userText);
+	// 		}catch(e){
+	// 			//TODO handle the exception
+	// 			user={account:"解析用户信息出错"};
+	// 		}
+	// 		account=user.account||"未登录";
+	// 	}else{
+	// 		account="未登录";
+	// 	}
+	// 	var errorJson={"bug_report":text,"account":account};
+	// 	if(typeof Wapi=="object"){//如果已经加载了api文件，则直接发送错误
+	// 		Wapi.crash.add(function(res){},errorJson);
+	// 	}else{//否则存在本地，等Wapi加载完会自动发送
+	// 		var errorLog=localStorage.getItem("errorList");
+	// 		var errorList;
+	// 		if(errorLog){
+	// 			try{
+	// 				errorList=JSON.parse(errorLog);
+	// 			}catch(e){
+	// 				//TODO handle the exception
+	// 				errorList=[];
+	// 			}
+	// 		}else{
+	// 			errorList=[];
+	// 		}
+	// 		errorList.push(errorJson);
+	// 		localStorage.setItem("errorList",JSON.stringify(errorList));
+	// 	}
+	// }
 }
 window.addEventListener('load',function(){
 	//处理记录在本地的错误日志
-	var __errorLog=localStorage.getItem("errorList");
-	var __errorList;
-	if(__errorLog){
-		try{
-			__errorList=JSON.parse(__errorLog);
-		}catch(e){
-			//TODO handle the exception
-			__errorList=[];
-		}
-		for(var __i=0;__i<__errorList.length;__i++){
-			Wapi.crash.add(function(res){},__errorList[__i]);
-		}
-		localStorage.removeItem("errorList");
-	}
+	// var __errorLog=localStorage.getItem("errorList");
+	// var __errorList;
+	// if(__errorLog){
+	// 	try{
+	// 		__errorList=JSON.parse(__errorLog);
+	// 	}catch(e){
+	// 		//TODO handle the exception
+	// 		__errorList=[];
+	// 	}
+	// 	for(var __i=0;__i<__errorList.length;__i++){
+	// 		Wapi.crash.add(function(res){},__errorList[__i]);
+	// 	}
+	// 	localStorage.removeItem("errorList");
+	// }
 });
 
 
@@ -730,6 +732,9 @@ W.plusReady=function(fun,web){
 window._g=W.getSearch();
 
 var	WiStorm_root="http://"+location.host+"/";
+if(location.protocol=="https:"){
+	WiStorm_root="https://"+location.host+"/";
+}
 if(location.host.indexOf('localhost')==-1&&!location.host.match(/(192\.|127\.)/))
 	WiStorm_root+="wo365_user/";
 var u = navigator.userAgent;

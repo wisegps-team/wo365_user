@@ -62,50 +62,52 @@ class App extends Component {
         W.loading();
         if(!res._code){
             let user=res;
-            Wapi.customer.get(cust=>{
-                let remark='注册成功！';
-                let link='#';
-                if(this.state.selectBookingId){
-                    remark='订单'+this.state.selectBookingId+'注册成功！';
-                    link=location.origin+'/?loginLocation=%252Fwo365_user%252Forder.html%253FbookingId%253D'+this.state.selectBookingId+'&wx_app_id='+_g.wx_app_id;
-                }
-                Wapi.serverApi.sendWeixinByTemplate(function(res){
-                    if(res.errcode||res.status_code){
-                        W.alert(remark)
-                    }else
-                        W.native.close();
-                },{
-                    openId:_g.openid,
-                    wxAppKey:_g.wx_app_id,
-                    templateId:'OPENTM408183089',//安装成功通知'
-                    link,
-                    data:{
-                        "first": {//标题
-                            "value": '',
-                            "color": "#173177"
-                        },
-                        "keyword1": {//安装网点
-                            "value": cust.data.name,
-                            "color": "#173177"
-                        },
-                        "keyword2": {//型号
-                            "value": device.model,
-                            "color": "#173177"
-                        },
-                        "keyword3": {//IMEI
-                            "value": device.did,
-                            "color": "#173177"
-                        },
-                        "remark": {
-                            "value": remark,
-                            "color": "#173177"
-                        }
+            if(user.customer.parentId && user.customer.parentId.length > 0){
+                Wapi.customer.get(cust=>{
+                    let remark='注册成功！';
+                    let link='#';
+                    if(this.state.selectBookingId){
+                        remark='订单'+this.state.selectBookingId+'注册成功！';
+                        link=location.origin+'/?loginLocation=%252Fwo365_user%252Forder.html%253FbookingId%253D'+this.state.selectBookingId+'&wx_app_id='+_g.wx_app_id;
                     }
+                    Wapi.serverApi.sendWeixinByTemplate(function(res){
+                        if(res.errcode||res.status_code){
+                            W.alert(remark)
+                        }else
+                            W.native.close();
+                    },{
+                        openId:_g.openid,
+                        wxAppKey:_g.wx_app_id,
+                        templateId:'OPENTM408183089',//安装成功通知'
+                        link,
+                        data:{
+                            "first": {//标题
+                                "value": '',
+                                "color": "#173177"
+                            },
+                            "keyword1": {//安装网点
+                                "value": cust.data.name,
+                                "color": "#173177"
+                            },
+                            "keyword2": {//型号
+                                "value": device.model,
+                                "color": "#173177"
+                            },
+                            "keyword3": {//IMEI
+                                "value": device.did,
+                                "color": "#173177"
+                            },
+                            "remark": {
+                                "value": remark,
+                                "color": "#173177"
+                            }
+                        }
+                    });
+                },{
+                    objectId:user.customer.parentId[0],
+                    access_token:user.access_token
                 });
-            },{
-                objectId:user.customer.parentId[0],
-                access_token:user.access_token
-            });
+            }
         }else{
             switch (res._code) {
                 case 1:

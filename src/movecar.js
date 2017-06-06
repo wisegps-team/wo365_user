@@ -2,6 +2,7 @@
  * 2017-04-21
  */
 "use strict";
+import 'babel-polyfill';
 import React,{Component} from 'react';
 import ReactDOM from 'react-dom';
 
@@ -106,7 +107,8 @@ class BindCar extends Component {
             addHeader:"粤",
             subWx:null,
             valid_code:null,
-            wordWrap:null
+            wordWrap:null,
+            status_code: parseInt(_g.status_code)
         }
         this.submit = this.submit.bind(this);
         this.editOpen = this.editOpen.bind(this);
@@ -153,10 +155,14 @@ class BindCar extends Component {
                                 },{
                                     uid:cus.data.objectId
                                 })
+                            }else{
+                                this.setState({status_code:1})
                             }
                         },{
                             uid:res.data[0].objectId
                         })
+                    }else{
+                        this.setState({status_code:1})
                     }
                 },{
                     ['authData.'+key]:_g.openid
@@ -196,7 +202,7 @@ class BindCar extends Component {
     accountChange(e,val){
         // console.log(reg.test(val))
         // let reg=/^[1][3578][0-9]{9}$/;
-        var reg = /^(((13[0-9]{1})|(14[0-9]{1})|(17[0]{1})|(n15[0-3]{1})|(15[5-9]{1})|(18[0-9]{1}))+\d{8})$/;
+        var reg = /^(((13[0-9]{1})|(14[0-9]{1})|(17[0]{1})|(n15[0-3]{1})|(15[0-9]{1})|(18[0-9]{1}))+\d{8})$/;
         console.log(reg.test(val))
         if(reg.test(val)){
             console.log(true)
@@ -245,7 +251,7 @@ class BindCar extends Component {
         if(value.length == 6){
             Wapi.serverApi.checkVehicleExists(res =>{
                 if(res.data){
-                    W.alert('车牌已存在，请从新输入')
+                    W.alert('车牌已存在，请重新输入')
                 }else{
                      this.setState({carplate:value})
                 }
@@ -279,7 +285,7 @@ class BindCar extends Component {
         }
          
         let mobile = this.state.user?this.state.user.tel:null
-        if(_g.status_code == 0){
+        if(this.state.status_code == 0){
             if(mobile){//已存在车主平台用户    
                 Wapi.customer.update(res => {//添加留言
                     console.log('添加留言成功',res)
@@ -609,11 +615,7 @@ class BindCar extends Component {
                 }
             },data)
         }
-
-
     }
-
-
 
     close(){
         this.open = false;

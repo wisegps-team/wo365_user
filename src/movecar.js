@@ -17,6 +17,7 @@ import TextField from 'material-ui/TextField';
 import Dialog from 'material-ui/Dialog';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import Checkbox from 'material-ui/Checkbox';
 
 import VerificationCode from './_component/base/verificationCode';
 import Input from './_component/base/input';
@@ -49,6 +50,7 @@ class App extends Component {
         this.state ={
             active:0
         }
+        this.changeStatus = this.changeStatus.bind(this);
     }
     componentDidMount() {
         // console.log(11)
@@ -65,27 +67,29 @@ class App extends Component {
             },{
                 did:_g.did
             })
-        }else { //普通二维码
-            // console.log(22)
-            if(_g.type == '1'){
-                // console.log(33)
-                this.setState({active:0})
-            }else if(_g.type == '2'){
-                // console.log(44)
-                this.setState({active:1})
-            }else if(_g.plate){ //普通绑定二维码车主自己打印的二维码
-                this.setState({active:1})
-            }
-            
+        }else if(_g.plate){ //普通二维码
+            this.setState({active:1})
+        }else {
+            this.setState({active:1})
         }
         
     }
-    
+    changeStatus(sd){
+        console.log(sd)
+        if(sd){
+            this.setState({active:1})
+        }else {
+            this.setState({active:0})
+        }
+    }
     render() {
         return (
             <ThemeProvider style={{background:'f7f7f7',minHeight:'100vh'}}>
                 {
-                    this.state.active ? <MoveCar /> : <BindCar/>
+                    this.state.active ? 
+                    <MoveCar active={this.changeStatus}/> 
+                    : 
+                    <BindCar active={this.changeStatus}/>
                 }
             </ThemeProvider>
         );
@@ -388,7 +392,12 @@ class BindCar extends Component {
                             +'&wx_app_id='+_g.wx_app_id
 
                     });  
-                    
+                    Wapi.qrDistribution.update(cust => {
+                        console.log('单一编码绑定次数',cust)
+                    },{
+                        _objectId:_g.distributionId,
+                        bind_num:'+1'
+                    })
                     Wapi.customer.update(cust => {
                         console.log('普通挪车卡绑定次数',cust)
                     },{
@@ -459,6 +468,13 @@ class BindCar extends Component {
                                 _objectId:_g.creator,
                                 access_token:r.access_token,
                                 car_bind:'+1',
+                            })
+                            Wapi.qrDistribution.update(qrUp => { //
+                            console.log('添加单一编码绑定次数成功',qrUp)
+                            },{
+                                _objectId:_g.distributionId,
+                                access_token:r.access_token,
+                                bind_num:'+1'
                             })
                         }
                         if(_g.did){ //添加绑定次数和一物一码挪车短链
@@ -689,14 +705,63 @@ class BindCar extends Component {
             if(data.tel&&data.plate&&this.state.valid_code) showbutton = false;
         }
         console.log(showbutton,'showb')
+        let wid = window.screen.width/2+'px'
         return(
             <div style={{backgroundColor:'#f7f7f7',minHeight:'100vh'}}>
                 <div style={{width:'100%',height:'210px',display:'block',backgroundColor:'#ffffff'}}>
                     <img src='img/movecar.png' style={{width:'100%',height:'100%'}}/>
                 </div>
-                <div style={{width:'100%',lineHeight:'50px',display:'block',textAlign:'center'}}>
+                {/*<div style={{width:'100%',lineHeight:'50px',display:'block',textAlign:'center'}}>
                     {'绑定挪车卡'}
-                </div>
+                </div>*/}
+                {
+                    _g.did?
+                    <div style={{display:'block',width:'100%',height:'50px',textAlign:'center'}}>
+                        <div style={{width:wid,float:'left'}}>
+                            <Checkbox 
+                                label={'免费通知车主挪车'} 
+                                disabled={true}
+                                checked={false}
+                                style={{marginTop: '1em',left:'50%',marginLeft:-76}}
+                                iconStyle={{marginRight:0,left:0}}
+                                labelStyle={{width:'auto'}}
+                            />
+                        </div>
+                        <div style={{width:wid,float:'left'}}>
+                            <Checkbox 
+                                label={'我有挪车卡要绑定'} 
+                                checked={true}
+                                disabled={true}
+                                style={{marginTop: '1em',left:'50%',marginLeft:-76}}
+                                iconStyle={{marginRight:0,left:0}}
+                                labelStyle={{width:'auto'}}
+                            />
+                        </div>
+                    </div>
+                    :
+                    <div style={{display:'block',width:'100%',height:'50px',textAlign:'center'}}>
+                        <div style={{width:wid,float:'left'}}>
+                            <Checkbox 
+                                label={'免费通知车主挪车'} 
+                                checked={false}
+                                onCheck={e=>this.props.active(true)} 
+                                style={{marginTop: '1em',left:'50%',marginLeft:-76}}
+                                iconStyle={{marginRight:0,left:0}}
+                                labelStyle={{width:'auto'}}
+                            />
+                        </div>
+                        <div style={{width:wid,float:'left'}}>
+                            <Checkbox 
+                                label={'我有挪车卡要绑定'} 
+                                checked={true}
+                                style={{marginTop: '1em',left:'50%',marginLeft:-76}}
+                                iconStyle={{marginRight:0,left:0}}
+                                labelStyle={{width:'auto'}}
+                            />
+                        </div>
+                    </div>
+                }
+                
                 {/*如果openId有登录账号就直接显示电话号码否则就输入手机号码并验证*/}
 
                 {/*如果有车辆信息就显示车辆列表并绑定新车牌 否则就输入车辆信息并绑定新车牌*/}
@@ -1186,6 +1251,15 @@ class MoveCar extends Component {
                     access_token:access_token,
                     car_move:'+1'
                 })
+                if(!_g.plate){//车主打印二维码
+                    Wapi.qrDistribution.update(res => {
+                        console.log('更新单一编码qr挪出次数',res)
+                    },{
+                        _objectId:_g.distributionId,
+                        access_token:access_token,
+                        move_num:'+1'
+                    })
+                }
             }
         }else{
             if(_g.did){ //一物一码
@@ -1208,6 +1282,15 @@ class MoveCar extends Component {
                     _objectId:_g.creator,
                     car_move:'+1'
                 })
+                if(!_g.plate){//车主打印二维码
+                    Wapi.qrDistribution.update(res => {
+                        console.log('更新单一编码qr挪出次数',res)
+                    },{
+                        _objectId:_g.distributionId,
+                        access_token:access_token,
+                        move_num:'+1'
+                    })
+                }
             }
         }
         
@@ -1292,9 +1375,53 @@ class MoveCar extends Component {
                 <div style={sty.img}>
                     <img src='img/movecar.png' style={{width:'100%',height:'100%'}}/>
                 </div>
-                <div style={sty.h2}>
+                {/*<div style={sty.h2}>
                     {'恶意通知车主挪车的用户将被关入小黑屋哦!'}
-                </div>
+                </div>*/}
+                {_g.did||_g.plate?
+                    <div style={{display:'block',width:'100%',height:'50px',textAlign:'center'}}>
+                        <div style={{width:'50%',float:'left'}}>
+                            <Checkbox 
+                                label={'免费通知车主挪车'} 
+                                checked={true}
+                                disabled={true}
+                                style={{marginTop: '1em',left:'50%',marginLeft:-76}}
+                                iconStyle={{marginRight:0,left:0}}
+                                labelStyle={{width:'auto'}}
+                            />
+                        </div>
+                        <div style={{width:'50%',float:'left'}}>
+                            <Checkbox 
+                                label={'我有挪车卡要绑定'} 
+                                disabled={true}
+                                style={{marginTop: '1em',left:'50%',marginLeft:-76}}
+                                iconStyle={{marginRight:0,left:0}}
+                                labelStyle={{width:'auto'}}
+                            />
+                        </div>
+                    </div>
+                    :
+                    <div style={{display:'block',width:'100%',height:'50px',textAlign:'center'}}>
+                        <div style={{width:'50%',float:'left'}}>
+                            <Checkbox 
+                                label={'免费通知车主挪车'} 
+                                checked={true}
+                                style={{marginTop: '1em',left:'50%',marginLeft:-76}}
+                                iconStyle={{marginRight:0,left:0}}
+                                labelStyle={{width:'auto'}}
+                            />
+                        </div>
+                        <div style={{width:'50%',float:'left'}}>
+                            <Checkbox 
+                                label={'我有挪车卡要绑定'} 
+                                onCheck={e=>this.props.active(false)} 
+                                style={{marginTop: '1em',left:'50%',marginLeft:-76}}
+                                iconStyle={{marginRight:0,left:0}}
+                                labelStyle={{width:'auto'}}
+                            />
+                        </div>
+                    </div>
+                }
                 {/*如果是普通挪车卡输入车牌号码*/}
                 {
                     (_g.plate||_g.plate1)?

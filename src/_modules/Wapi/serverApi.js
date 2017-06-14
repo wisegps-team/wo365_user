@@ -6,7 +6,7 @@ import WiStormAPI from './WiStormAPI.js';
 class ServerApi{
     constructor(props, context) {
 		// this.url = 'http://h5test.bibibaba.cn/server_api.php'
-		this.url='http://h5.bibibaba.cn/server_api.php';
+		this.url='https://h5.bibibaba.cn/server_api.php';
 		// this.url='http://192.168.3.233:8080/test/server_api.php';
 		this.ajax=WiStormAPI.prototype.ajax;
 	}

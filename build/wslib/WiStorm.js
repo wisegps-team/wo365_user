@@ -578,7 +578,7 @@ W.wxLogin=function(s){
 		var url = WiStorm.config.wx_login; //测试使用
 		url = url.replace(/\?\S*/, "");
 		url = W.encoded(url);
-		top.location = "https://open.weixin.qq.com/connect/oauth2/authorize?appid="+WiStorm.config.wx_app_id+"&redirect_uri=http://h5.bibibaba.cn/jump.html&response_type=code&scope=snsapi_userinfo&state="+url+"#wechat_redirect";
+		top.location = "https://open.weixin.qq.com/connect/oauth2/authorize?appid="+WiStorm.config.wx_app_id+"&redirect_uri=https://h5.bibibaba.cn/jump.html&response_type=code&scope=snsapi_userinfo&state="+url+"#wechat_redirect";
 	}else{
 		W.setCookie("__login_redirect_uri__",location.href,-15);
 		var u=encodeURIComponent(WiStorm.config.wx_login);
@@ -749,7 +749,7 @@ window.WiStorm={
 		"default_language": "zh-cn",
 		"update_url": WiStorm_root+"update/version.json",
 		"wx_ticket_url":location.origin+"/WX.TokenAndTicket.php?action=ticket",
-		"wx_sdk":"http://res.wx.qq.com/open/js/jweixin-1.0.0.js",
+		"wx_sdk":"https://res.wx.qq.com/open/js/jweixin-1.0.0.js",
 		"wx_login":location.origin+"/oauth2.php",
 		languages:['zh-cn','en-us'],
 		'map':'BAIDU',

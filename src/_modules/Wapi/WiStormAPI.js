@@ -11,14 +11,14 @@ function _noop(){};
 function WiStormAPI(name,token,key,secret,opt){
     Object.defineProperties(this, {//添加只读属性
         "url": {
-			value:'http://wop-api.chease.cn/router/rest'
+			value:'https://wop-api.chease.cn/router/rest'
 			// value:'http://wop-api3.chease.cn/router/rest'
 			// value:'http://192.168.3.120:8089/router/rest'
             // value: "http://o.bibibaba.cn/router/rest"
         },
         "safetyUrl": {
             // value: "http://h5test.bibibaba.cn/baba/wx/wslib/api/safetyWapi.php",
-			value: "http://h5.bibibaba.cn/baba/wx/wslib/api/safetyWapi.php"
+			value: "https://h5.bibibaba.cn/baba/wx/wslib/api/safetyWapi.php"
         },
         "appKey": {
             value: key

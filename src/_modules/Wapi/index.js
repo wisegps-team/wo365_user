@@ -99,7 +99,7 @@ WCommApi.prototype.validCode=function(callback,data,op){
  * remark:说明
  */
 WCommApi.prototype.sendWeixin=function(callback,data){
-	var url="http://h5.bibibaba.cn/send_weixin.php";
+	var url="https://h5.bibibaba.cn/send_weixin.php";
 	var now = new Date();
     var op = {
         "first": {

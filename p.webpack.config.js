@@ -16,7 +16,7 @@ function getAllFile(path,entry_json){
 }
 var entry_json={};
 getAllFile('/src',entry_json);
-entry_json['common.js']=['./src/_reducers/main.js','./src/_theme/default.js','./src/_modules/Wapi'];
+entry_json['common.js']=['babel-polyfill','./src/_reducers/main.js','./src/_theme/default.js','./src/_modules/Wapi'];
 console.log(entry_json);
 
 module.exports = {

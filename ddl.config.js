@@ -6,7 +6,8 @@ const vendors = [
     'react-dom',
     'react-tap-event-plugin',
     'redux',
-    'material-ui'
+    'material-ui',
+    'babel-polyfill'
 ];
 
 module.exports = {

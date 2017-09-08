@@ -12,5 +12,5 @@ var getScriptRequest = function() {
 
 var sr = getScriptRequest();
 // console.log(JSON.stringify(sr));
-var lib_version = '36';
+var lib_version = '47';
 document.write('<script src="' + sr["u"] + 'wslib/WiStorm.js?v=' + lib_version + '"><\/script>');

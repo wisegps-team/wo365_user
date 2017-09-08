@@ -4,7 +4,7 @@
  * 目的是封装百度地图，简化使用，目前非常不完善，只有几个基本方法
  */
 if(WiStorm.config.map=='BAIDU')
-	W.include("http://api.map.baidu.com/api?v=2.0&ak=647127add68dd0a3ed1051fd68e78900&callback=__WMap_mapInit");
+	W.include("https://api.map.baidu.com/api?v=2.0&ak=647127add68dd0a3ed1051fd68e78900&callback=__WMap_mapInit");
 else
 	// W.include("https://www.google.cn/maps/api/js?key=AIzaSyDPwroSpXMst_Esu2GUnw5K_6LTS4wuNBc&callback=__WMap_mapInit");
 	W.include("https://maps.googleapis.com/maps/api/js?key=AIzaSyDPwroSpXMst_Esu2GUnw5K_6LTS4wuNBc&callback=__WMap_mapInit");

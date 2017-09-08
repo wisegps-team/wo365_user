@@ -76,7 +76,7 @@ class App extends Component {
     render() {
         let items=this.data.map((ele,i)=>
             <div key={i} style={styles.card}>
-                <div style={styles.line}>{___.data_code +' '}<span style={styles.variable}>{'http://autogps.cn/?s='+ele.id}</span></div>
+                <div style={styles.line}>{___.data_code +' '}<span style={styles.variable}>{'http://t.autogps.cn/?s='+ele.id}</span></div>
                 <div style={styles.line}>
                     <span onClick={()=>this.toScan(ele)} style={styles.variable}>{___.scan_count}0</span>
                     <span onClick={()=>this.removeBind(ele)} style={styles.link}>{___.remove_bind}</span>

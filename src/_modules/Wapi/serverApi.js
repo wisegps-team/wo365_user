@@ -105,6 +105,10 @@ class ServerApi{
 		data.method='getMoveCarInfo';
 		this.get(data,callback);
 	}
+	getMoveCarUserInfo(callback,data){
+		data.method='getMoveCarUserInfo';
+		this.get(data,callback);
+	}
 }
 
 export default ServerApi;

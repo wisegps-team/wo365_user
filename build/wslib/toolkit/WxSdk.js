@@ -117,7 +117,7 @@ if(WiStorm.agent.weixin){//如果是微信端
 	
 //	W.wx.ticket=W.getCookie("wxTicket");//获取jssdk的ticket，调用任何api都需要用到
 	if(!W.wx.ticket){//ticket过期，则重新获取ticket
-		W.getJSON(WiStorm.config.wx_ticket_url,{HTTP_HOST:location.host},
+		W.getJSON(WiStorm.config.wx_ticket_url,{wxAppKey:WiStorm.config.wx_app_id},
 			function(data){
 				W.wx.ticket=data.ticket;
 				var expires=-parseInt(data.expires/60);//计算有效时间，转换成分钟

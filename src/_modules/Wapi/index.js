@@ -153,6 +153,21 @@ function WServiceApi(token){
 WServiceApi.prototype=new WiStormAPI();//继承父类WiStormAPI的方法
 
 /**
+ * 获取ip地址接口
+ * @constructor
+ */
+function WIpApi(token){
+	WiStormAPI.call(this,'ip',token,config.app_key,config.app_secret)
+}
+WIpApi.prototype=new WiStormAPI()
+WIpApi.prototype.getIp = function(callback){
+	var data={
+		'method':"wicare.ip.get"
+	};
+	this.getApi(data,callback);
+}
+
+/**
  * 文件接口api类
  * @constructor
  */
@@ -599,6 +614,7 @@ const Wapi={
     app:new WAppApi(_user?_user.access_token:null),
 	call:new WCallApi(_user?_user.access_token:null),
     table:new WTableApi(_user?_user.access_token:null),
+	ip:new WIpApi(_user?_user.access_token:null),
     file:new WFileApi(_user?_user.access_token:null),
     comm:new WCommApi(_user?_user.access_token:null),
 	role:new WRoleApi(_user?_user.access_token:null),
@@ -632,7 +648,8 @@ const Wapi={
 	pay:new WPayApi(_user?_user.access_token:null),
 	activityProduct:new WAPI('activityProduct',_user?_user.access_token:null),
 	qrLink:new WAPI('qrLink',_user?_user.access_token:null),
-	qrDistribution:new WAPI('qrDistribution',_user?_user.access_token:null)
+	qrDistribution:new WAPI('qrDistribution',_user?_user.access_token:null),
+	advertisement:new WAPI('advertisement',_user?_user.access_token:null)
 };
 
 
@@ -667,6 +684,7 @@ makeGetOp('product','objectId,name,company,uid,brand,brandId',{limit:-1,sorts:'n
 makeGetOp('booking','userId,activityId,mobile,sellerId,sellerName,uid,status,status0,status1,status2,status3,name,carType,resTime,payTime,confirmTime,money,did,openId,installId,install,installDate,type,userName,userMobile,payMoney,payStatus,orderId,activityType,userOpenId,product,receiptDate,selectInstallDate,res,receipt,receiptId,commission,commissionId,commissionDate,managerId,objectId,createdAt,updatedAt');
 makeGetOp('activity','creator,objectId,uid,type,name,url,imgUrl,status,reward,pay,deposit,offersDesc,price,installationFee,getCard,principal,principalId,principalTel,sellerType,sellerTypeId,brand,product,productId,wxAppKey,count,tel,createdAt,updatedAt');
 makeGetOp('qrLink','objectId,id,uid,url,act,sellerId,i,type,batchId,batchName,status');
+makeGetOp('advertisement','objectId,uid,ad_name,approveDate,status,applyDate,ad_time,small_img,big_img');
 
 
 

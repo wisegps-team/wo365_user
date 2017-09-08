@@ -23,12 +23,17 @@ import VerificationCode from './_component/base/verificationCode';
 import Input from './_component/base/input';
 import PhoneInput from './_component/base/PhoneInput';
 
+import NavigationArrowDropDown from 'material-ui/svg-icons/navigation/arrow-drop-down'
+import ContentAddCircleOutline from 'material-ui/svg-icons/content/add-circle-outline'
 import SonPage from './_component/base/sonPage';
 // import AppBox from './_component/booking/app_box';
 // import PayBox from './_component/booking/pay_box';
 import QrImg from './_component/base/qrImg';
 import {changeToLetter,getOpenIdKey} from './_modules/tool';
 // import {getOpenIdKey} from '../_modules/tool';
+import WMap from './_modules/WMap';
+import Chip from 'material-ui/Chip';
+import Slider from './_component/slider';
 
 let sty = {
     img: {width:'100%',height:'210px',display:'block',backgroundColor:'#ffffff'},
@@ -43,17 +48,52 @@ thisView.addEventListener('load',function(e){
 });
 
 
+
+
 // var plate='粤B12345'
 class App extends Component {
     constructor(props,context){
         super(props,context)
         this.state ={
-            active:0
+            active:null,
+            gcj:null,
+            showBig: false
         }
         this.changeStatus = this.changeStatus.bind(this);
+        this.showBig = this.showBig.bind(this);
+        this.hideBig = this.hideBig.bind(this);
+        this.show_big = {
+            big_img: []
+
+            // big_img:[{
+            //     imgUrl:"http://img2.bibibaba.cn/photo/1502093100808.png@!baba",
+            //     name:"2-3-1.png",
+            //     size:"300*299"
+            // },{
+            //     imgUrl:"http://img2.bibibaba.cn/photo/1502162407352.jpg@!baba",
+            //     name:"2-3-1.png",
+            //     size:"300*299"
+            // }]
+        }
+        this.small_img = [];
     }
     componentDidMount() {
         // console.log(11)
+        Wapi.advertisement.list(res => {
+            console.log(res)
+            if(res.data.length){
+                this.show_big.big_img = res.data[0].big_img
+                this.small_img = res.data[0].small_img;
+                this.forceUpdate();
+            }else{
+                this.show_big.big_img = [];
+                this.small_img = [{imgUrl:'img/movecar.png'}] 
+                this.forceUpdate()
+            }
+        },{
+            uid:_g.creator,
+            status:1
+        })
         debugger;
         if(_g.did){ //一物一码
             // console.log('11')
@@ -82,17 +122,80 @@ class App extends Component {
             this.setState({active:0})
         }
     }
+    showBig(){
+        this.setState({showBig:true})
+    }
+    hideBig(){
+        this.setState({showBig:false})
+    }
     render() {
+        var slides = [{
+            imgUrl: "http://img2.bibibaba.cn/photo/1502093100808.png@!baba",
+            link: ""
+        }, {
+            imgUrl: "http://img2.bibibaba.cn/photo/1502162407352.jpg@!baba",
+            link: ""
+        }, {
+            imgUrl: 'img/movecar.png',
+            link:""
+        },{
+            imgUrl: "http://img2.bibibaba.cn/photo/1502162407352.jpg@!baba",
+            link: ""
+        }, {
+            imgUrl: 'img/movecar.png',
+            link:""
+        }]
+        // this.small_img = slides
         return (
             <ThemeProvider style={{background:'f7f7f7',minHeight:'100vh'}}>
-                {
+                <div style={sty.img}>
+                    {/* {this.small_img[0]?<img src={this.small_img[0].imgUrl} style={{width:'100%',height:'100%'}} onClick={this.showBig}/> :null}   */}
+                    {/* <Slider slides= {slides} time="3000" click={this.showBig}/ >     */}
+                    {   this.small_img.length > 1 ?
+                        <Slider slides= {this.small_img} time="3000" click={this.showBig}/ >:
+                        (
+                            this.small_img[0]?<img src={this.small_img[0].imgUrl} style={{width:'100%',height:'100%'}} onClick={this.showBig}/> :null
+                        )
+                        
+                    }
+                </div>
+                {   this.state.active == null
+                    ?
+                    null
+                    :
                     this.state.active ? 
-                    <MoveCar active={this.changeStatus}/> 
+                    <MoveCar active={this.changeStatus} gcj={this.state.gcj}/> 
                     : 
                     <BindCar active={this.changeStatus}/>
                 }
+                {
+                    this.show_big.big_img.length ?
+                    <SonPage open={this.state.showBig} back={this.hideBig}>
+                        <BigImg data={this.show_big}/>
+                    </SonPage> 
+                    :
+                    null
+                }
+                
             </ThemeProvider>
         );
+    }
+}
+
+class BigImg extends Component{
+    render(){
+        console.log(this.props.data,'idnd')
+        let bigImg = null;
+        this.props.data? bigImg = this.props.data.big_img:null;
+        // bigImg = bigImg.
+        if(bigImg){
+            bigImg = bigImg.map((ele,index) => {
+                return(<img key={index} src={ele.imgUrl} style={{width:'100%',verticalAlign:'middle'}}/>)
+            })
+        }
+        return(<div>
+            {bigImg}
+        </div>)
     }
 }
 let pr = ['京','津','沪','渝','冀','豫','云','辽','黑','湘','皖','鲁','新','苏','浙','赣','鄂','桂','甘','晋','蒙','陕','吉','闽','贵','粤','青','藏','川','宁','琼']
@@ -108,11 +211,14 @@ class BindCar extends Component {
             carplate:null,
             user:null,
             selectCar:null,
-            addHeader:"粤",
+            addHeader:"京",
             subWx:null,
             valid_code:null,
             wordWrap:null,
-            status_code: parseInt(_g.status_code)
+            status_code: parseInt(_g.status_code),
+            showProve: false,
+            Info:null,
+            plateValue:null
         }
         this.submit = this.submit.bind(this);
         this.editOpen = this.editOpen.bind(this);
@@ -127,6 +233,11 @@ class BindCar extends Component {
         this.addPlate = this.addPlate.bind(this);
         // this.success = this.success.bind(this);
         this.close = this.close.bind(this);
+        this.showProve = this.showProve.bind(this);
+        this.hideProve = this.hideProve.bind(this);
+        this.addHeaders = this.addHeaders.bind(this);
+        this.mapinit = this.mapinit.bind(this);
+        this.moveBind = this.moveBind.bind(this);
         this.value = '如果我停的位置给您带来不便，非常抱歉，如需挪车，收到通知我立刻过来！'
         this.open = false;
         this.formData={
@@ -138,6 +249,35 @@ class BindCar extends Component {
     }
     
     componentDidMount() {
+        Wapi.serverApi.getMoveCarUserInfo(res=>{
+            // console.log(res)
+            this.setState({Info:res})
+        },{
+            distributionId:_g.distributionId,
+            wxAppKey: _g.wx_app_id
+        })
+        var that = this;
+        if(WiStorm.agent.weixin){
+            wx.ready(function(){
+                wx.getLocation({
+                    type: 'gcj02', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+                    success: function (res) {
+                        console.log(res,'gcj02')
+                        if(typeof WMap!='undefined'&&WMap.ready){//已经加载好
+                            that.mapinit(res);
+                        }else{
+                            window.addEventListener('W.mapready',()=>{that.mapinit(res)});
+                        }
+                    },
+                    fail: function(res){
+                        console.log(res,'error')
+                    },
+                    cancel: function(res){
+                        console.log(res)
+                    }
+                });
+            })
+        } 
         if(_g.status_code==0){
             if(_g.openid){
                 //判断openId是否有绑定登录账号
@@ -175,8 +315,16 @@ class BindCar extends Component {
                 })
             }
         }
-            
-        
+    }
+    //定位获取省份根据浏览器地址获取
+    mapinit(resss){
+        var that = this;
+        var myGeo=new WMap.Geocoder();
+        let area = '京';
+        myGeo.getLocation(new WMap.Point(resss.longitude,resss.latitude),function(result){
+            area = ___.prove[result.addressComponents.province]||'京';
+            that.setState({addHeader:area})
+        });
     }
     //打开修改留言
     editOpen(){
@@ -241,23 +389,29 @@ class BindCar extends Component {
             this.setState({showadd:true})
         }
     }
-    //选择车牌号码前面一位
+    // 选择车牌号码前面一位
     addHeader(e,v,i){
         this.setState({addHeader:i})
         
     }
+    addHeaders(v){
+        // console.log(v,'zehshi')
+        this.setState({addHeader:v.toUpperCase()})
+        this.setState({showProve:false})
+    }
     //是否显示输入新增车牌号码
     addCar(){
-        this.setState({showadd:true})
+        this.setState({showadd:!this.state.showadd})
     }
     //输入新增车牌号码
     addPlate(e,value){
+        this.setState({plateValue:value.toUpperCase()})
         if(value.length == 6){
             Wapi.serverApi.checkVehicleExists(res =>{
                 if(res.data){
                     W.alert('车牌已存在，请重新输入')
                 }else{
-                     this.setState({carplate:value})
+                     this.setState({carplate:value.toUpperCase()})
                 }
             },{
                 name:this.state.addHeader+value
@@ -267,7 +421,6 @@ class BindCar extends Component {
              this.setState({carplate:null})
         }
     }
-    
     //点击绑定
     submit(){
         // this.open = true;
@@ -278,14 +431,18 @@ class BindCar extends Component {
         if(this.state.vehicle.length){
             plate = this.state.vehicle[0].name
         }
-        if(this.state.selectCar){
-            if(this.state.selectCar != 'add'){
-                plate = this.state.selectCar
-            }else if(this.state.selectCar == 'add'){
-                plate = this.state.addHeader + this.state.carplate
-            }
-        }else if(this.state.carplate){
-            plate = this.state.addHeader + this.state.carplate
+        // if(this.state.selectCar){
+        //     if(this.state.selectCar != 'add'){
+        //         plate = this.state.selectCar
+        //     }else if(this.state.selectCar == 'add'){
+        //         plate = this.state.addHeader + this.state.carplate
+        //     }
+        // }else if(this.state.carplate){
+        //     plate = this.state.addHeader + this.state.carplate
+        // }
+        if(this.state.carplate){
+            plate = this.state.addHeader + this.state.carplate;
+            plate = plate.toUpperCase();
         }
          
         let mobile = this.state.user?this.state.user.tel:null
@@ -308,7 +465,7 @@ class BindCar extends Component {
                         distributionId:_g.distributionId?_g.distributionId:''
                 });
                 if(this.state.subWx.subWx.indexOf(_g.wx_app_id) != -1){ //发送模板消息
-                    let value = '挪车卡绑定成功，他人扫码挪车时平台将通过拨打'+mobile+'通知您！';
+                    let value = '挪车卡绑定成功，他人扫码挪车时平台将主动拨打您的手机号码，来电显示为“0755-61971818”，为方便记忆，可将此号码新建联系人存为“挪车热线”。';
                     let title = '绑定成功通知'
                     sendTemplate(plate,value,null,title);
                     // history.back();
@@ -355,14 +512,15 @@ class BindCar extends Component {
                             name:this.state.addHeader + this.state.carplate,
                             access_token:_g.access_token
                         })
-                    }else if(this.state.selectCar.objectId){ //选择某辆车绑定
-                        Wapi.vehicle.update(veh => {
-                            console.log('一物一码选择车辆',veh)
-                        },{
-                            _objectId:this.state.selectCar.objectId,
-                            mid:_g.did
-                        })
                     }
+                    // else if(this.state.selectCar.objectId){ //选择某辆车绑定
+                    //     Wapi.vehicle.update(veh => {
+                    //         console.log('一物一码选择车辆',veh)
+                    //     },{
+                    //         _objectId:this.state.selectCar.objectId,
+                    //         mid:_g.did
+                    //     })
+                    // }
                 }else{//如果是普通二维码
                     if(this.state.carplate){//如果新增车牌
                         Wapi.vehicle.add(veh => { //绑定新增车辆
@@ -637,6 +795,17 @@ class BindCar extends Component {
         this.open = false;
         this.forceUpdate()
     }
+
+    showProve(){
+        // alert(11)
+        this.setState({showProve:true})
+    }
+    hideProve(){
+        this.setState({showProve:false})
+    }
+    moveBind(data){
+        console.log(data)
+    }
     render(){
         console.log(this.formData)
         console.log(this.state.valid_code,'valid')
@@ -646,11 +815,40 @@ class BindCar extends Component {
         // if(this.state.vehicle.length){
         //     first = this.state.vehicle[0].name
         // }
-        let items = this.state.vehicle.map((ele,index) => {
-            return(<MenuItem value={ele.name} key={index} primaryText={ele.name}/>)
+        // let datas = [
+        //     {key: 0, label: '新A12345'},
+        //     {key: 1, label: '新A12346'},
+        // ]
+        // let itmes = datas.map((ele,index) => {
+        //     return (
+        //         <Chip
+        //             key={ele.key}
+        //             style={{margin: 4}}
+        //         >
+        //             {ele.label}
+        //         </Chip>
+        //     );
+        // })
+        let itmes = this.state.vehicle.map((ele,index) => {
+            return (
+                <Chip
+                    key={index}
+                    style={{margin: 4}}
+                >
+                    {ele.name}
+                </Chip>
+            );
         })
+
+        // let items = this.state.vehicle.map((ele,index) => {
+        //     return(<MenuItem value={ele.name} key={index} primaryText={ele.name}/>)
+        // })
+        // let item = pr.map((ele,index) => {
+        //     return(<MenuItem value={ele} key={index} primaryText={ele}/>)
+        // })
+        let sWid = ((window.screen.width*0.85)-48)/5-10 + 'px';
         let item = pr.map((ele,index) => {
-            return(<MenuItem value={ele} key={index} primaryText={ele}/>)
+            return(<span onClick={()=>{this.addHeaders(ele)}} key={index} style={{fontSize:'14px',display:'inline-block',width:sWid,height:sWid,lineHeight:sWid,background:'#2196f3',textAlign:'center',color:'#fff',margin:5}}>{ele}</span>)
         })
         const actions = [
             <FlatButton
@@ -665,15 +863,24 @@ class BindCar extends Component {
                 onTouchTap={this.editClose}
             />,
         ];
+        const actiont = [
+            <FlatButton
+                label="关闭"
+                primary={true}
+                keyboardFocused={true}
+                onTouchTap={this.hideProve}
+                labelStyle={{color:'#23ed31'}}
+            />,              
+        ]
         // console.log(this.state.account)
         console.log(this.state.user)
         console.log(this.state.selectCar)
         let mobile = this.state.user?this.state.user.tel:null
         let data = {}
-        let first = null
-        if(this.state.vehicle.length){
-            first = this.state.vehicle[0].name
-        }
+        // let first = null
+        // if(this.state.vehicle.length){
+        //     first = this.state.vehicle[0].name
+        // }
         //已绑定openid
         if(mobile){
             data.tel = mobile;
@@ -682,18 +889,21 @@ class BindCar extends Component {
                 data.tel = this.state.account;
             }
         }
-        if(this.state.selectCar){ //已有车辆选择
-            if(this.state.selectCar != 'add'){//选择车辆
-                data.plate = this.state.selectCar
-            }else if(this.state.selectCar == 'add'){//选择绑定新车辆
-                if(this.state.carplate){
-                     data.plate = this.state.addHeader + this.state.carplate
-                }   
-            }
-        }else if(this.state.carplate){ //新车辆
-            data.plate = this.state.addHeader + this.state.carplate
-        }else if(first){
-            data.plate = first;
+        // if(this.state.selectCar){ //已有车辆选择
+        //     if(this.state.selectCar != 'add'){//选择车辆
+        //         data.plate = this.state.selectCar
+        //     }else if(this.state.selectCar == 'add'){//选择绑定新车辆
+        //         if(this.state.carplate){
+        //              data.plate = this.state.addHeader + this.state.carplate
+        //         }   
+        //     }
+        // }else if(this.state.carplate){ //新车辆
+        //     data.plate = this.state.addHeader + this.state.carplate
+        // }else if(first){
+        //     data.plate = first;
+        // }
+        if(this.state.carplate){
+            data.plate = (this.state.addHeader + this.state.carplate).toUpperCase();
         }
         // console.log(this.state.selectCar,'dd')
         let showbutton = true;
@@ -706,11 +916,20 @@ class BindCar extends Component {
         }
         console.log(showbutton,'showb')
         let wid = window.screen.width/2+'px'
+        
         return(
-            <div style={{backgroundColor:'#f7f7f7',minHeight:'100vh'}}>
-                <div style={{width:'100%',height:'210px',display:'block',backgroundColor:'#ffffff'}}>
-                    <img src='img/movecar.png' style={{width:'100%',height:'100%'}}/>
-                </div>
+            <div style={{backgroundColor:'#f7f7f7'}}>
+                {/* <div style={{width:'100%',height:'210px',display:'block',backgroundColor:'#ffffff'}}>
+                    <img src='img/movecar.png' style={{width:'100%',height:'100%'}} onClick={() => {console.log(1)}}/>
+                </div> */}
+                {   !_g.did?
+                    <div style={{position:'absolute',top:0,right:0,fontSize:'14px'}}>
+                        {_g.distributionId?(this.state.Info?('['+this.state.Info.name+']'+_g.distributionId.substr(8,10)+'A'+'-'+this.state.Info.num+'-'+this.state.Info.bind_num):null):null}
+                    </div>
+                    :
+                    null
+                }
+                
                 {/*<div style={{width:'100%',lineHeight:'50px',display:'block',textAlign:'center'}}>
                     {'绑定挪车卡'}
                 </div>*/}
@@ -765,9 +984,7 @@ class BindCar extends Component {
                 {/*如果openId有登录账号就直接显示电话号码否则就输入手机号码并验证*/}
 
                 {/*如果有车辆信息就显示车辆列表并绑定新车牌 否则就输入车辆信息并绑定新车牌*/}
-                {
-                    items.length?
-                    <div style={{background:'#fff',padding:'0 10px'}}>
+                {/*<div style={{background:'#fff',padding:'0 10px'}}>
                         <SelectField
                             value={this.state.selectCar?this.state.selectCar:first}
                             maxHeight={200}
@@ -775,38 +992,75 @@ class BindCar extends Component {
                             onChange={this.selectCar}
                         >
                             {items}
-                            {/*<MenuItem value='add' children={<FlatButton label={'绑定新车牌'}  labelStyle={{paddingLeft:0}} primary={true} onClick={this.addCar} />}/>*/}
+                            <MenuItem value='add' children={<FlatButton label={'绑定新车牌'}  labelStyle={{paddingLeft:0}} primary={true} onClick={this.addCar} />}/>
                             <FlatButton label={'绑定新车牌'} labelStyle={{paddingLeft:24}} primary={true} onClick={this.addCar} value='add'/>                            
                         </SelectField>
+                    </div>*/}
+                {
+                    itmes.length?
+                    <div style={{display: 'flex',flexWrap: 'wrap',background:'#fff',padding:'0 10px'}}>
+                        {itmes}
+                        <ContentAddCircleOutline style={{height:32,width:32,margin:'4px 2px'}} onClick={this.addCar}/>
                     </div>
                     :
                     <div style={{background:'#fff',padding:'0 10px',height:'48px'}}>
-                        <SelectField
+                        {/*<SelectField
                             value={this.state.addHeader}
                             maxHeight={200}
                             style={{width:'12%'}}
                             onChange={this.addHeader}
-                        >
-                            {/*<MenuItem value={0} key={0} primaryText={'粤'}/>*/}
-                            {item}
-                        </SelectField>
-                        <TextField hintText={'输入车牌号码'}  onChange={this.addPlate} style={{width:'88%',top:'-4px'}} />
+                        >*/}
+                            {/*<MenuItem value={0} key={0} primaryText={'京'}/>*/}
+                            {/*{item}*/}
+                        {/*</SelectField>*/}
+                        <span onClick={this.showProve} style={{color:'#2196f3',lineHeight:'30px',width:'24px',padding:'0 5px',display:'inline-block',position:'relative',top:'-4px',borderBottom:'1px solid #ccc'}}>{this.state.addHeader}<span style={{position:'absolute',top:3,right:'-7px'}}><NavigationArrowDropDown style={{fill: 'rgba(0, 0, 0, 0.11)'}}/></span></span>
+                        <TextField hintText={'输入车牌号码'} value={this.state.plateValue} onChange={this.addPlate} style={{width:'88%',top:'-4px'}} />
                     </div>
                 }
+                <div>
+                    <Dialog
+                        title="请选择"
+                        titleStyle={{borderBottom:'none',lineHeight:'43px',height:43,padding:'5px 0',textAlign:'center',fontSize:'16px'}}
+                        actions={actiont}
+                        modal={false}
+                        open={this.state.showProve}
+                        contentStyle={{width:'85%'}}
+                        onRequestClose={this.handleClose}
+                        autoScrollBodyContent={true}
+                        bodyStyle={{padding:'0 24px'}}
+                        actionsContainerStyle={{textAlign:'center',fontSize:'16px',borderTop:'1px solid #ccc'}}
+                        >
+                        {item}
+                        {/*<DatePicker hintText="Date Picker" />*/}
+                    </Dialog>
+                </div>
+                {/*<div style={{background:'#fff',padding:'0 10px',height:'48px'}}>
+                    <SelectField
+                        value={this.state.addHeader}
+                        maxHeight={200}
+                        style={{width:'12%'}}
+                        onChange={this.addHeader}
+                    >*/}
+                        {/*<MenuItem value={0} key={0} primaryText={'京'}/>*/}
+                        {/*{item}*/}
+                    {/*</SelectField>
+                    <TextField hintText={'输入车牌号码'}  onChange={this.addPlate} style={{width:'88%',top:'-4px'}} />
+                </div>*/}
                 {/*点击新增车牌号码显示*/}
                 {
                     this.state.showadd ? 
                     <div style={{background:'#fff',padding:'0 10px',height:'48px'}}>
-                        <SelectField
+                        {/*<SelectField
                             value={this.state.addHeader}
                             maxHeight={200}
                             style={{width:'12%'}}
                             onChange={this.addHeader}
-                        >
-                            {/*<MenuItem value={0} key={0} primaryText={'粤'}/>*/}
-                            {item}
-                        </SelectField>
-                        <TextField hintText={'请输入车牌号码'}  onChange={this.addPlate} style={{width:'88%',top:'-4px'}} />
+                        >*/}
+                            {/*<MenuItem value={0} key={0} primaryText={'京'}/>*/}
+                            {/*{item}*/}
+                        {/*</SelectField>*/}
+                        <span onClick={this.showProve} style={{color:'#2196f3',lineHeight:'30px',width:'24px',padding:'0 5px',display:'inline-block',position:'relative',top:'-4px',borderBottom:'1px solid #ccc'}}>{this.state.addHeader}<span style={{position:'absolute',top:3,right:'-7px'}}><NavigationArrowDropDown style={{fill: 'rgba(0, 0, 0, 0.11)'}}/></span></span>
+                        <TextField hintText={'请输入车牌号码'} value={this.state.plateValue} onChange={this.addPlate} style={{width:'88%',top:'-4px'}} />
                     </div>
                     :
                     null
@@ -821,7 +1075,7 @@ class BindCar extends Component {
                     <div style={{background:'#fff',padding:'0 10px'}}>
                         <Input
                             name='account'
-                            hintText={'输入接收挪车回复的手机号码，不会显示给他人。'}
+                            hintText={'输入接收挪车通知的手机号码，不会显示给他人。'}
                             floatingLabelText={___.phone_num}
                             onChange={this.accountChange}
                             type='tel'
@@ -861,7 +1115,7 @@ class BindCar extends Component {
                 <p style={{textIndent:'2em',background:'#fff',lineHeight:'30px',margin:'0px',padding:'5px 10px'}}>{this.state.default}</p>
                 {/*<TextField hintText="Hint Text"/>*/}
                 <div style={{width:'100%',display:'block',textAlign:'center'}}>
-                    <RaisedButton label={'绑定'}  disabled={showbutton} primary={true} onClick={() => {this.submit()}} style={{backgroundColor:'#f7f7f7',margin:'20px 0'}}/>
+                    <RaisedButton label={'绑定车辆'}  disabled={showbutton} primary={true} onClick={() => {this.submit()}} style={{backgroundColor:'#f7f7f7',margin:'20px 0'}}/>
                 </div>
                 <SonPage open={this.open} back={this.close}>
                     <ShowBin data={data}/>
@@ -872,7 +1126,7 @@ class BindCar extends Component {
     }
 }
 
-// let pr = ['新','粤']
+// let pr = ['新','京']
 var i = 5
 class MoveCar extends Component {
     constructor(props,context){
@@ -883,14 +1137,46 @@ class MoveCar extends Component {
             open:false,
             account:null,
             plate:null,
-            addplateCar:"粤",
+            addplateCar:"京",
             addplate:null,
             user:null,
             carMobile:null,
             customer:null,
             driver_openid:null,
             wordWrap:null,
-            plateValue:null
+            plateValue:null,
+            showProve:false
+        }
+        var that = this;
+            
+        if(WiStorm.agent.weixin){
+           var timer = setTimeout(()=>{
+                wx.ready(function(){
+                    wx.getLocation({
+                        type: 'gcj02', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
+                        success: function (res) {
+                            console.log(res,'gcj02')
+                            if(typeof WMap!='undefined'&&WMap.ready){//已经加载好
+                                that.mapinit(res);
+                                clearTimeout(timer)
+                            }else{
+                                window.addEventListener('W.mapready',()=>{
+                                    that.mapinit(res);
+                                    clearTimeout(timer)
+                                });
+                            }
+                        },
+                        fail: function(res){
+                            console.log(res,'error');
+                            clearTimeout(timer)
+                        },
+                        cancel: function(res){
+                            console.log(res);
+                            clearTimeout(timer)
+                        }
+                    });
+                })
+            },2000)
         }
         this.editClose = this.editClose.bind(this);
         this.noEdit = this.noEdit.bind(this);
@@ -903,6 +1189,10 @@ class MoveCar extends Component {
         this.selectCar = this.selectCar.bind(this);
         this.addPlate = this.addPlate.bind(this);
         this.updateColum = this.updateColum.bind(this)
+        this.showProve = this.showProve.bind(this);
+        this.hideProve = this.hideProve.bind(this);
+        this.addHeaders = this.addHeaders.bind(this);
+        this.mapinit = this.mapinit.bind(this);
         this.open = false;
         this.formData={
             mobile:null,
@@ -912,7 +1202,16 @@ class MoveCar extends Component {
         };
     }
     componentDidMount() {   
-        let plate =  W.getCookie('plate')
+        // if(areas){
+        //     this.setState({addplateCar:areas})
+        // }
+        
+        
+        
+        let plate =  W.getCookie('plate');
+        if(plate){
+            plate.toUpperCase();
+        }
         let head = null;
         if(plate){
              head = plate.slice(0,1);
@@ -946,21 +1245,20 @@ class MoveCar extends Component {
         // }
         if(_g.did){ //一物一码获取车牌号码和车主信息(车主)
             // debugger;
-            this.setState({plate:_g.plate});
+            this.setState({plate:_g.plate.toUpperCase()});
             this.setState({carMobile:_g.mobile})
             this.setState({default:_g.message})
            
         }
         if(_g.plate1){ //车主自己打印的二维码(车主)
 
-            this.setState({plate:_g.plate1});
+            this.setState({plate:_g.plate1.toUpperCase()});
             this.setState({carMobile:_g.mobile})
             this.setState({default:_g.message})
 
         }
 
         if(_g.status_code == 0){
-        
             if(_g.openid){
                 //判断openId是否有绑定登录账号/用户接收公众推送消息(扫码用户)
                 // debugger;
@@ -987,8 +1285,19 @@ class MoveCar extends Component {
                 })
             }
         }
-    
     }
+    
+    mapinit(resss){
+        var that = this;
+        var myGeo=new WMap.Geocoder();
+        let area = '京';
+        myGeo.getLocation(new WMap.Point(resss.longitude,resss.latitude),function(result){
+            area = ___.prove[result.addressComponents.province]||'京'
+            that.setState({addplateCar:area})
+        });
+           
+    }
+
     //选择车辆号首位例如‘粤’
     selectCar(e,v,i){
         this.setState({addplateCar:i})
@@ -999,11 +1308,11 @@ class MoveCar extends Component {
         // console.log(v.length,'dd')
         this.setState({plate:null})
         this.setState({plateValue:v})
-        let plate = this.state.addplateCar + v
+        let plate = (this.state.addplateCar + v).toUpperCase();
         if(v.length == 6){
             Wapi.serverApi.getMoveCarInfo(res => {
                 if(res){
-                    this.setState({addplate:v})
+                    this.setState({addplate:v.toUpperCase()})
                     this.setState({default:res.message})
                     this.setState({driver_openid:res.openid})
                     this.setState({carMobile:res.mobile})
@@ -1086,13 +1395,13 @@ class MoveCar extends Component {
         let plate = null;
         
         if(this.state.addplate){
-           plate = this.state.addplateCar+this.state.addplate
+           plate = (this.state.addplateCar+this.state.addplate).toUpperCase();
         }else if(_g.plate1){
-            plate = _g.plate1
+            plate = _g.plate1.toUpperCase()
         }else if(_g.plate){
-            plate = _g.plate
+            plate = _g.plate.toUpperCase()
         }else if(this.state.plate){
-            plate = this.state.plate
+            plate = this.state.plate.toUpperCase()
         }
         W.setCookie('plate',plate,-30) //存车牌号码
         // W.setCookie('message',this.state.default,-30) //存留言
@@ -1300,30 +1609,45 @@ class MoveCar extends Component {
         this.open = false;
         this.forceUpdate();
     }
-    
+    addHeaders(v){
+        // console.log(v,'zehshi')
+        this.setState({addplateCar:v})
+        this.setState({showProve:false})
+    }
+    showProve(){
+        // alert(11)
+        this.setState({showProve:true})
+    }
+    hideProve(){
+        this.setState({showProve:false})
+    }
     render() {
-        // let pr = ['新','粤']
+        // let pr = ['新','京']
         console.log(this.state.addplate,'plate')
         console.log(this.state.addplateCar)
         let plate = null;
         let plateValue = null;
         if(this.state.addplate){
-            plate = this.state.addplateCar+this.state.addplate
+            plate = (this.state.addplateCar+this.state.addplate).toUpperCase()
             // dd = addplate
         }else if(_g.plate){
-            plate = _g.plate
+            plate = _g.plate.toUpperCase()
         }else if(_g.plate1){
-            plate = _g.plate1
+            plate = _g.plate1.toUpperCase()
         }else if(this.state.plate){
-            plate = this.state.plate;
-            plateValue = this.state.plate.substring(1,8);
+            plate = this.state.plate.toUpperCase();
+            plateValue = this.state.plate.substring(1,8).toUpperCase();
         }
         if(this.state.plateValue){
-            plateValue = this.state.plateValue;
+            plateValue = this.state.plateValue.toUpperCase();
         }
         console.log(plate,'plate')
-        let items = pr.map((ele,index) => {
-            return(<MenuItem value={ele} key={index} primaryText={ele}/> )
+        // let items = pr.map((ele,index) => {
+        //     return(<MenuItem value={ele} key={index} primaryText={ele}/> )
+        // })
+        let sWid = ((window.screen.width*0.85)-48)/5-10 + 'px';
+        let item = pr.map((ele,index) => {
+            return(<span onClick={()=>{this.addHeaders(ele)}} key={index} style={{fontSize:'14px',display:'inline-block',width:sWid,height:sWid,lineHeight:sWid,background:'#2196f3',textAlign:'center',color:'#fff',margin:5}}>{ele}</span>)
         })
         console.log(this.state.plate,_g.plate,'trueorfaluse')
         const actions = [
@@ -1339,6 +1663,15 @@ class MoveCar extends Component {
                 onTouchTap={this.editClose}
             />,
         ];
+        const actiont = [
+            <FlatButton
+                label="关闭"
+                primary={true}
+                keyboardFocused={true}
+                onTouchTap={this.hideProve}
+                labelStyle={{color:'#23ed31'}}
+            />,              
+        ]
         let mobile = this.state.user?this.state.user.mobile:null //扫码用户
         let op = {}
         console.log(this.state.carMobile,'user')
@@ -1371,10 +1704,10 @@ class MoveCar extends Component {
         }
         
         return (
-            <div style={{backgroundColor:'#f7f7f7',minHeight:'100vh'}}>
-                <div style={sty.img}>
+            <div style={{backgroundColor:'#f7f7f7'}}>
+                {/* <div style={sty.img}>
                     <img src='img/movecar.png' style={{width:'100%',height:'100%'}}/>
-                </div>
+                </div> */}
                 {/*<div style={sty.h2}>
                     {'恶意通知车主挪车的用户将被关入小黑屋哦!'}
                 </div>*/}
@@ -1428,19 +1761,37 @@ class MoveCar extends Component {
                     null
                     :
                     <div style={{background:'#fff',padding:'0 10px',height:'48px'}}>
-                        <SelectField
+                        {/*<SelectField
                             value={this.state.addplateCar}
                             maxHeight={200}
                             style={{width:'12%'}}
                             onChange={this.selectCar}
-                        >
-                            {items}
-                        </SelectField>
-                        <TextField hintText={'请输入车牌号码'}  value={plateValue} onChange={this.addPlate} style={{width:'88%',top:'-4px'}} />
+                        >*/}
+                            {/*{items}*/}
+                        {/*</SelectField>*/}
+                        <span onClick={this.showProve} style={{color:'#2196f3',lineHeight:'30px',width:'24px',padding:'0 5px',display:'inline-block',position:'relative',top:'-4px',borderBottom:'1px solid #ccc'}}>{this.state.addplateCar}<span style={{position:'absolute',top:3,right:'-7px'}}><NavigationArrowDropDown style={{fill: 'rgba(0, 0, 0, 0.11)'}}/></span></span>
+                        
+                        <TextField hintText={'输入车牌号码'}  value={plateValue} onChange={this.addPlate} style={{width:'88%',top:'-4px'}} />
                     </div>
                     
                 }
-
+                <div>
+                    <Dialog
+                        title="请选择"
+                        titleStyle={{borderBottom:'none',lineHeight:'43px',height:43,padding:'5px 0',textAlign:'center',fontSize:'16px'}}
+                        actions={actiont}
+                        modal={false}
+                        open={this.state.showProve}
+                        contentStyle={{width:'85%'}}
+                        onRequestClose={this.handleClose}
+                        autoScrollBodyContent={true}
+                        bodyStyle={{padding:'0 24px'}}
+                        actionsContainerStyle={{textAlign:'center',fontSize:'16px',borderTop:'1px solid #ccc'}}
+                        >
+                        {item}
+                        {/*<DatePicker hintText="Date Picker" />*/}
+                    </Dialog>
+                </div>
                 {/*如果是普通挪车卡显示车主留言，如果是一物一码显示车牌号码加车主留言*/}
                { this.state.addplate?
                     <div style={{background:'#fff'}}>
@@ -1480,7 +1831,7 @@ class MoveCar extends Component {
                     <div style={{background:'#fff',padding:'0 10px'}}>
                         <Input
                             name='account'
-                            hintText={'输入接收挪车回复的手机号码,不会显示给车主。'}
+                            hintText={'输入接收挪车回复的手机号码，不会显示给车主。'}
                             onChange={this.accountChange}
                             type='tel'
                         />
@@ -1523,7 +1874,7 @@ class MoveCar extends Component {
                 <p style={sty.p}>{this.state.default1}</p>
                 {/*<TextField hintText="Hint Text"/>*/}
                 <div style={{width:'100%',display:'block',textAlign:'center'}}>
-                    <RaisedButton label={'通知车主挪车'} disabled={showbutton} primary={true} onClick={() => {this.submit()}} style={{backgroundColor:'#f7f7f7',margin:'20px 0'}}/>
+                    <RaisedButton label={'通知挪车'} disabled={showbutton} primary={true} onClick={() => {this.submit()}} style={{backgroundColor:'#f7f7f7',margin:'20px 0'}}/>
                 </div>
                 <SonPage open={this.open} back={this.close}>
                     <ShowMove data={Object.assign({},op)}/>
@@ -1613,7 +1964,7 @@ class ShowBin extends Component {
                 }
             Wapi.serverApi.getAnyQrcode(res=>{//获取二维码
                 if(res.status_code){
-                    W.alert(res.err_msg);
+                    // W.alert(res.err_msg);
                     return;
                 }
                 this.setState({url:res.url});
@@ -1673,7 +2024,7 @@ class ShowMove extends Component {
             console.log(op,'p[p')
             Wapi.serverApi.getAnyQrcode(res=>{//获取二维码
                 if(res.status_code){
-                    W.alert(res.err_msg);
+                    // W.alert(res.err_msg);
                     return;
                 }
                 console.log(res.url,'url')
